@@ -8,6 +8,7 @@ const Skills = () => {
   return (
     <section id="about" className="skills-section">
       <div className="skills-container">
+        <h2 className="skills-title">{t.skills.title}</h2>
         <div className="skills-content-wrapper">
           <div className="skills-logos">
             <div className="skills-circles-bg">
@@ -30,7 +31,6 @@ const Skills = () => {
             </div>
           </div>
           <div className="skills-cards">
-            <h2 className="skills-title">{t.skills.title}</h2>
             <div className="skill-card skill-card-1">
               <div className="skill-card-number">{t.skills.skill1.number}</div>
               <h3 className="skill-card-title">{t.skills.skill1.title}</h3>
