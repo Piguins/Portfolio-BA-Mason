@@ -37,7 +37,7 @@
   position: absolute;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.08;
+  opacity: 0.15;
 }
 
 .wavy-decoration img {
@@ -47,10 +47,10 @@
 }
 
 .wavy-decoration-2 {
-  bottom: 10%;
-  left: -8%;
-  width: 900px;
-  height: 450px;
+  bottom: 5%;
+  left: -5%;
+  width: 1000px;
+  height: 550px;
   transform: rotate(10deg);
 }
 
