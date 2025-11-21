@@ -69,31 +69,6 @@ export const translations = {
       },
     },
   },
-  faq: {
-    label: 'FAQ',
-    title: 'Frequently Asked',
-    titleAccent: 'Questions',
-    intro: 'If you have any other questions, you can contact me by email',
-    email: 'youremail@gmail.com',
-    questions: [
-      {
-        question: 'Do you do business analysis or business consulting?',
-        answer: 'Community files are design files creators have shared with the Community. Create templates for wireframe, UI kits, asset libraries, and design systems. Or share educational resources, interactive tutorials, and tools to use across the design process.',
-      },
-      {
-        question: 'How long does a business analysis project take?',
-        answer: '',
-      },
-      {
-        question: 'Will you work on the project in your account or mine?',
-        answer: '',
-      },
-      {
-        question: "I'm an agency, what you can do for us?",
-        answer: '',
-      },
-    ],
-  },
   footer: {
     madeWith: 'Made with ❤️ by me.',
     question: 'Got a question?',
