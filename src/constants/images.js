@@ -6,7 +6,7 @@ export const IMAGES = {
   githubIcon: "https://www.figma.com/api/mcp/asset/721220bb-a01e-40f4-a159-539f6ef83725",
   emailIcon: "https://www.figma.com/api/mcp/asset/390c0629-2ae2-4b8c-a1dd-0806157bcd6d",
   squersDecoration: "https://www.figma.com/api/mcp/asset/70e9c2b9-bc6b-4065-a108-ae3c6ca5d05b",
-  blurGradient: "https://www.figma.com/api/mcp/asset/a94bdaac-6ba2-4e06-8aa5-faa6dc352272",
+  blurGradient: "https://www.figma.com/api/mcp/asset/67142e2a-0d6b-4b27-bb3a-8a550704e5e2",
   linesDecoration: "https://www.figma.com/api/mcp/asset/f7cc3815-2f59-445b-90a6-5f119094899c",
   
   // Skills Section
