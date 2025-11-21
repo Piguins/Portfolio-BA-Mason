@@ -71,15 +71,29 @@
 .skills-logos {
   position: relative;
   min-height: 500px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .skills-circles-bg {
   position: absolute;
   width: 725px;
   height: 725px;
-  top: 0;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
+  animation: rotateBackground 60s linear infinite;
+}
+
+@keyframes rotateBackground {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }
 
 .skills-circles-bg img {
@@ -88,6 +102,7 @@
   object-fit: contain;
 }
 
+/* Orbit container for logo items */
 .logo-item {
   position: absolute;
   width: 119px;
@@ -96,77 +111,122 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  animation: floatLogo 6s ease-in-out infinite;
-  transition: transform 0.3s ease;
+  transition: all 0.3s ease;
+  transform-origin: center center;
 }
 
-@keyframes floatLogo {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-.logo-item:hover {
-  transform: translateY(-5px) scale(1.1);
-  animation: none;
-}
-
+/* Orbit animation - quỹ đạo vũ trụ */
 .logo-1 {
-  animation-delay: 0s;
+  animation: orbit1 20s linear infinite;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes orbit1 {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg) translateX(180px) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg) translateX(180px) rotate(-360deg);
+  }
 }
 
 .logo-2 {
-  animation-delay: 1.2s;
+  animation: orbit2 25s linear infinite;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes orbit2 {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg) translateX(220px) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg) translateX(220px) rotate(-360deg);
+  }
 }
 
 .logo-3 {
-  animation-delay: 0.4s;
+  animation: orbit3 30s linear infinite;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes orbit3 {
+  from {
+    transform: translate(-50%, -50%) rotate(120deg) translateX(160px) rotate(-120deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(480deg) translateX(160px) rotate(-480deg);
+  }
 }
 
 .logo-4 {
-  animation-delay: 1.6s;
+  animation: orbit4 18s linear infinite;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes orbit4 {
+  from {
+    transform: translate(-50%, -50%) rotate(240deg) translateX(190px) rotate(-240deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(600deg) translateX(190px) rotate(-600deg);
+  }
 }
 
 .logo-5 {
-  animation-delay: 0.8s;
+  animation: orbit5 22s linear infinite;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes orbit5 {
+  from {
+    transform: translate(-50%, -50%) rotate(180deg) translateX(200px) rotate(-180deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(540deg) translateX(200px) rotate(-540deg);
+  }
 }
 
 .logo-item img {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  animation: logoSpin 8s linear infinite reverse;
 }
 
-.logo-1 {
-  top: 105px;
-  left: 0;
+@keyframes logoSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.logo-2 {
-  top: 152px;
-  left: 344px;
+.logo-item:hover {
+  transform: scale(1.2) !important;
+  z-index: 10;
+  animation-play-state: paused;
 }
 
-.logo-3 {
-  top: 297px;
-  left: 180px;
-}
-
-.logo-4 {
-  top: 439px;
-  left: 5px;
-}
-
-.logo-5 {
-  top: 484px;
-  left: 366px;
+.logo-item:hover img {
+  animation-play-state: paused;
 }
 
 .skills-cards {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 }
 
 .skill-card {
@@ -175,35 +235,104 @@
   border: 2px solid var(--text-light);
   border-radius: 8px;
   padding: 1.5rem;
-  margin-bottom: 1.25rem;
   min-height: auto;
   overflow: hidden;
-  transform: rotate(-2deg);
-  transition: all 0.3s ease;
-  animation: slideInLeft 0.8s ease-out both;
+  transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  transform-style: preserve-3d;
 }
 
-@keyframes slideInLeft {
+/* Xiên xẹo cho từng card */
+.skill-card-1 {
+  transform: rotate(-8deg) skew(-2deg, 1deg) translateX(10px);
+  animation: slideInRight1 0.8s ease-out 0.2s both, cardFloat1 4s ease-in-out 1.2s infinite;
+}
+
+.skill-card-2 {
+  transform: rotate(12deg) skew(3deg, -2deg) translateX(-15px);
+  animation: slideInRight2 0.8s ease-out 0.4s both, cardFloat2 4s ease-in-out 1.7s infinite;
+}
+
+.skill-card-3 {
+  transform: rotate(-5deg) skew(-1deg, 2deg) translateX(8px);
+  animation: slideInRight3 0.8s ease-out 0.6s both, cardFloat3 4s ease-in-out 2.2s infinite;
+}
+
+@keyframes slideInRight1 {
   from {
     opacity: 0;
-    transform: rotate(-2deg) translateX(-30px);
+    transform: rotate(-8deg) skew(-2deg, 1deg) translateX(50px);
   }
   to {
     opacity: 1;
-    transform: rotate(-2deg) translateX(0);
+    transform: rotate(-8deg) skew(-2deg, 1deg) translateX(10px);
   }
 }
 
-.skill-card:nth-child(1) {
-  animation-delay: 0.2s;
+@keyframes slideInRight2 {
+  from {
+    opacity: 0;
+    transform: rotate(12deg) skew(3deg, -2deg) translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(12deg) skew(3deg, -2deg) translateX(-15px);
+  }
 }
 
-.skill-card:nth-child(2) {
-  animation-delay: 0.4s;
+@keyframes slideInRight3 {
+  from {
+    opacity: 0;
+    transform: rotate(-5deg) skew(-1deg, 2deg) translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-5deg) skew(-1deg, 2deg) translateX(8px);
+  }
 }
 
-.skill-card:nth-child(3) {
-  animation-delay: 0.6s;
+@keyframes cardFloat1 {
+  0%, 100% {
+    transform: rotate(-8deg) skew(-2deg, 1deg) translateX(10px) translateY(0);
+  }
+  25% {
+    transform: rotate(-8deg) skew(-2deg, 1deg) translateX(10px) translateY(-8px) rotate(-1deg);
+  }
+  50% {
+    transform: rotate(-8deg) skew(-2deg, 1deg) translateX(10px) translateY(-12px) rotate(0deg);
+  }
+  75% {
+    transform: rotate(-8deg) skew(-2deg, 1deg) translateX(10px) translateY(-8px) rotate(1deg);
+  }
+}
+
+@keyframes cardFloat2 {
+  0%, 100% {
+    transform: rotate(12deg) skew(3deg, -2deg) translateX(-15px) translateY(0);
+  }
+  25% {
+    transform: rotate(12deg) skew(3deg, -2deg) translateX(-15px) translateY(-8px) rotate(1deg);
+  }
+  50% {
+    transform: rotate(12deg) skew(3deg, -2deg) translateX(-15px) translateY(-12px) rotate(0deg);
+  }
+  75% {
+    transform: rotate(12deg) skew(3deg, -2deg) translateX(-15px) translateY(-8px) rotate(-1deg);
+  }
+}
+
+@keyframes cardFloat3 {
+  0%, 100% {
+    transform: rotate(-5deg) skew(-1deg, 2deg) translateX(8px) translateY(0);
+  }
+  25% {
+    transform: rotate(-5deg) skew(-1deg, 2deg) translateX(8px) translateY(-8px) rotate(-1deg);
+  }
+  50% {
+    transform: rotate(-5deg) skew(-1deg, 2deg) translateX(8px) translateY(-12px) rotate(0deg);
+  }
+  75% {
+    transform: rotate(-5deg) skew(-1deg, 2deg) translateX(8px) translateY(-8px) rotate(1deg);
+  }
 }
 
 /* Decorative pattern overlay for skill cards */
@@ -218,6 +347,47 @@
   opacity: 0.4;
   pointer-events: none;
   z-index: 0;
+  animation: patternMove 20s linear infinite;
+}
+
+@keyframes patternMove {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 60px 60px;
+  }
+}
+
+/* Glowing effect on hover */
+.skill-card::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(88, 63, 188, 0.1) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.skill-card:hover::after {
+  opacity: 1;
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
 }
 
 .skill-card > * {
@@ -225,21 +395,22 @@
   z-index: 1;
 }
 
-.skill-card:hover {
-  transform: rotate(0deg) translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-}
-
-.skill-card-2 {
-  transform: rotate(2deg);
+.skill-card-1:hover {
+  transform: rotate(-8deg) skew(-2deg, 1deg) translateX(10px) translateY(-10px) scale(1.05) !important;
+  box-shadow: 0 15px 30px rgba(88, 63, 188, 0.25);
+  z-index: 10;
 }
 
 .skill-card-2:hover {
-  transform: rotate(0deg);
+  transform: rotate(12deg) skew(3deg, -2deg) translateX(-15px) translateY(-10px) scale(1.05) !important;
+  box-shadow: 0 15px 30px rgba(88, 63, 188, 0.25);
+  z-index: 10;
 }
 
-.skill-card-3 {
-  transform: rotate(-2deg);
+.skill-card-3:hover {
+  transform: rotate(-5deg) skew(-1deg, 2deg) translateX(8px) translateY(-10px) scale(1.05) !important;
+  box-shadow: 0 15px 30px rgba(88, 63, 188, 0.25);
+  z-index: 10;
 }
 
 .skill-card-number {
