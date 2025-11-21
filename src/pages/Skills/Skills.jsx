@@ -7,6 +7,11 @@ const Skills = () => {
 
   return (
     <section id="about" className="skills-section">
+      {/* Decorative wavy vector pattern */}
+      <div className="wavy-decoration wavy-decoration-1">
+        <img src={IMAGES.wavyVector1} alt="" />
+      </div>
+      
       <div className="skills-container">
         <h2 className="skills-title">{t.skills.title}</h2>
         <div className="skills-content-wrapper">

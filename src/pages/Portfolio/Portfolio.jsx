@@ -1,5 +1,6 @@
 import { FiArrowRight } from 'react-icons/fi'
 import { useTranslations } from '../../hooks/useTranslations'
+import { IMAGES } from '../../constants/images'
 import './Portfolio.css'
 
 const Portfolio = () => {
@@ -7,6 +8,11 @@ const Portfolio = () => {
 
   return (
     <section id="portfolio" className="portfolio-section">
+      {/* Decorative wavy vector pattern */}
+      <div className="wavy-decoration wavy-decoration-2">
+        <img src={IMAGES.wavyVector2} alt="" />
+      </div>
+      
       <h2 className="portfolio-title">{t.portfolio.title}</h2>
       <div className="portfolio-items">
         <div className="portfolio-item portfolio-item-1">

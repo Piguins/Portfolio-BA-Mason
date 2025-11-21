@@ -1,5 +1,6 @@
 import { FaLinkedin, FaGithub } from 'react-icons/fa'
 import { useTranslations } from '../../hooks/useTranslations'
+import { IMAGES } from '../../constants/images'
 import './CTA.css'
 
 const CTA = () => {
@@ -9,6 +10,11 @@ const CTA = () => {
     <>
       {/* CTA Section 1 */}
       <section className="cta-section cta-section-1">
+        {/* Decorative wavy vector pattern */}
+        <div className="wavy-decoration wavy-decoration-cta1">
+          <img src={IMAGES.wavyVector3} alt="" />
+        </div>
+        
         <div className="cta-content">
           <h2 className="cta-title">{t.cta.section1.title}</h2>
           <p className="cta-description">
@@ -22,6 +28,11 @@ const CTA = () => {
 
       {/* CTA Section 2 / Contact */}
       <section id="contact" className="cta-section cta-section-2">
+        {/* Decorative wavy vector pattern */}
+        <div className="wavy-decoration wavy-decoration-cta2">
+          <img src={IMAGES.wavyVector1} alt="" />
+        </div>
+        
         <div className="cta-wrapper">
           <div className="cta-info">
             <div className="cta-avatar">

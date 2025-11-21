@@ -16,5 +16,10 @@ export const IMAGES = {
   powerBILogo: "https://www.figma.com/api/mcp/asset/5ab7ec9d-8a45-4a63-843d-0ef2ae23f41f",
   tableauLogo: "https://www.figma.com/api/mcp/asset/a10f4beb-5941-4b34-9c46-a78b37d90383",
   jiraLogo: "https://www.figma.com/api/mcp/asset/0eac62da-c492-45f3-b3f5-98eb76af38cc",
+  
+  // Decorative Vector Patterns
+  wavyVector1: "https://www.figma.com/api/mcp/asset/5fad9893-075f-4b4f-bb01-50331a346f59",
+  wavyVector2: "https://www.figma.com/api/mcp/asset/15f7e586-9700-4578-bbb2-be0ddde21619",
+  wavyVector3: "https://www.figma.com/api/mcp/asset/f1adc080-14a0-4fc9-964e-67a4e2604f1e",
 }
 
