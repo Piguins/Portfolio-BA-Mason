@@ -21,5 +21,10 @@ export const IMAGES = {
   wavyVector1: "https://www.figma.com/api/mcp/asset/5fad9893-075f-4b4f-bb01-50331a346f59",
   wavyVector2: "https://www.figma.com/api/mcp/asset/15f7e586-9700-4578-bbb2-be0ddde21619",
   wavyVector3: "https://www.figma.com/api/mcp/asset/f1adc080-14a0-4fc9-964e-67a4e2604f1e",
+  
+  // Decorative Ellipse Shapes
+  ellipse2179: "https://www.figma.com/api/mcp/asset/5c175357-e4ba-4f7a-87b8-fe4f1ee903bb",
+  ellipse2180: "https://www.figma.com/api/mcp/asset/d80e4665-6ef7-4c00-be22-488aeb44f472",
+  ellipse2181: "https://www.figma.com/api/mcp/asset/d85214a6-28cd-465b-b1d7-d5b882912844",
 }
 
