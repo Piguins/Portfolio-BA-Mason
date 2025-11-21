@@ -19,23 +19,18 @@ const LanguageSelector = () => {
         <h2 className="language-selector-title">
           {enTranslations.languageSelector.title}
         </h2>
-        <p className="language-selector-subtitle">
-          {enTranslations.languageSelector.subtitle}
-        </p>
         <div className="language-selector-buttons">
           <button
             className="language-btn language-btn-vi"
             onClick={() => handleLanguageSelect('vi')}
           >
-            <span className="language-flag">🇻🇳</span>
-            <span className="language-label">{enTranslations.languageSelector.vietnamese}</span>
+            {enTranslations.languageSelector.vietnamese}
           </button>
           <button
             className="language-btn language-btn-en"
             onClick={() => handleLanguageSelect('en')}
           >
-            <span className="language-flag">🇺🇸</span>
-            <span className="language-label">{enTranslations.languageSelector.english}</span>
+            {enTranslations.languageSelector.english}
           </button>
         </div>
       </div>
