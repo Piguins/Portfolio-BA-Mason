@@ -188,7 +188,7 @@
   visibility: hidden;
 }
 
-/* Card 1 (light blue background) - ellipses with color #717EA7, positioned left */
+/* Card 1 (light blue background) - ellipses with color #7DE0EA, positioned left */
 .portfolio-ellipse-1 {
   top: -20px;
   left: 20px;
@@ -203,7 +203,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: #717EA7;
+  background-color: #7DE0EA;
   border-radius: 50%;
   opacity: 0.6;
   z-index: 0;
@@ -242,7 +242,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: #717EA7;
+  background-color: #7DE0EA;
   border-radius: 50%;
   opacity: 0.5;
   z-index: 0;
