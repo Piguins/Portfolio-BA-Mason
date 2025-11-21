@@ -195,39 +195,41 @@
   visibility: hidden;
 }
 
-/* Card 1 (light blue background) - ellipses with color #7DE0EA, positioned left */
+/* Card 1 (light blue background) - large half ellipse at top-left corner */
 .portfolio-ellipse-1 {
-  top: -20px;
-  left: 20px;
-  width: 120px;
-  height: 120px;
+  top: -50%;
+  left: -50%;
+  width: 280px;
+  height: 280px;
+  overflow: hidden;
 }
 
 .portfolio-ellipse-1::after {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
+  top: 50%;
+  left: 50%;
   width: 100%;
   height: 100%;
   background-color: #7DE0EA;
   border-radius: 50%;
-  opacity: 0.6;
+  opacity: 0.5;
   z-index: 0;
   border: none;
   outline: none;
   box-shadow: none;
   animation: ellipsePulse 4s ease-in-out infinite;
+  transform: translate(-50%, -50%);
 }
 
 @keyframes ellipsePulse {
   0%, 100% {
-    transform: scale(1);
-    opacity: 0.6;
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.5;
   }
   50% {
-    transform: scale(1.1);
-    opacity: 0.8;
+    transform: translate(-50%, -50%) scale(1.05);
+    opacity: 0.6;
   }
 }
 
@@ -235,75 +237,20 @@
   display: none;
 }
 
-.portfolio-ellipse-2 {
-  bottom: 20px;
-  left: 30px;
-  width: 100px;
-  height: 100px;
-}
-
-.portfolio-ellipse-2::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: #7DE0EA;
-  border-radius: 50%;
-  opacity: 0.5;
-  z-index: 0;
-  border: none;
-  outline: none;
-  box-shadow: none;
-  animation: ellipsePulse 5s ease-in-out infinite 0.5s;
-}
-
-.portfolio-ellipse-2 img {
-  display: none;
-}
-
-/* Card 2 (light purple background) - ellipses with purple color, positioned left */
+/* Card 2 (light purple background) - large half ellipse at top-left corner */
 .portfolio-ellipse-3 {
-  top: 30px;
-  left: 30px;
-  width: 110px;
-  height: 110px;
+  top: -50%;
+  left: -50%;
+  width: 280px;
+  height: 280px;
+  overflow: hidden;
 }
 
 .portfolio-ellipse-3::after {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: #583FBC;
-  border-radius: 50%;
-  opacity: 0.6;
-  z-index: 0;
-  border: none;
-  outline: none;
-  box-shadow: none;
-  animation: ellipsePulse 4.5s ease-in-out infinite;
-}
-
-.portfolio-ellipse-3 img {
-  display: none;
-}
-
-.portfolio-ellipse-4 {
-  bottom: 30px;
-  left: 20px;
-  width: 90px;
-  height: 90px;
-}
-
-.portfolio-ellipse-4::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
+  top: 50%;
+  left: 50%;
   width: 100%;
   height: 100%;
   background-color: #583FBC;
@@ -313,10 +260,11 @@
   border: none;
   outline: none;
   box-shadow: none;
-  animation: ellipsePulse 5.5s ease-in-out infinite 0.3s;
+  animation: ellipsePulse 4.5s ease-in-out infinite;
+  transform: translate(-50%, -50%);
 }
 
-.portfolio-ellipse-4 img {
+.portfolio-ellipse-3 img {
   display: none;
 }
 
