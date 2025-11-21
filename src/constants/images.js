@@ -1,7 +1,7 @@
 // Image URLs from Figma
 export const IMAGES = {
   // Hero Section
-  heroImage: "https://i.postimg.cc/jSB9KJHF/Untitled-design.png",
+  heroImage: "https://i.postimg.cc/prD89448/Untitled-design-(1).png",
   linkedinIcon: "https://www.figma.com/api/mcp/asset/1a5c91e4-05b6-4f1c-b017-5d1b229db165",
   githubIcon: "https://www.figma.com/api/mcp/asset/721220bb-a01e-40f4-a159-539f6ef83725",
   emailIcon: "https://www.figma.com/api/mcp/asset/390c0629-2ae2-4b8c-a1dd-0806157bcd6d",
