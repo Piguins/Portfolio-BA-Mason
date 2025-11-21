@@ -195,12 +195,12 @@
   visibility: hidden;
 }
 
-/* Card 1 (light blue background) - large full circle at top-left corner */
+/* Card 1 (light blue background) - full circle at top-left corner */
 .portfolio-ellipse-1 {
-  top: -120px;
-  left: -120px;
-  width: 350px;
-  height: 350px;
+  top: -100px;
+  left: -100px;
+  width: 250px;
+  height: 250px;
 }
 
 .portfolio-ellipse-1::after {
@@ -208,8 +208,8 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 350px;
-  height: 350px;
+  width: 250px;
+  height: 250px;
   background-color: #7DE0EA;
   border-radius: 50%;
   opacity: 0.5;
@@ -235,12 +235,12 @@
   display: none;
 }
 
-/* Card 2 (light purple background) - large full circle at top-left corner */
+/* Card 2 (light purple background) - full circle at top-left corner */
 .portfolio-ellipse-3 {
-  top: -120px;
-  left: -120px;
-  width: 350px;
-  height: 350px;
+  top: -100px;
+  left: -100px;
+  width: 250px;
+  height: 250px;
 }
 
 .portfolio-ellipse-3::after {
@@ -248,8 +248,8 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 350px;
-  height: 350px;
+  width: 250px;
+  height: 250px;
   background-color: #583FBC;
   border-radius: 50%;
   opacity: 0.5;
@@ -264,12 +264,12 @@
   display: none;
 }
 
-/* Card 3 (light blue background) - large full circle at top-left corner */
+/* Card 3 (light blue background) - full circle at top-left corner */
 .portfolio-ellipse-5 {
-  top: -120px;
-  left: -120px;
-  width: 350px;
-  height: 350px;
+  top: -100px;
+  left: -100px;
+  width: 250px;
+  height: 250px;
 }
 
 .portfolio-ellipse-5::after {
@@ -277,8 +277,8 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 350px;
-  height: 350px;
+  width: 250px;
+  height: 250px;
   background-color: #7DE0EA;
   border-radius: 50%;
   opacity: 0.5;
