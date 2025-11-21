@@ -197,20 +197,20 @@
 
 /* Card 1 (light blue background) - large half ellipse at top-left corner */
 .portfolio-ellipse-1 {
-  top: -50%;
-  left: -50%;
-  width: 280px;
-  height: 280px;
+  top: 0;
+  left: 0;
+  width: 300px;
+  height: 300px;
   overflow: hidden;
 }
 
 .portfolio-ellipse-1::after {
   content: '';
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
+  top: 0;
+  left: 0;
+  width: 300px;
+  height: 300px;
   background-color: #7DE0EA;
   border-radius: 50%;
   opacity: 0.5;
@@ -219,16 +219,15 @@
   outline: none;
   box-shadow: none;
   animation: ellipsePulse 4s ease-in-out infinite;
-  transform: translate(-50%, -50%);
 }
 
 @keyframes ellipsePulse {
   0%, 100% {
-    transform: translate(-50%, -50%) scale(1);
+    transform: scale(1);
     opacity: 0.5;
   }
   50% {
-    transform: translate(-50%, -50%) scale(1.05);
+    transform: scale(1.05);
     opacity: 0.6;
   }
 }
@@ -239,20 +238,20 @@
 
 /* Card 2 (light purple background) - large half ellipse at top-left corner */
 .portfolio-ellipse-3 {
-  top: -50%;
-  left: -50%;
-  width: 280px;
-  height: 280px;
+  top: 0;
+  left: 0;
+  width: 300px;
+  height: 300px;
   overflow: hidden;
 }
 
 .portfolio-ellipse-3::after {
   content: '';
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
+  top: 0;
+  left: 0;
+  width: 300px;
+  height: 300px;
   background-color: #583FBC;
   border-radius: 50%;
   opacity: 0.5;
@@ -261,7 +260,6 @@
   outline: none;
   box-shadow: none;
   animation: ellipsePulse 4.5s ease-in-out infinite;
-  transform: translate(-50%, -50%);
 }
 
 .portfolio-ellipse-3 img {
@@ -270,20 +268,20 @@
 
 /* Card 3 (light blue background) - large half ellipse at top-left corner */
 .portfolio-ellipse-5 {
-  top: -50%;
-  left: -50%;
-  width: 280px;
-  height: 280px;
+  top: 0;
+  left: 0;
+  width: 300px;
+  height: 300px;
   overflow: hidden;
 }
 
 .portfolio-ellipse-5::after {
   content: '';
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
+  top: 0;
+  left: 0;
+  width: 300px;
+  height: 300px;
   background-color: #7DE0EA;
   border-radius: 50%;
   opacity: 0.5;
@@ -292,7 +290,6 @@
   outline: none;
   box-shadow: none;
   animation: ellipsePulse 4.2s ease-in-out infinite;
-  transform: translate(-50%, -50%);
 }
 
 .portfolio-ellipse-5 img {
