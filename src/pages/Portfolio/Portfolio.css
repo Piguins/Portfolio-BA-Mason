@@ -199,8 +199,8 @@
 .portfolio-ellipse-1 {
   top: -100px;
   left: -100px;
-  width: 250px;
-  height: 250px;
+  width: 200px;
+  height: 200px;
 }
 
 .portfolio-ellipse-1::after {
@@ -208,8 +208,8 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 250px;
-  height: 250px;
+  width: 200px;
+  height: 200px;
   background-color: #7DE0EA;
   border-radius: 50%;
   opacity: 0.5;
@@ -268,8 +268,8 @@
 .portfolio-ellipse-3 {
   top: -100px;
   left: -100px;
-  width: 250px;
-  height: 250px;
+  width: 200px;
+  height: 200px;
 }
 
 .portfolio-ellipse-3::after {
@@ -277,8 +277,8 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 250px;
-  height: 250px;
+  width: 200px;
+  height: 200px;
   background-color: #583FBC;
   border-radius: 50%;
   opacity: 0.5;
@@ -326,8 +326,8 @@
 .portfolio-ellipse-5 {
   top: -100px;
   left: -100px;
-  width: 250px;
-  height: 250px;
+  width: 200px;
+  height: 200px;
 }
 
 .portfolio-ellipse-5::after {
@@ -335,8 +335,8 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 250px;
-  height: 250px;
+  width: 200px;
+  height: 200px;
   background-color: #7DE0EA;
   border-radius: 50%;
   opacity: 0.5;
@@ -383,7 +383,7 @@
 /* Card 1 (light blue background) - small circle next to bottom ellipse */
 .portfolio-ellipse-7 {
   bottom: -90px;
-  left: 100px;
+  left: 140px;
   width: 160px;
   height: 160px;
 }
@@ -412,7 +412,7 @@
 /* Card 2 (light purple background) - small circle next to bottom ellipse */
 .portfolio-ellipse-8 {
   bottom: -90px;
-  left: 100px;
+  left: 140px;
   width: 160px;
   height: 160px;
 }
@@ -441,7 +441,7 @@
 /* Card 3 (light blue background) - small circle next to bottom ellipse */
 .portfolio-ellipse-9 {
   bottom: -90px;
-  left: 100px;
+  left: 140px;
   width: 160px;
   height: 160px;
 }
@@ -793,15 +793,15 @@
   .portfolio-ellipse-5 {
     top: -70px;
     left: -70px;
-    width: 180px;
-    height: 180px;
+    width: 150px;
+    height: 150px;
   }
 
   .portfolio-ellipse-1::after,
   .portfolio-ellipse-3::after,
   .portfolio-ellipse-5::after {
-    width: 180px;
-    height: 180px;
+    width: 150px;
+    height: 150px;
   }
 
   .portfolio-ellipse-2,
@@ -824,7 +824,7 @@
   .portfolio-ellipse-8,
   .portfolio-ellipse-9 {
     bottom: -65px;
-    left: 75px;
+    left: 110px;
     width: 120px;
     height: 120px;
   }
@@ -857,15 +857,15 @@
   .portfolio-ellipse-5 {
     top: -60px;
     left: -60px;
-    width: 150px;
-    height: 150px;
+    width: 130px;
+    height: 130px;
   }
 
   .portfolio-ellipse-1::after,
   .portfolio-ellipse-3::after,
   .portfolio-ellipse-5::after {
-    width: 150px;
-    height: 150px;
+    width: 130px;
+    height: 130px;
   }
 
   .portfolio-ellipse-2,
@@ -888,7 +888,7 @@
   .portfolio-ellipse-8,
   .portfolio-ellipse-9 {
     bottom: -60px;
-    left: 65px;
+    left: 95px;
     width: 100px;
     height: 100px;
   }
@@ -907,15 +907,15 @@
   .portfolio-ellipse-5 {
     top: -50px;
     left: -50px;
-    width: 120px;
-    height: 120px;
+    width: 100px;
+    height: 100px;
   }
 
   .portfolio-ellipse-1::after,
   .portfolio-ellipse-3::after,
   .portfolio-ellipse-5::after {
-    width: 120px;
-    height: 120px;
+    width: 100px;
+    height: 100px;
     opacity: 0.4;
   }
 
@@ -940,7 +940,7 @@
   .portfolio-ellipse-8,
   .portfolio-ellipse-9 {
     bottom: -50px;
-    left: 50px;
+    left: 75px;
     width: 80px;
     height: 80px;
   }
