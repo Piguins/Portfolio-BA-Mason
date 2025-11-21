@@ -3,7 +3,6 @@ export const translations = {
     home: 'Home',
     about: 'About me',
     portfolio: 'Portfolio',
-    faq: 'FAQ',
     contact: 'Contact',
     logo: 'Mason Portfolio',
   },

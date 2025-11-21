@@ -3,7 +3,6 @@ export const translations = {
     home: 'Trang chủ',
     about: 'Giới thiệu',
     portfolio: 'Dự án',
-    faq: 'Câu hỏi',
     contact: 'Liên hệ',
     logo: 'Mason Portfolio',
   },
@@ -69,31 +68,6 @@ export const translations = {
         button: 'Liên hệ',
       },
     },
-  },
-  faq: {
-    label: 'FAQ',
-    title: 'Câu hỏi',
-    titleAccent: 'thường gặp',
-    intro: 'Nếu bạn có bất kỳ câu hỏi nào khác, bạn có thể liên hệ với tôi qua email',
-    email: 'youremail@gmail.com',
-    questions: [
-      {
-        question: 'Bạn có làm phân tích nghiệp vụ hay tư vấn nghiệp vụ không?',
-        answer: 'Community files là các file thiết kế mà người tạo đã chia sẻ với Cộng đồng. Tạo các mẫu cho wireframe, UI kits, thư viện tài sản và hệ thống thiết kế. Hoặc chia sẻ tài nguyên giáo dục, hướng dẫn tương tác và công cụ để sử dụng trong quá trình thiết kế.',
-      },
-      {
-        question: 'Một dự án phân tích nghiệp vụ mất bao lâu?',
-        answer: '',
-      },
-      {
-        question: 'Bạn sẽ làm việc trên dự án trong tài khoản của bạn hay của tôi?',
-        answer: '',
-      },
-      {
-        question: 'Tôi là một agency, bạn có thể làm gì cho chúng tôi?',
-        answer: '',
-      },
-    ],
   },
   footer: {
     madeWith: 'Được tạo với ❤️ bởi tôi.',
