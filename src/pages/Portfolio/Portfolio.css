@@ -63,6 +63,18 @@
   margin-bottom: 2.5rem;
   position: relative;
   z-index: 1;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .portfolio-items {
@@ -85,6 +97,25 @@
   padding: 2rem;
   position: relative;
   overflow: hidden;
+  transition: all 0.4s ease;
+  animation: fadeInUp 0.8s ease-out both;
+}
+
+.portfolio-item:nth-child(1) {
+  animation-delay: 0.2s;
+}
+
+.portfolio-item:nth-child(2) {
+  animation-delay: 0.4s;
+}
+
+.portfolio-item:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+.portfolio-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
 }
 
 /* Additional decorative pattern for portfolio items */
@@ -363,11 +394,34 @@
   transition: all 0.3s ease;
   position: relative;
   z-index: 2;
+  overflow: hidden;
+}
+
+.portfolio-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.portfolio-btn:hover::before {
+  width: 300px;
+  height: 300px;
 }
 
 .portfolio-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 20px rgba(88, 63, 188, 0.3);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 10px 25px rgba(88, 63, 188, 0.4);
+}
+
+.portfolio-btn:active {
+  transform: translateY(-1px) scale(1.02);
 }
 
 .portfolio-image {

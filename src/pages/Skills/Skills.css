@@ -47,6 +47,18 @@
   text-align: center;
   margin-bottom: 2.5rem;
   line-height: 1.2;
+  animation: fadeInUp 0.8s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .skills-content-wrapper {
@@ -84,6 +96,42 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  animation: floatLogo 6s ease-in-out infinite;
+  transition: transform 0.3s ease;
+}
+
+@keyframes floatLogo {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.logo-item:hover {
+  transform: translateY(-5px) scale(1.1);
+  animation: none;
+}
+
+.logo-1 {
+  animation-delay: 0s;
+}
+
+.logo-2 {
+  animation-delay: 1.2s;
+}
+
+.logo-3 {
+  animation-delay: 0.4s;
+}
+
+.logo-4 {
+  animation-delay: 1.6s;
+}
+
+.logo-5 {
+  animation-delay: 0.8s;
 }
 
 .logo-item img {
@@ -131,7 +179,31 @@
   min-height: auto;
   overflow: hidden;
   transform: rotate(-2deg);
-  transition: transform 0.3s ease;
+  transition: all 0.3s ease;
+  animation: slideInLeft 0.8s ease-out both;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: rotate(-2deg) translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(-2deg) translateX(0);
+  }
+}
+
+.skill-card:nth-child(1) {
+  animation-delay: 0.2s;
+}
+
+.skill-card:nth-child(2) {
+  animation-delay: 0.4s;
+}
+
+.skill-card:nth-child(3) {
+  animation-delay: 0.6s;
 }
 
 /* Decorative pattern overlay for skill cards */
@@ -154,7 +226,8 @@
 }
 
 .skill-card:hover {
-  transform: rotate(0deg);
+  transform: rotate(0deg) translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
 .skill-card-2 {
