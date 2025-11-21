@@ -7,9 +7,9 @@ export const translations = {
     logo: 'Mason Portfolio',
   },
   hero: {
-    greeting: 'XIN CHÀO!',
+    greeting: 'Xin chào!',
     greetingPart2: 'Tôi là',
-    name: 'Mason',
+    name: 'Thế Kiệt (Mason)',
     title: 'Business Analyst',
     description: 'Phân tích nghiệp vụ chất lượng với sự chăm sóc tận tâm của một freelancer.',
   },

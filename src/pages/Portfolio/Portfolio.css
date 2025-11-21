@@ -384,8 +384,8 @@
 .portfolio-ellipse-7 {
   bottom: -90px;
   left: 140px;
-  width: 160px;
-  height: 160px;
+  width: 140px;
+  height: 140px;
 }
 
 .portfolio-ellipse-7::after {
@@ -393,8 +393,8 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 160px;
-  height: 160px;
+  width: 140px;
+  height: 140px;
   background-color: #7DE0EA;
   border-radius: 50%;
   opacity: 0.4;
@@ -413,8 +413,8 @@
 .portfolio-ellipse-8 {
   bottom: -90px;
   left: 140px;
-  width: 160px;
-  height: 160px;
+  width: 140px;
+  height: 140px;
 }
 
 .portfolio-ellipse-8::after {
@@ -422,8 +422,8 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 160px;
-  height: 160px;
+  width: 140px;
+  height: 140px;
   background-color: #583FBC;
   border-radius: 50%;
   opacity: 0.4;
@@ -442,8 +442,8 @@
 .portfolio-ellipse-9 {
   bottom: -90px;
   left: 140px;
-  width: 160px;
-  height: 160px;
+  width: 140px;
+  height: 140px;
 }
 
 .portfolio-ellipse-9::after {
@@ -451,8 +451,8 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 160px;
-  height: 160px;
+  width: 140px;
+  height: 140px;
   background-color: #7DE0EA;
   border-radius: 50%;
   opacity: 0.4;
@@ -825,15 +825,15 @@
   .portfolio-ellipse-9 {
     bottom: -65px;
     left: 110px;
-    width: 120px;
-    height: 120px;
+    width: 105px;
+    height: 105px;
   }
 
   .portfolio-ellipse-7::after,
   .portfolio-ellipse-8::after,
   .portfolio-ellipse-9::after {
-    width: 120px;
-    height: 120px;
+    width: 105px;
+    height: 105px;
   }
 }
 
@@ -889,15 +889,15 @@
   .portfolio-ellipse-9 {
     bottom: -60px;
     left: 95px;
-    width: 100px;
-    height: 100px;
+    width: 90px;
+    height: 90px;
   }
 
   .portfolio-ellipse-7::after,
   .portfolio-ellipse-8::after,
   .portfolio-ellipse-9::after {
-    width: 100px;
-    height: 100px;
+    width: 90px;
+    height: 90px;
   }
 }
 
@@ -941,15 +941,15 @@
   .portfolio-ellipse-9 {
     bottom: -50px;
     left: 75px;
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
   }
 
   .portfolio-ellipse-7::after,
   .portfolio-ellipse-8::after,
   .portfolio-ellipse-9::after {
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
     opacity: 0.3;
   }
 }
