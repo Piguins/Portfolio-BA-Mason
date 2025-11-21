@@ -7,6 +7,46 @@
   background: var(--bg-white);
   z-index: 1;
   padding: 3rem 1.5rem;
+  overflow: hidden;
+}
+
+/* Wavy decorative vector patterns for Hero */
+.wavy-decoration {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.08;
+}
+
+.wavy-decoration img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.wavy-decoration-hero-1 {
+  top: 10%;
+  left: -5%;
+  width: 1000px;
+  height: 600px;
+  transform: rotate(-10deg);
+}
+
+.wavy-decoration-hero-2 {
+  top: 30%;
+  right: -8%;
+  width: 900px;
+  height: 550px;
+  transform: rotate(15deg);
+}
+
+.wavy-decoration-hero-3 {
+  bottom: 10%;
+  left: 20%;
+  width: 800px;
+  height: 500px;
+  transform: rotate(-5deg);
+  opacity: 0.06;
 }
 
 .hero-container {
@@ -282,6 +322,12 @@
   .squers-decoration {
     width: 240px;
     height: 180px;
+  }
+
+  .wavy-decoration-hero-1,
+  .wavy-decoration-hero-2,
+  .wavy-decoration-hero-3 {
+    display: none;
   }
 }
 

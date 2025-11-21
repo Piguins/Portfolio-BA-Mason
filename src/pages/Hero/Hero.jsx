@@ -7,6 +7,17 @@ const Hero = () => {
 
   return (
     <section id="home" className="hero">
+      {/* Decorative wavy vector patterns */}
+      <div className="wavy-decoration wavy-decoration-hero-1">
+        <img src={IMAGES.wavyVector1} alt="" />
+      </div>
+      <div className="wavy-decoration wavy-decoration-hero-2">
+        <img src={IMAGES.wavyVector2} alt="" />
+      </div>
+      <div className="wavy-decoration wavy-decoration-hero-3">
+        <img src={IMAGES.wavyVector3} alt="" />
+      </div>
+      
       <div className="hero-container">
         <div className="hero-content">
           <div className="hero-text">
