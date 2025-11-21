@@ -268,47 +268,20 @@
   display: none;
 }
 
-/* Card 3 (light blue background) - ellipses with color #7DE0EA, positioned left */
+/* Card 3 (light blue background) - large half ellipse at top-left corner */
 .portfolio-ellipse-5 {
-  top: -15px;
-  left: 30px;
-  width: 115px;
-  height: 115px;
+  top: -50%;
+  left: -50%;
+  width: 280px;
+  height: 280px;
+  overflow: hidden;
 }
 
 .portfolio-ellipse-5::after {
   content: '';
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: #7DE0EA;
-  border-radius: 50%;
-  opacity: 0.6;
-  z-index: 0;
-  border: none;
-  outline: none;
-  box-shadow: none;
-  animation: ellipsePulse 4.2s ease-in-out infinite;
-}
-
-.portfolio-ellipse-5 img {
-  display: none;
-}
-
-.portfolio-ellipse-6 {
-  bottom: 25px;
-  left: 25px;
-  width: 95px;
-  height: 95px;
-}
-
-.portfolio-ellipse-6::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
+  top: 50%;
+  left: 50%;
   width: 100%;
   height: 100%;
   background-color: #7DE0EA;
@@ -318,10 +291,11 @@
   border: none;
   outline: none;
   box-shadow: none;
-  animation: ellipsePulse 5.8s ease-in-out infinite 0.7s;
+  animation: ellipsePulse 4.2s ease-in-out infinite;
+  transform: translate(-50%, -50%);
 }
 
-.portfolio-ellipse-6 img {
+.portfolio-ellipse-5 img {
   display: none;
 }
 
