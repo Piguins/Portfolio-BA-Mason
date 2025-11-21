@@ -77,8 +77,8 @@ const Hero = () => {
                 src={IMAGES.heroImage} 
                 alt={`${t.hero.name} - ${t.hero.title}`} 
                 className={`hero-main-image ${imageLoaded ? 'loaded' : ''}`}
-                width="420"
-                height="500"
+                width="320"
+                height="380"
                 loading="eager"
                 fetchPriority="high"
                 decoding="async"

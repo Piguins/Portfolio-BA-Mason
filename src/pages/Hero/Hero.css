@@ -261,7 +261,7 @@
 .hero-image-section {
   position: relative;
   width: 100%;
-  height: 500px;
+  height: 380px;
   overflow: visible;
   animation: slideInRight 1s ease-out 0.3s both;
 }
@@ -288,8 +288,8 @@
 
 .hero-circle {
   position: absolute;
-  width: 450px;
-  height: 450px;
+  width: 340px;
+  height: 340px;
   background: #DFE1FA;
   backdrop-filter: blur(50px);
   border-radius: 1000px;
@@ -313,8 +313,8 @@
 
 .hero-main-image {
   position: relative;
-  width: 420px;
-  height: 500px;
+  width: 320px;
+  height: 380px;
   object-fit: cover;
   object-position: center;
   z-index: 2;
@@ -330,8 +330,8 @@
 /* Loading placeholder for hero image */
 .hero-image-placeholder {
   position: absolute;
-  width: 420px;
-  height: 500px;
+  width: 320px;
+  height: 380px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -364,8 +364,8 @@
 
 .squers-decoration {
   position: absolute;
-  width: 400px;
-  height: 300px;
+  width: 300px;
+  height: 230px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -381,8 +381,8 @@
 
 .blur-gradient {
   position: absolute;
-  width: 800px;
-  height: 600px;
+  width: 600px;
+  height: 450px;
   top: 50%;
   left: 60%;
   transform: translate(-50%, -50%);
