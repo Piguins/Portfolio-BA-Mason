@@ -53,49 +53,39 @@ const Navbar = () => {
     <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
       <div className="nav-container">
         <div className="nav-wrapper">
-          {/* Top Section */}
-          <div className="nav-top">
-            <div className="nav-menu-left" style={{ width: '400px', gap: '32px' }}>
-              <a href="#home" onClick={(e) => { e.preventDefault(); scrollToSection('home') }} className="nav-logo">
-                <span className="logo-text">{t.navbar.logo}</span>
-              </a>
-            </div>
-            <div className="nav-menu-right">
-              <button
-                className="nav-language-btn"
-                onClick={toggleLanguage}
-                title={language === 'vi' ? 'Switch to English' : 'Chuyển sang Tiếng Việt'}
-              >
-                {language === 'vi' ? 'VI' : 'EN'}
-                <FiChevronDown size={16} />
-              </button>
+          <a href="#home" onClick={(e) => { e.preventDefault(); scrollToSection('home') }} className="nav-logo">
+            <span className="logo-text">{t.navbar.logo}</span>
+          </a>
+          
+          <div className="nav-menu-center">
+            {navLinks.map((link) => (
               <a
-                href="#contact"
-                onClick={(e) => { e.preventDefault(); scrollToSection('contact') }}
-                className="nav-btn"
+                key={link.id}
+                href={`#${link.id}`}
+                onClick={(e) => { e.preventDefault(); scrollToSection(link.id) }}
+                className={`nav-link ${activeSection === link.id ? 'active' : ''}`}
               >
-                {t.navbar.contact}
+                {link.label}
               </a>
-            </div>
+            ))}
           </div>
 
-          {/* Bottom Section */}
-          <div className="nav-bottom">
-            <div className="nav-menu-left">
-              {navLinks.map((link) => (
-                <a
-                  key={link.id}
-                  href={`#${link.id}`}
-                  onClick={(e) => { e.preventDefault(); scrollToSection(link.id) }}
-                  className={`nav-link ${activeSection === link.id ? 'active' : ''}`}
-                >
-                  {link.label}
-                </a>
-              ))}
-            </div>
-            <div className="nav-menu-right">
-              {/* Reserved for future action buttons */}
-            </div>
+          <div className="nav-menu-right">
+            <button
+              className="nav-language-btn"
+              onClick={toggleLanguage}
+              title={language === 'vi' ? 'Switch to English' : 'Chuyển sang Tiếng Việt'}
+            >
+              {language === 'vi' ? 'VI' : 'EN'}
+              <FiChevronDown size={16} />
+            </button>
+            <a
+              href="#contact"
+              onClick={(e) => { e.preventDefault(); scrollToSection('contact') }}
+              className="nav-btn"
+            >
+              {t.navbar.contact}
+            </a>
           </div>
         </div>
 
