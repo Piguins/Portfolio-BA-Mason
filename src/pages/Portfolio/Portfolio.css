@@ -125,9 +125,10 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-  opacity: 0.9;
+  opacity: 0;
   border: none;
   outline: none;
+  visibility: hidden;
 }
 
 /* Card 1 (light blue background) - ellipses with color #717EA7, positioned left */
@@ -176,17 +177,15 @@
   height: 100%;
   background-color: #717EA7;
   border-radius: 50%;
-  mix-blend-mode: color;
   opacity: 1;
   z-index: 1;
   border: none;
   outline: none;
+  box-shadow: none;
 }
 
 .portfolio-ellipse-2 img {
-  filter: grayscale(100%) brightness(1.1);
-  position: relative;
-  z-index: 0;
+  display: none;
 }
 
 /* Card 2 (light purple background) - ellipses with purple color, positioned left */
