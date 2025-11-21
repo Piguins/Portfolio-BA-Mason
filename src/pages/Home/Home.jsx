@@ -1,7 +1,6 @@
 import Hero from '../Hero'
 import Skills from '../Skills'
 import Portfolio from '../Portfolio'
-import Reviews from '../Reviews'
 import FAQ from '../FAQ'
 import CTA from '../CTA'
 import { IMAGES } from '../../constants/images'
@@ -23,7 +22,6 @@ const Home = () => {
       <Hero />
       <Skills />
       <Portfolio />
-      <Reviews />
       <CTA />
       <FAQ />
     </div>
