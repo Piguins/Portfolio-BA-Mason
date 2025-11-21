@@ -33,112 +33,103 @@
   height: 100%;
   object-fit: cover;
   filter: contrast(1.8) brightness(0.6);
-  animation: waveFlow 8s ease-in-out infinite;
 }
 
-@keyframes waveFlow {
-  0%, 100% {
-    transform: translateX(0) translateY(0);
-  }
-  25% {
-    transform: translateX(15px) translateY(-8px);
-  }
-  50% {
-    transform: translateX(0) translateY(-15px);
-  }
-  75% {
-    transform: translateX(-15px) translateY(-8px);
-  }
-}
-
-/* Top wavy pattern - flows from top-left through center to top-right */
+/* Top wavy pattern - separated and flows smoothly */
 .wavy-decoration-hero-1 {
-  top: 0%;
-  left: -10%;
-  width: 120%;
-  height: 700px;
-  transform: rotate(0deg);
+  top: -15%;
+  left: -8%;
+  width: 116%;
+  height: 500px;
   opacity: 0.65;
-  animation: floatWave1 25s ease-in-out infinite;
+  animation: smoothWave1 20s ease-in-out infinite;
 }
 
-@keyframes floatWave1 {
+@keyframes smoothWave1 {
   0%, 100% {
-    transform: rotate(0deg) translateY(0) translateX(0);
-  }
-  25% {
-    transform: rotate(2deg) translateY(-15px) translateX(15px);
+    transform: translateY(0) translateX(0);
   }
   50% {
-    transform: rotate(0deg) translateY(-25px) translateX(0);
-  }
-  75% {
-    transform: rotate(-2deg) translateY(-15px) translateX(-15px);
+    transform: translateY(8px) translateX(10px);
   }
 }
 
 .wavy-decoration-hero-1 img {
-  animation: waveFlow 6s ease-in-out infinite;
+  animation: waveFlow1 12s ease-in-out infinite;
 }
 
-/* Bottom wavy pattern - flows from bottom-left to bottom-right */
-.wavy-decoration-hero-2 {
-  bottom: 0%;
-  left: -5%;
-  width: 115%;
-  height: 600px;
-  transform: rotate(0deg);
-  opacity: 0.6;
-  animation: floatWave2 22s ease-in-out infinite;
-}
-
-@keyframes floatWave2 {
+@keyframes waveFlow1 {
   0%, 100% {
-    transform: rotate(0deg) translateY(0) translateX(0);
-  }
-  25% {
-    transform: rotate(-2deg) translateY(10px) translateX(-15px);
+    transform: translateX(0) translateY(0);
   }
   50% {
-    transform: rotate(0deg) translateY(20px) translateX(0);
-  }
-  75% {
-    transform: rotate(2deg) translateY(10px) translateX(15px);
+    transform: translateX(8px) translateY(-5px);
   }
 }
 
-.wavy-decoration-hero-2 img {
-  animation: waveFlow 7s ease-in-out infinite 0.5s;
-}
-
-/* Middle wavy pattern - flows horizontally across center */
+/* Middle wavy pattern - separated and flows smoothly */
 .wavy-decoration-hero-3 {
-  top: 50%;
-  left: -8%;
-  width: 118%;
-  height: 500px;
-  transform: translateY(-50%) rotate(0deg);
+  top: 35%;
+  left: -6%;
+  width: 112%;
+  height: 450px;
+  transform: translateY(-50%);
   opacity: 0.55;
-  animation: floatWave3 18s ease-in-out infinite;
+  animation: smoothWave3 18s ease-in-out infinite 0.3s;
 }
 
-@keyframes floatWave3 {
+@keyframes smoothWave3 {
   0%, 100% {
-    transform: translateY(-50%) rotate(0deg) translateX(0) translateY(0);
-  }
-  25% {
-    transform: translateY(-50%) rotate(1.5deg) translateX(20px) translateY(-8px);
+    transform: translateY(-50%) translateX(0) translateY(0);
   }
   50% {
-    transform: translateY(-50%) rotate(0deg) translateX(0) translateY(-15px);
-  }
-  75% {
-    transform: translateY(-50%) rotate(-1.5deg) translateX(-20px) translateY(-8px);
+    transform: translateY(-50%) translateX(-8px) translateY(6px);
   }
 }
 
 .wavy-decoration-hero-3 img {
-  animation: waveFlow 8s ease-in-out infinite 1s;
+  animation: waveFlow3 14s ease-in-out infinite 0.5s;
+}
+
+@keyframes waveFlow3 {
+  0%, 100% {
+    transform: translateX(0) translateY(0);
+  }
+  50% {
+    transform: translateX(-6px) translateY(4px);
+  }
+}
+
+/* Bottom wavy pattern - separated and flows smoothly */
+.wavy-decoration-hero-2 {
+  bottom: -12%;
+  left: -5%;
+  width: 110%;
+  height: 480px;
+  opacity: 0.6;
+  animation: smoothWave2 22s ease-in-out infinite 0.6s;
+}
+
+@keyframes smoothWave2 {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(-6px) translateX(8px);
+  }
+}
+
+.wavy-decoration-hero-2 img {
+  animation: waveFlow2 16s ease-in-out infinite 1s;
+}
+
+@keyframes waveFlow2 {
+  0%, 100% {
+    transform: translateX(0) translateY(0);
+  }
+  50% {
+    transform: translateX(10px) translateY(6px);
+  }
 }
 
 .hero-container {
