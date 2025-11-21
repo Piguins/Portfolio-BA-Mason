@@ -2,11 +2,41 @@
   padding: 3rem 1.5rem;
   background: var(--bg-white);
   position: relative;
+  overflow: hidden;
+}
+
+/* Decorative background patterns */
+.skills-section::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(circle, rgba(88, 63, 188, 0.03) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.skills-section::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -5%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(125, 224, 234, 0.04) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .skills-container {
   max-width: 1200px;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 .skills-title {
@@ -102,6 +132,25 @@
   overflow: hidden;
   transform: rotate(-2deg);
   transition: transform 0.3s ease;
+}
+
+/* Decorative pattern overlay for skill cards */
+.skill-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('data:image/svg+xml,<svg width="60" height="60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="30" r="1.5" fill="rgba(88,63,188,0.08)"/></svg>');
+  opacity: 0.4;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.skill-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 .skill-card:hover {
