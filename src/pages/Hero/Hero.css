@@ -26,16 +26,6 @@
   pointer-events: none;
   z-index: 0;
   opacity: 0.6;
-  animation: float 20s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0) translateX(0);
-  }
-  50% {
-    transform: translateY(-20px) translateX(10px);
-  }
 }
 
 .wavy-decoration img {
@@ -43,6 +33,16 @@
   height: 100%;
   object-fit: cover;
   filter: contrast(1.8) brightness(0.6);
+  animation: floatPattern 20s ease-in-out infinite;
+}
+
+@keyframes floatPattern {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(-15px) translateX(10px);
+  }
 }
 
 /* Top wavy pattern - flows from top-left through center to top-right */
@@ -53,6 +53,16 @@
   height: 700px;
   transform: rotate(0deg);
   opacity: 0.65;
+  animation: floatWave1 25s ease-in-out infinite;
+}
+
+@keyframes floatWave1 {
+  0%, 100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  50% {
+    transform: rotate(0deg) translateY(-20px);
+  }
 }
 
 /* Bottom wavy pattern - flows from bottom-left to bottom-right */
@@ -63,6 +73,16 @@
   height: 600px;
   transform: rotate(0deg);
   opacity: 0.6;
+  animation: floatWave2 22s ease-in-out infinite;
+}
+
+@keyframes floatWave2 {
+  0%, 100% {
+    transform: rotate(0deg) translateY(0);
+  }
+  50% {
+    transform: rotate(0deg) translateY(15px);
+  }
 }
 
 /* Middle wavy pattern - flows horizontally across center */
@@ -73,6 +93,16 @@
   height: 500px;
   transform: translateY(-50%) rotate(0deg);
   opacity: 0.55;
+  animation: floatWave3 18s ease-in-out infinite;
+}
+
+@keyframes floatWave3 {
+  0%, 100% {
+    transform: translateY(-50%) rotate(0deg) translateX(0);
+  }
+  50% {
+    transform: translateY(-50%) rotate(0deg) translateX(10px);
+  }
 }
 
 .hero-container {
