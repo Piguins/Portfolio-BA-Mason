@@ -194,8 +194,24 @@
   height: 110px;
 }
 
+.portfolio-ellipse-3::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #583FBC;
+  border-radius: 50%;
+  opacity: 1;
+  z-index: 1;
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+
 .portfolio-ellipse-3 img {
-  filter: hue-rotate(-15deg) saturate(1.4) brightness(0.9);
+  display: none;
 }
 
 .portfolio-ellipse-4 {
@@ -205,8 +221,24 @@
   height: 90px;
 }
 
+.portfolio-ellipse-4::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #583FBC;
+  border-radius: 50%;
+  opacity: 1;
+  z-index: 1;
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+
 .portfolio-ellipse-4 img {
-  filter: hue-rotate(-10deg) saturate(1.3) brightness(0.95);
+  display: none;
 }
 
 /* Card 3 (light blue background) - ellipses with color #7DE0EA, positioned left */
