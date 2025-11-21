@@ -1,17 +1,5 @@
 # Portfolio Website - Business Analyst
 
-<div align="center">
-  <a href="#readme-vi">
-    <button style="padding: 10px 20px; margin: 5px; background-color: #583FBC; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: 600;">
-      Tiếng Việt (VIE)
-    </button>
-  </a>
-  <a href="#readme-en">
-    <button style="padding: 10px 20px; margin: 5px; background-color: #7DE0EA; color: #1D2130; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: 600;">
-      English (ENG)
-    </button>
-  </a>
-</div>
 
 ---
 
