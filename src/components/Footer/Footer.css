@@ -1,15 +1,13 @@
 .footer {
   background: var(--bg-white);
-  color: var(--text-dark);
-  margin-top: auto;
-  padding: 3rem 0;
-  border-top: 1px dashed rgba(38, 37, 43, 0.5);
+  border-top: 1px solid var(--bg-grey);
+  padding: 2rem 1.5rem;
+  margin-top: 3rem;
 }
 
 .footer-container {
-  max-width: 1280px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 2rem;
 }
 
 .footer-content {
@@ -17,38 +15,31 @@
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 2rem;
+  gap: 1rem;
 }
 
-.footer-left {
-  display: flex;
-  align-items: center;
-}
-
-.footer-text {
-  font-family: var(--font-primary);
-  font-size: 16px;
-  color: var(--text-dark);
-  margin: 0;
-}
-
+.footer-left,
 .footer-right {
   display: flex;
   align-items: center;
   gap: 1rem;
 }
 
+.footer-text {
+  font-family: var(--font-primary);
+  font-size: 14px;
+  color: var(--text-light);
+}
+
 .footer-question {
   font-family: var(--font-primary);
-  font-size: 16px;
+  font-size: 14px;
   color: var(--text-dark);
-  margin: 0;
 }
 
 .footer-email {
   font-family: var(--font-primary);
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 14px;
   color: var(--primary-color);
   text-decoration: none;
   transition: color 0.3s ease;
@@ -62,11 +53,6 @@
   .footer-content {
     flex-direction: column;
     text-align: center;
-  }
-
-  .footer-right {
-    flex-direction: column;
-    gap: 0.5rem;
   }
 }
 
