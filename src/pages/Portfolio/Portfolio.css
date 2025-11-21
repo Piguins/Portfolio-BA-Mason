@@ -126,6 +126,8 @@
   height: 100%;
   object-fit: contain;
   opacity: 0.9;
+  border: none;
+  outline: none;
 }
 
 /* Card 1 (light blue background) - ellipses with color #717EA7, positioned left */
@@ -148,6 +150,8 @@
   mix-blend-mode: color;
   opacity: 1;
   z-index: 1;
+  border: none;
+  outline: none;
 }
 
 .portfolio-ellipse-1 img {
@@ -175,6 +179,8 @@
   mix-blend-mode: color;
   opacity: 1;
   z-index: 1;
+  border: none;
+  outline: none;
 }
 
 .portfolio-ellipse-2 img {
@@ -253,6 +259,8 @@
   mix-blend-mode: color;
   opacity: 1;
   z-index: 1;
+  border: none;
+  outline: none;
 }
 
 .portfolio-ellipse-6 img {
