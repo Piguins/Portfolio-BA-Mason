@@ -21,7 +21,7 @@
 
 > Professional portfolio website built with React JS for Business Analyst.
 
-[📖 Read Vietnamese Documentation](./README_VI.md)
+[Read Vietnamese Documentation](./README_VI.md)
 
 </div>
 
@@ -33,7 +33,7 @@
 
 > Professional portfolio website built with React JS for Business Analyst.
 
-[📖 Read English Documentation](./README_EN.md)
+[Read English Documentation](./README_EN.md)
 
 </div>
 
