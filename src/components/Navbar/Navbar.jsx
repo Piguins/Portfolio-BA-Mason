@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react'
 import { FiMenu, FiX, FiArrowRight } from 'react-icons/fi'
 import { useTranslations } from '../../hooks/useTranslations'
+import { useLanguage } from '../../contexts/LanguageContext'
 import './Navbar.css'
 
 const Navbar = () => {
   const t = useTranslations()
+  const { language, toggleLanguage } = useLanguage()
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [activeSection, setActiveSection] = useState('home')
@@ -65,6 +67,13 @@ const Navbar = () => {
               <span className="nav-link-text">{link.label}</span>
             </a>
           ))}
+          <button
+            className="nav-language-btn"
+            onClick={toggleLanguage}
+            title={language === 'vi' ? 'Switch to English' : 'Chuyển sang Tiếng Việt'}
+          >
+            {language === 'vi' ? 'EN' : 'VI'}
+          </button>
           <a
             href="#contact"
             onClick={(e) => { e.preventDefault(); scrollToSection('contact') }}

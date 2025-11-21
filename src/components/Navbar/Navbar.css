@@ -79,6 +79,30 @@
   border-radius: 1px;
 }
 
+.nav-language-btn {
+  font-family: var(--font-primary);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-dark);
+  background: var(--bg-light);
+  padding: 0.5rem 1rem;
+  border: 1.5px solid var(--bg-grey);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 50px;
+}
+
+.nav-language-btn:hover {
+  background: var(--primary-color);
+  color: var(--bg-white);
+  border-color: var(--primary-color);
+  transform: translateY(-1px);
+}
+
 .nav-btn {
   text-decoration: none;
   font-family: var(--font-primary);
@@ -131,11 +155,16 @@
   }
 
   .nav-link,
+  .nav-language-btn,
   .nav-btn {
     padding: 0.8rem 1rem;
     display: block;
     width: 100%;
     text-align: center;
+  }
+
+  .nav-language-btn {
+    margin: 0.5rem 0;
   }
 
   .nav-btn {

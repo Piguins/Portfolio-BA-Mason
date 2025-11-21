@@ -11,12 +11,20 @@ export const useLanguage = () => {
 }
 
 export const LanguageProvider = ({ children }) => {
-  // Always start with no language selected (require selection on every refresh)
-  const [language, setLanguage] = useState(null)
-  const [showLanguageSelector, setShowLanguageSelector] = useState(true)
+  const [language, setLanguage] = useState(() => {
+    // Check localStorage first
+    const savedLanguage = localStorage.getItem('portfolio-language')
+    if (savedLanguage) {
+      return savedLanguage
+    }
+    // Return null if no language selected yet (first visit)
+    return null
+  })
+  const [showLanguageSelector, setShowLanguageSelector] = useState(!language)
 
   useEffect(() => {
     if (language) {
+      localStorage.setItem('portfolio-language', language)
       setShowLanguageSelector(false)
     }
   }, [language])
@@ -25,9 +33,18 @@ export const LanguageProvider = ({ children }) => {
     setLanguage(lang)
   }
 
+  const toggleLanguage = () => {
+    if (language === 'vi') {
+      setLanguage('en')
+    } else {
+      setLanguage('vi')
+    }
+  }
+
   const value = {
     language,
     selectLanguage,
+    toggleLanguage,
     showLanguageSelector,
   }
 
