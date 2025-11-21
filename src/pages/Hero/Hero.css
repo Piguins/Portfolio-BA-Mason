@@ -33,15 +33,21 @@
   height: 100%;
   object-fit: cover;
   filter: contrast(1.8) brightness(0.6);
-  animation: floatPattern 20s ease-in-out infinite;
+  animation: waveFlow 8s ease-in-out infinite;
 }
 
-@keyframes floatPattern {
+@keyframes waveFlow {
   0%, 100% {
-    transform: translateY(0) translateX(0);
+    transform: translateX(0) translateY(0);
+  }
+  25% {
+    transform: translateX(15px) translateY(-8px);
   }
   50% {
-    transform: translateY(-15px) translateX(10px);
+    transform: translateX(0) translateY(-15px);
+  }
+  75% {
+    transform: translateX(-15px) translateY(-8px);
   }
 }
 
@@ -58,11 +64,21 @@
 
 @keyframes floatWave1 {
   0%, 100% {
-    transform: rotate(0deg) translateY(0);
+    transform: rotate(0deg) translateY(0) translateX(0);
+  }
+  25% {
+    transform: rotate(2deg) translateY(-15px) translateX(15px);
   }
   50% {
-    transform: rotate(0deg) translateY(-20px);
+    transform: rotate(0deg) translateY(-25px) translateX(0);
   }
+  75% {
+    transform: rotate(-2deg) translateY(-15px) translateX(-15px);
+  }
+}
+
+.wavy-decoration-hero-1 img {
+  animation: waveFlow 6s ease-in-out infinite;
 }
 
 /* Bottom wavy pattern - flows from bottom-left to bottom-right */
@@ -78,11 +94,21 @@
 
 @keyframes floatWave2 {
   0%, 100% {
-    transform: rotate(0deg) translateY(0);
+    transform: rotate(0deg) translateY(0) translateX(0);
+  }
+  25% {
+    transform: rotate(-2deg) translateY(10px) translateX(-15px);
   }
   50% {
-    transform: rotate(0deg) translateY(15px);
+    transform: rotate(0deg) translateY(20px) translateX(0);
   }
+  75% {
+    transform: rotate(2deg) translateY(10px) translateX(15px);
+  }
+}
+
+.wavy-decoration-hero-2 img {
+  animation: waveFlow 7s ease-in-out infinite 0.5s;
 }
 
 /* Middle wavy pattern - flows horizontally across center */
@@ -98,11 +124,21 @@
 
 @keyframes floatWave3 {
   0%, 100% {
-    transform: translateY(-50%) rotate(0deg) translateX(0);
+    transform: translateY(-50%) rotate(0deg) translateX(0) translateY(0);
+  }
+  25% {
+    transform: translateY(-50%) rotate(1.5deg) translateX(20px) translateY(-8px);
   }
   50% {
-    transform: translateY(-50%) rotate(0deg) translateX(10px);
+    transform: translateY(-50%) rotate(0deg) translateX(0) translateY(-15px);
   }
+  75% {
+    transform: translateY(-50%) rotate(-1.5deg) translateX(-20px) translateY(-8px);
+  }
+}
+
+.wavy-decoration-hero-3 img {
+  animation: waveFlow 8s ease-in-out infinite 1s;
 }
 
 .hero-container {
