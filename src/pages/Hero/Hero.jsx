@@ -54,7 +54,7 @@ const Hero = () => {
               {t.hero.description}
             </p>
             <div className="hero-social-buttons">
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="social-btn">
+              <a href="https://www.linkedin.com/in/piguinslie/" target="_blank" rel="noopener noreferrer" className="social-btn">
                 <img src={IMAGES.linkedinIcon} alt="LinkedIn" loading="lazy" />
               </a>
               <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="social-btn">
