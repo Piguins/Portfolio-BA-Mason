@@ -24,6 +24,10 @@ const Portfolio = () => {
           <div className="portfolio-ellipse portfolio-ellipse-2">
             <img src={IMAGES.ellipse2180} alt="" loading="lazy" />
           </div>
+          {/* Small decorative ellipse next to bottom ellipse */}
+          <div className="portfolio-ellipse portfolio-ellipse-7">
+            <img src={IMAGES.ellipse2181} alt="" loading="lazy" />
+          </div>
           
           <div className="portfolio-content">
             <h3 className="portfolio-item-title">{t.portfolio.project1.title}</h3>
@@ -53,6 +57,10 @@ const Portfolio = () => {
           <div className="portfolio-ellipse portfolio-ellipse-4">
             <img src={IMAGES.ellipse2179} alt="" loading="lazy" />
           </div>
+          {/* Small decorative ellipse next to bottom ellipse */}
+          <div className="portfolio-ellipse portfolio-ellipse-8">
+            <img src={IMAGES.ellipse2180} alt="" loading="lazy" />
+          </div>
           
           <div className="portfolio-content">
             <h3 className="portfolio-item-title">{t.portfolio.project2.title}</h3>
@@ -81,6 +89,10 @@ const Portfolio = () => {
           {/* Decorative ellipse shape - visible at bottom-left corner */}
           <div className="portfolio-ellipse portfolio-ellipse-6">
             <img src={IMAGES.ellipse2181} alt="" loading="lazy" />
+          </div>
+          {/* Small decorative ellipse next to bottom ellipse */}
+          <div className="portfolio-ellipse portfolio-ellipse-9">
+            <img src={IMAGES.ellipse2179} alt="" loading="lazy" />
           </div>
           
           <div className="portfolio-content">

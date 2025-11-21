@@ -380,6 +380,93 @@
   display: none;
 }
 
+/* Card 1 (light blue background) - small circle next to bottom ellipse */
+.portfolio-ellipse-7 {
+  bottom: -70px;
+  left: 80px;
+  width: 160px;
+  height: 160px;
+}
+
+.portfolio-ellipse-7::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 160px;
+  height: 160px;
+  background-color: #7DE0EA;
+  border-radius: 50%;
+  opacity: 0.4;
+  z-index: 0;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  animation: ellipsePulse 5s ease-in-out infinite 1s;
+}
+
+.portfolio-ellipse-7 img {
+  display: none;
+}
+
+/* Card 2 (light purple background) - small circle next to bottom ellipse */
+.portfolio-ellipse-8 {
+  bottom: -70px;
+  left: 80px;
+  width: 160px;
+  height: 160px;
+}
+
+.portfolio-ellipse-8::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 160px;
+  height: 160px;
+  background-color: #583FBC;
+  border-radius: 50%;
+  opacity: 0.4;
+  z-index: 0;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  animation: ellipsePulse 5.2s ease-in-out infinite 1.2s;
+}
+
+.portfolio-ellipse-8 img {
+  display: none;
+}
+
+/* Card 3 (light blue background) - small circle next to bottom ellipse */
+.portfolio-ellipse-9 {
+  bottom: -70px;
+  left: 80px;
+  width: 160px;
+  height: 160px;
+}
+
+.portfolio-ellipse-9::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 160px;
+  height: 160px;
+  background-color: #7DE0EA;
+  border-radius: 50%;
+  opacity: 0.4;
+  z-index: 0;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  animation: ellipsePulse 4.9s ease-in-out infinite 1.1s;
+}
+
+.portfolio-ellipse-9 img {
+  display: none;
+}
+
 .portfolio-item-1 {
   background: var(--light-blue);
   position: relative;
@@ -732,6 +819,22 @@
     width: 180px;
     height: 180px;
   }
+
+  .portfolio-ellipse-7,
+  .portfolio-ellipse-8,
+  .portfolio-ellipse-9 {
+    bottom: -50px;
+    left: 60px;
+    width: 120px;
+    height: 120px;
+  }
+
+  .portfolio-ellipse-7::after,
+  .portfolio-ellipse-8::after,
+  .portfolio-ellipse-9::after {
+    width: 120px;
+    height: 120px;
+  }
 }
 
 @media screen and (max-width: 768px) {
@@ -780,6 +883,22 @@
     width: 150px;
     height: 150px;
   }
+
+  .portfolio-ellipse-7,
+  .portfolio-ellipse-8,
+  .portfolio-ellipse-9 {
+    bottom: -50px;
+    left: 50px;
+    width: 100px;
+    height: 100px;
+  }
+
+  .portfolio-ellipse-7::after,
+  .portfolio-ellipse-8::after,
+  .portfolio-ellipse-9::after {
+    width: 100px;
+    height: 100px;
+  }
 }
 
 @media screen and (max-width: 480px) {
@@ -815,6 +934,23 @@
     width: 120px;
     height: 120px;
     opacity: 0.4;
+  }
+
+  .portfolio-ellipse-7,
+  .portfolio-ellipse-8,
+  .portfolio-ellipse-9 {
+    bottom: -40px;
+    left: 40px;
+    width: 80px;
+    height: 80px;
+  }
+
+  .portfolio-ellipse-7::after,
+  .portfolio-ellipse-8::after,
+  .portfolio-ellipse-9::after {
+    width: 80px;
+    height: 80px;
+    opacity: 0.3;
   }
 }
 
