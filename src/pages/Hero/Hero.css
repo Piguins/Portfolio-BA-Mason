@@ -1,0 +1,287 @@
+/* Hero Section */
+.hero {
+  position: relative;
+  min-height: auto;
+  display: flex;
+  align-items: center;
+  background: var(--bg-white);
+  z-index: 1;
+  padding: 3rem 1.5rem;
+}
+
+.hero-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+  position: relative;
+}
+
+.hero-text {
+  max-width: 100%;
+}
+
+.hero-title {
+  font-family: var(--font-primary);
+  font-size: 42px;
+  line-height: 1.1;
+  color: var(--dark-blue);
+  margin-bottom: 1.5rem;
+  font-weight: 400;
+}
+
+.title-line-1 {
+  font-size: 42px;
+  font-weight: 400;
+}
+
+.title-line-2 {
+  font-size: 42px;
+  font-weight: 400;
+}
+
+.title-line-2.bold {
+  font-weight: 700;
+}
+
+.title-line-3 {
+  font-size: 48px;
+  font-weight: 400;
+  display: block;
+}
+
+.hero-description {
+  font-family: var(--font-secondary);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text-light);
+  opacity: 0.87;
+  margin-bottom: 2rem;
+  max-width: 100%;
+}
+
+.hero-social-buttons {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 2rem;
+}
+
+.social-btn {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+
+.social-btn:hover {
+  transform: translateY(-5px);
+}
+
+.social-btn img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.hero-image-section {
+  position: relative;
+  width: 100%;
+  height: 500px;
+}
+
+.hero-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-circle {
+  position: absolute;
+  width: 450px;
+  height: 450px;
+  background: #DFE1FA;
+  backdrop-filter: blur(50px);
+  border-radius: 1000px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+.hero-main-image {
+  position: relative;
+  width: 420px;
+  height: 500px;
+  object-fit: cover;
+  object-position: center;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.squers-decoration {
+  position: absolute;
+  width: 400px;
+  height: 300px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.squers-decoration img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.blur-gradient {
+  position: absolute;
+  width: 589px;
+  height: 402px;
+  top: 254px;
+  left: 920px;
+  opacity: 0.5;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.blur-gradient img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+@media screen and (max-width: 1200px) {
+  .hero-content {
+    gap: 2.5rem;
+  }
+
+  .hero-title {
+    font-size: 36px;
+  }
+
+  .title-line-3 {
+    font-size: 42px;
+  }
+
+  .hero-main-image {
+    width: 360px;
+    height: 420px;
+  }
+
+  .hero-circle {
+    width: 380px;
+    height: 380px;
+  }
+  
+  .hero-image-section {
+    height: 420px;
+  }
+}
+
+@media screen and (max-width: 968px) {
+  .hero {
+    padding: 2rem 1.5rem;
+  }
+
+  .hero-content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    text-align: center;
+  }
+
+  .hero-title {
+    font-size: 32px;
+  }
+
+  .title-line-3 {
+    font-size: 36px;
+  }
+
+  .hero-description {
+    max-width: 100%;
+    margin: 0 auto 2rem;
+  }
+
+  .hero-social-buttons {
+    justify-content: center;
+  }
+
+  .hero-image-section {
+    height: 400px;
+  }
+
+  .hero-main-image {
+    width: 300px;
+    height: 360px;
+  }
+
+  .hero-circle {
+    width: 320px;
+    height: 320px;
+  }
+  
+  .squers-decoration {
+    width: 280px;
+    height: 200px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .hero {
+    padding: 2rem 1rem;
+  }
+
+  .hero-title {
+    font-size: 28px;
+  }
+
+  .title-line-3 {
+    font-size: 32px;
+  }
+
+  .hero-description {
+    font-size: 14px;
+  }
+
+  .social-btn {
+    width: 50px;
+    height: 50px;
+  }
+
+  .hero-image-section {
+    height: 350px;
+  }
+
+  .hero-main-image {
+    width: 250px;
+    height: 300px;
+  }
+
+  .hero-circle {
+    width: 280px;
+    height: 280px;
+  }
+  
+  .squers-decoration {
+    width: 240px;
+    height: 180px;
+  }
+}
+

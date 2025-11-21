@@ -1,0 +1,34 @@
+import Hero from '../Hero'
+import Skills from '../Skills'
+import Portfolio from '../Portfolio'
+import Reviews from '../Reviews'
+import FAQ from '../FAQ'
+import CTA from '../CTA'
+import { IMAGES } from '../../constants/images'
+import './Home.css'
+
+const Home = () => {
+
+  return (
+    <div className="home">
+      {/* Top decorative shapes */}
+      <div className="top-shapes">
+        <div className="gradient-shape gradient-shape-1"></div>
+        <div className="gradient-shape gradient-shape-2"></div>
+        <div className="lines-decoration">
+          <img src={IMAGES.linesDecoration} alt="" />
+        </div>
+      </div>
+
+      <Hero />
+      <Skills />
+      <Portfolio />
+      <Reviews />
+      <CTA />
+      <FAQ />
+    </div>
+  )
+}
+
+export default Home
+

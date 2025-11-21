@@ -1,0 +1,113 @@
+.reviews-section {
+  padding: 3rem 1.5rem;
+  background: #F6F7FC;
+  position: relative;
+  overflow: hidden;
+}
+
+.reviews-title {
+  font-family: var(--font-primary);
+  font-size: 36px;
+  font-weight: 600;
+  color: var(--dark-blue);
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.reviews-items {
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.review-card {
+  background: var(--bg-white);
+  border-radius: 25px;
+  padding: 3rem 2rem;
+  text-align: center;
+  position: relative;
+  min-height: 289px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: var(--shadow);
+}
+
+.review-avatar {
+  position: absolute;
+  top: -65px;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  border: 5px solid var(--bg-white);
+  overflow: hidden;
+}
+
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  background: var(--primary-color);
+}
+
+.review-text {
+  font-family: var(--font-primary);
+  font-size: 16px;
+  color: var(--cinder);
+  line-height: 1.75;
+  margin-top: 3rem;
+  margin-bottom: 1.5rem;
+}
+
+.review-author {
+  font-family: var(--font-primary);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--cinder);
+  margin-bottom: 0.5rem;
+}
+
+.review-role {
+  font-family: var(--font-primary);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--cinder-light);
+  background: var(--bg-light);
+  padding: 0.3rem 0.7rem;
+  border-radius: 4px;
+}
+
+.reviews-arrows {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+}
+
+.arrow-btn {
+  width: 41px;
+  height: 41px;
+  border: 1px solid rgba(41, 45, 52, 0.25);
+  border-radius: 20.5px;
+  background: var(--bg-white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.arrow-btn.active {
+  border-color: var(--dark-blue);
+}
+
+.arrow-btn:hover {
+  background: var(--bg-light);
+}
+
+@media screen and (max-width: 768px) {
+  .reviews-items {
+    grid-template-columns: 1fr;
+  }
+}
+

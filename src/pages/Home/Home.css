@@ -1,0 +1,59 @@
+.home {
+  padding-top: 80px;
+  position: relative;
+  background: var(--bg-white);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Top decorative shapes */
+.top-shapes {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.gradient-shape {
+  position: absolute;
+  width: 1920px;
+  height: 1015px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+}
+
+.gradient-shape-1 {
+  top: -7.5px;
+  left: -78.73px;
+}
+
+.gradient-shape-2 {
+  top: 388.83px;
+  left: -130.55px;
+  transform: scaleY(-1);
+}
+
+.lines-decoration {
+  position: absolute;
+  top: 152.83px;
+  left: -187.63px;
+  width: 2215px;
+  height: 717px;
+  opacity: 0.1;
+}
+
+.lines-decoration img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+@media screen and (max-width: 768px) {
+  .top-shapes {
+    display: none;
+  }
+}
+
