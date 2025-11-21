@@ -1,7 +1,6 @@
 import Hero from '../Hero'
 import Skills from '../Skills'
 import Portfolio from '../Portfolio'
-import CTA from '../CTA'
 import { IMAGES } from '../../constants/images'
 import './Home.css'
 
@@ -21,7 +20,6 @@ const Home = () => {
       <Hero />
       <Skills />
       <Portfolio />
-      <CTA />
     </div>
   )
 }

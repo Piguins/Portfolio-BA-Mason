@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { FiMenu, FiX, FiArrowRight, FiChevronDown } from 'react-icons/fi'
+import { FiMenu, FiX, FiChevronDown } from 'react-icons/fi'
 import { useTranslations } from '../../hooks/useTranslations'
 import { useLanguage } from '../../contexts/LanguageContext'
 import './Navbar.css'
@@ -16,7 +16,7 @@ const Navbar = () => {
       setScrolled(window.scrollY > 50)
       
       // Detect active section
-      const sections = ['home', 'about', 'portfolio', 'contact']
+      const sections = ['home', 'about', 'portfolio']
       const scrollPosition = window.scrollY + 150
       
       for (let i = sections.length - 1; i >= 0; i--) {
@@ -78,13 +78,6 @@ const Navbar = () => {
               {language === 'vi' ? 'VI' : 'EN'}
               <FiChevronDown size={16} />
             </button>
-            <a
-              href="#contact"
-              onClick={(e) => { e.preventDefault(); scrollToSection('contact') }}
-              className="nav-btn"
-            >
-              {t.navbar.contact}
-            </a>
           </div>
         </div>
 
@@ -111,13 +104,6 @@ const Navbar = () => {
           >
             {language === 'vi' ? 'VI' : 'EN'} <FiChevronDown size={16} />
           </button>
-          <a
-            href="#contact"
-            onClick={(e) => { e.preventDefault(); scrollToSection('contact'); setIsOpen(false) }}
-            className="nav-btn"
-          >
-            {t.navbar.contact}
-          </a>
         </div>
       </div>
     </nav>

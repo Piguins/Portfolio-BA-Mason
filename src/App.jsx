@@ -2,7 +2,6 @@ import { LanguageProvider } from './contexts/LanguageContext'
 import LanguageSelector from './components/LanguageSelector'
 import Navbar from './components/Navbar'
 import Home from './pages/Home'
-import Footer from './components/Footer'
 import { Analytics } from '@vercel/analytics/react'
 import './App.css'
 
@@ -13,7 +12,6 @@ function App() {
         <LanguageSelector />
         <Navbar />
         <Home />
-        <Footer />
         <Analytics />
       </div>
     </LanguageProvider>
