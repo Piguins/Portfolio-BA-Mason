@@ -8,11 +8,23 @@ const Hero = () => {
   const [imageLoaded, setImageLoaded] = useState(false)
 
   useEffect(() => {
-    // Preload hero image
+    // Check if image is already loaded (from preload)
     const img = new Image()
     img.src = IMAGES.heroImage
-    img.onload = () => setImageLoaded(true)
-    img.onerror = () => setImageLoaded(true) // Show image even if error
+    img.crossOrigin = 'anonymous'
+    
+    if (img.complete) {
+      setImageLoaded(true)
+    } else {
+      img.onload = () => setImageLoaded(true)
+      img.onerror = () => setImageLoaded(true) // Show image even if error
+    }
+    
+    // Also check the actual img element
+    const heroImg = document.querySelector('.hero-main-image')
+    if (heroImg && heroImg.complete) {
+      setImageLoaded(true)
+    }
   }, [])
 
   return (
@@ -77,9 +89,14 @@ const Hero = () => {
                 src={IMAGES.heroImage} 
                 alt={`${t.hero.name} - ${t.hero.title}`} 
                 className={`hero-main-image ${imageLoaded ? 'loaded' : ''}`}
+                width="420"
+                height="500"
                 loading="eager"
                 fetchPriority="high"
+                crossOrigin="anonymous"
+                decoding="async"
                 onLoad={() => setImageLoaded(true)}
+                onError={() => setImageLoaded(true)}
               />
               <div className="squers-decoration">
                 <img src={IMAGES.squersDecoration} alt="" loading="lazy" />
