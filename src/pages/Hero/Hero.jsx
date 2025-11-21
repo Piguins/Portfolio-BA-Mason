@@ -11,7 +11,6 @@ const Hero = () => {
     // Check if image is already loaded (from preload)
     const img = new Image()
     img.src = IMAGES.heroImage
-    img.crossOrigin = 'anonymous'
     
     if (img.complete) {
       setImageLoaded(true)
@@ -82,7 +81,6 @@ const Hero = () => {
                 height="500"
                 loading="eager"
                 fetchPriority="high"
-                crossOrigin="anonymous"
                 decoding="async"
                 onLoad={() => setImageLoaded(true)}
                 onError={() => setImageLoaded(true)}
