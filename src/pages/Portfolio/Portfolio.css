@@ -114,6 +114,67 @@
   z-index: 0;
 }
 
+/* Decorative ellipse shapes for portfolio items */
+.portfolio-ellipse {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.portfolio-ellipse img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.portfolio-ellipse-1 {
+  top: 20px;
+  right: 30px;
+  width: 100px;
+  height: 100px;
+  opacity: 0.8;
+}
+
+.portfolio-ellipse-2 {
+  bottom: 30px;
+  right: 60px;
+  width: 80px;
+  height: 80px;
+  opacity: 0.75;
+}
+
+.portfolio-ellipse-3 {
+  top: 40px;
+  left: 40px;
+  width: 90px;
+  height: 90px;
+  opacity: 0.8;
+}
+
+.portfolio-ellipse-4 {
+  bottom: 50px;
+  left: 20px;
+  width: 70px;
+  height: 70px;
+  opacity: 0.7;
+}
+
+.portfolio-ellipse-5 {
+  top: 30px;
+  right: 50px;
+  width: 85px;
+  height: 85px;
+  opacity: 0.75;
+}
+
+.portfolio-ellipse-6 {
+  bottom: 40px;
+  right: 30px;
+  width: 95px;
+  height: 95px;
+  opacity: 0.8;
+}
+
 .portfolio-item-1 {
   background: var(--light-blue);
 }
@@ -230,6 +291,10 @@
   }
 
   .wavy-decoration-2 {
+    display: none;
+  }
+
+  .portfolio-ellipse {
     display: none;
   }
 }

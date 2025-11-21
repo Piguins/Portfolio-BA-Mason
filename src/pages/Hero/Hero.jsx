@@ -67,17 +67,6 @@ const Hero = () => {
             </div>
           </div>
           <div className="hero-image-section">
-            {/* Decorative ellipse shapes */}
-            <div className="hero-ellipse hero-ellipse-1">
-              <img src={IMAGES.ellipse2179} alt="" loading="lazy" />
-            </div>
-            <div className="hero-ellipse hero-ellipse-2">
-              <img src={IMAGES.ellipse2180} alt="" loading="lazy" />
-            </div>
-            <div className="hero-ellipse hero-ellipse-3">
-              <img src={IMAGES.ellipse2181} alt="" loading="lazy" />
-            </div>
-            
             <div className="hero-image-wrapper">
               <div className="hero-circle"></div>
               {!imageLoaded && (

@@ -16,6 +16,14 @@ const Portfolio = () => {
       <h2 className="portfolio-title">{t.portfolio.title}</h2>
       <div className="portfolio-items">
         <div className="portfolio-item portfolio-item-1">
+          {/* Decorative ellipse shapes */}
+          <div className="portfolio-ellipse portfolio-ellipse-1">
+            <img src={IMAGES.ellipse2179} alt="" loading="lazy" />
+          </div>
+          <div className="portfolio-ellipse portfolio-ellipse-2">
+            <img src={IMAGES.ellipse2180} alt="" loading="lazy" />
+          </div>
+          
           <div className="portfolio-content">
             <h3 className="portfolio-item-title">{t.portfolio.project1.title}</h3>
             <div className="portfolio-tags">
@@ -36,6 +44,14 @@ const Portfolio = () => {
           </div>
         </div>
         <div className="portfolio-item portfolio-item-2">
+          {/* Decorative ellipse shapes */}
+          <div className="portfolio-ellipse portfolio-ellipse-3">
+            <img src={IMAGES.ellipse2181} alt="" loading="lazy" />
+          </div>
+          <div className="portfolio-ellipse portfolio-ellipse-4">
+            <img src={IMAGES.ellipse2179} alt="" loading="lazy" />
+          </div>
+          
           <div className="portfolio-content">
             <h3 className="portfolio-item-title">{t.portfolio.project2.title}</h3>
             <div className="portfolio-tags">
@@ -56,6 +72,14 @@ const Portfolio = () => {
           </div>
         </div>
         <div className="portfolio-item portfolio-item-3">
+          {/* Decorative ellipse shapes */}
+          <div className="portfolio-ellipse portfolio-ellipse-5">
+            <img src={IMAGES.ellipse2180} alt="" loading="lazy" />
+          </div>
+          <div className="portfolio-ellipse portfolio-ellipse-6">
+            <img src={IMAGES.ellipse2181} alt="" loading="lazy" />
+          </div>
+          
           <div className="portfolio-content">
             <h3 className="portfolio-item-title">{t.portfolio.project3.title}</h3>
             <div className="portfolio-tags">
