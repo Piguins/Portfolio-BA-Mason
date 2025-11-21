@@ -413,22 +413,22 @@
   }
 
   .hero-main-image {
-    width: 360px;
-    height: 420px;
+    width: 280px;
+    height: 330px;
   }
 
   .hero-image-placeholder {
-    width: 360px;
-    height: 420px;
+    width: 280px;
+    height: 330px;
   }
 
   .hero-circle {
-    width: 380px;
-    height: 380px;
+    width: 300px;
+    height: 300px;
   }
   
   .hero-image-section {
-    height: 420px;
+    height: 330px;
   }
 }
 
