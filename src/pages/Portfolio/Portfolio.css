@@ -174,7 +174,7 @@
   filter: hue-rotate(-10deg) saturate(1.3) brightness(0.95);
 }
 
-/* Card 3 (light blue background) - ellipses with blue color, positioned left */
+/* Card 3 (light blue background) - ellipses with blue color, same as Card 1 */
 .portfolio-ellipse-5 {
   top: -15px;
   left: 30px;
@@ -183,7 +183,7 @@
 }
 
 .portfolio-ellipse-5 img {
-  filter: hue-rotate(175deg) saturate(1.25) brightness(0.98);
+  filter: hue-rotate(180deg) saturate(1.3) brightness(0.95);
 }
 
 .portfolio-ellipse-6 {
@@ -194,7 +194,7 @@
 }
 
 .portfolio-ellipse-6 img {
-  filter: hue-rotate(180deg) saturate(1.2) brightness(1.05);
+  filter: hue-rotate(180deg) saturate(1.2) brightness(1.0);
 }
 
 .portfolio-item-1 {
