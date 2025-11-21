@@ -12,13 +12,13 @@
 .skills-content-wrapper {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 3rem;
+  gap: 2.5rem;
   align-items: flex-start;
 }
 
 .skills-logos {
   position: relative;
-  min-height: 600px;
+  min-height: 500px;
 }
 
 .skills-circles-bg {
@@ -83,10 +83,10 @@
 
 .skills-title {
   font-family: var(--font-primary);
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 600;
   color: var(--dark-blue);
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   line-height: 1.2;
 }
 
@@ -95,9 +95,9 @@
   background: var(--bg-grey);
   border: 2px solid var(--text-light);
   border-radius: 8px;
-  padding: 2.5rem;
-  margin-bottom: 2rem;
-  min-height: 202px;
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+  min-height: auto;
   overflow: hidden;
   transform: rotate(-2deg);
   transition: transform 0.3s ease;
@@ -121,26 +121,27 @@
 
 .skill-card-number {
   font-family: var(--font-secondary);
-  font-size: 25.6px;
+  font-size: 20px;
   font-weight: 700;
   color: var(--text-light);
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .skill-card-title {
   font-family: var(--font-secondary);
-  font-size: 31px;
+  font-size: 22px;
   font-weight: 700;
   color: var(--dark-blue);
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.3;
 }
 
 .skill-card-description {
   font-family: var(--font-secondary);
-  font-size: 16px;
+  font-size: 14px;
   color: var(--text-light);
   line-height: 1.5;
-  max-width: 530px;
+  max-width: 100%;
 }
 
 @media screen and (max-width: 968px) {
@@ -151,6 +152,28 @@
 
   .skills-logos {
     min-height: 300px;
+  }
+
+  .skills-title {
+    font-size: 24px;
+    margin-bottom: 1.25rem;
+  }
+
+  .skill-card {
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .skill-card-title {
+    font-size: 20px;
+  }
+
+  .skill-card-number {
+    font-size: 18px;
+  }
+
+  .skill-card-description {
+    font-size: 13px;
   }
 }
 
