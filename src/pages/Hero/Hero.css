@@ -15,14 +15,14 @@
   position: absolute;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.35;
+  opacity: 0.6;
 }
 
 .wavy-decoration img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: contrast(1.5) brightness(0.7);
+  filter: contrast(1.8) brightness(0.6);
 }
 
 /* Top wavy pattern - flows from top-left through center to top-right */
@@ -32,7 +32,7 @@
   width: 120%;
   height: 700px;
   transform: rotate(0deg);
-  opacity: 0.4;
+  opacity: 0.65;
 }
 
 /* Bottom wavy pattern - flows from bottom-left to bottom-right */
@@ -42,7 +42,7 @@
   width: 115%;
   height: 600px;
   transform: rotate(0deg);
-  opacity: 0.35;
+  opacity: 0.6;
 }
 
 /* Middle wavy pattern - flows horizontally across center */
@@ -52,7 +52,7 @@
   width: 118%;
   height: 500px;
   transform: translateY(-50%) rotate(0deg);
-  opacity: 0.3;
+  opacity: 0.55;
 }
 
 .hero-container {
@@ -203,10 +203,10 @@
   top: 50%;
   left: 60%;
   transform: translate(-50%, -50%);
-  opacity: 0.7;
+  opacity: 0.85;
   z-index: 0;
   pointer-events: none;
-  filter: blur(50px);
+  filter: blur(45px);
 }
 
 .blur-gradient img {
