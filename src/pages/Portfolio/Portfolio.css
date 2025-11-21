@@ -145,12 +145,15 @@
   height: 100%;
   background-color: #717EA7;
   border-radius: 50%;
-  mix-blend-mode: multiply;
-  opacity: 0.85;
+  mix-blend-mode: color;
+  opacity: 1;
+  z-index: 1;
 }
 
 .portfolio-ellipse-1 img {
-  filter: grayscale(100%) brightness(0.5) contrast(1.2);
+  filter: grayscale(100%) brightness(1.1);
+  position: relative;
+  z-index: 0;
 }
 
 .portfolio-ellipse-2 {
@@ -169,12 +172,15 @@
   height: 100%;
   background-color: #717EA7;
   border-radius: 50%;
-  mix-blend-mode: multiply;
-  opacity: 0.8;
+  mix-blend-mode: color;
+  opacity: 1;
+  z-index: 1;
 }
 
 .portfolio-ellipse-2 img {
-  filter: grayscale(100%) brightness(0.5) contrast(1.2);
+  filter: grayscale(100%) brightness(1.1);
+  position: relative;
+  z-index: 0;
 }
 
 /* Card 2 (light purple background) - ellipses with purple color, positioned left */
