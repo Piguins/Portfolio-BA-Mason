@@ -20,8 +20,8 @@ const Home = () => {
 
       <Hero />
       <Skills />
-      <Portfolio />
       <Experience />
+      <Portfolio />
     </div>
   )
 }

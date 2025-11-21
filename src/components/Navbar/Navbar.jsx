@@ -16,7 +16,7 @@ const Navbar = () => {
       setScrolled(window.scrollY > 50)
       
       // Detect active section
-      const sections = ['home', 'about', 'portfolio', 'experience']
+      const sections = ['home', 'about', 'experience', 'portfolio']
       const scrollPosition = window.scrollY + 150
       
       for (let i = sections.length - 1; i >= 0; i--) {
@@ -45,8 +45,8 @@ const Navbar = () => {
   const navLinks = [
     { id: 'home', label: t.navbar.home },
     { id: 'about', label: t.navbar.about },
-    { id: 'portfolio', label: t.navbar.portfolio },
     { id: 'experience', label: t.navbar.experience },
+    { id: 'portfolio', label: t.navbar.portfolio },
   ]
 
   return (
