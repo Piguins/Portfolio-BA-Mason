@@ -131,44 +131,51 @@
   box-shadow: 0 20px 40px rgba(88, 63, 188, 0.2);
 }
 
-/* Additional decorative pattern for portfolio items */
+/* Additional decorative patterns for portfolio items - base styles */
+.portfolio-item {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Soft glow effect top-right */
 .portfolio-item::before {
   content: '';
   position: absolute;
-  top: -50px;
-  right: -50px;
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+  top: -60px;
+  right: -60px;
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.1) 30%, transparent 70%);
   border-radius: 50%;
   pointer-events: none;
   z-index: 0;
-  animation: floatGlow 6s ease-in-out infinite;
+  animation: floatGlow 8s ease-in-out infinite;
 }
 
 @keyframes floatGlow {
   0%, 100% {
     transform: translate(0, 0) scale(1);
-    opacity: 0.2;
+    opacity: 0.8;
   }
   50% {
-    transform: translate(10px, -10px) scale(1.1);
-    opacity: 0.3;
+    transform: translate(15px, -15px) scale(1.15);
+    opacity: 1;
   }
 }
 
+/* Soft glow effect bottom-left */
 .portfolio-item::after {
   content: '';
   position: absolute;
-  bottom: -30px;
-  left: -30px;
-  width: 150px;
-  height: 150px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+  bottom: -40px;
+  left: -40px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.08) 35%, transparent 70%);
   border-radius: 50%;
   pointer-events: none;
   z-index: 0;
-  animation: floatGlow 8s ease-in-out infinite reverse;
+  animation: floatGlow 10s ease-in-out infinite reverse;
 }
 
 /* Decorative ellipse shapes for portfolio items */
@@ -372,14 +379,113 @@
 
 .portfolio-item-1 {
   background: var(--light-blue);
+  position: relative;
+  overflow: hidden;
+}
+
+.portfolio-item-1::before {
+  background: radial-gradient(circle, rgba(125, 224, 234, 0.3) 0%, rgba(125, 224, 234, 0.1) 30%, transparent 70%);
+}
+
+/* Decorative wavy line pattern for card 1 */
+.portfolio-item-1 {
+  background-image: 
+    /* Wavy lines pattern */
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      rgba(125, 224, 234, 0.05) 10px,
+      rgba(125, 224, 234, 0.05) 20px
+    ),
+    /* Dot pattern */
+    radial-gradient(circle, rgba(125, 224, 234, 0.08) 1.5px, transparent 1.5px),
+    var(--light-blue);
+  background-size: 
+    30px 30px,
+    25px 25px,
+    100% 100%;
+  background-position: 
+    0 0,
+    12px 12px,
+    0 0;
 }
 
 .portfolio-item-2 {
   background: var(--light-purple);
+  position: relative;
+  overflow: hidden;
+}
+
+.portfolio-item-2::before {
+  background: radial-gradient(circle, rgba(88, 63, 188, 0.3) 0%, rgba(88, 63, 188, 0.1) 30%, transparent 70%);
+}
+
+/* Decorative geometric pattern for card 2 */
+.portfolio-item-2 {
+  background-image: 
+    /* Diamond pattern */
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 15px,
+      rgba(88, 63, 188, 0.04) 15px,
+      rgba(88, 63, 188, 0.04) 30px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 15px,
+      rgba(88, 63, 188, 0.04) 15px,
+      rgba(88, 63, 188, 0.04) 30px
+    ),
+    /* Dot pattern */
+    radial-gradient(circle, rgba(88, 63, 188, 0.08) 1.5px, transparent 1.5px),
+    var(--light-purple);
+  background-size: 
+    30px 30px,
+    30px 30px,
+    20px 20px,
+    100% 100%;
+  background-position: 
+    0 0,
+    0 0,
+    10px 10px,
+    0 0;
 }
 
 .portfolio-item-3 {
   background: var(--light-blue);
+  position: relative;
+  overflow: hidden;
+}
+
+.portfolio-item-3::before {
+  background: radial-gradient(circle, rgba(125, 224, 234, 0.3) 0%, rgba(125, 224, 234, 0.1) 30%, transparent 70%);
+}
+
+/* Decorative wave pattern for card 3 */
+.portfolio-item-3 {
+  background-image: 
+    /* Curved wave pattern */
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 8px,
+      rgba(125, 224, 234, 0.06) 8px,
+      rgba(125, 224, 234, 0.06) 16px
+    ),
+    /* Dot pattern */
+    radial-gradient(circle, rgba(125, 224, 234, 0.08) 1.5px, transparent 1.5px),
+    var(--light-blue);
+  background-size: 
+    25px 25px,
+    30px 30px,
+    100% 100%;
+  background-position: 
+    0 0,
+    15px 15px,
+    0 0;
 }
 
 .portfolio-content {
@@ -568,21 +674,26 @@
   width: 100%;
   height: 100%;
   background-image: 
+    /* Large dots */
     url('data:image/svg+xml,<svg width="80" height="80" xmlns="http://www.w3.org/2000/svg"><circle cx="40" cy="40" r="2" fill="rgba(88,63,188,0.12)"/></svg>'),
-    url('data:image/svg+xml,<svg width="120" height="120" xmlns="http://www.w3.org/2000/svg"><circle cx="60" cy="60" r="1" fill="rgba(125,224,234,0.15)"/></svg>');
-  background-size: 80px 80px, 120px 120px;
-  background-position: 0 0, 40px 40px;
-  opacity: 0.5;
+    /* Small dots */
+    url('data:image/svg+xml,<svg width="120" height="120" xmlns="http://www.w3.org/2000/svg"><circle cx="60" cy="60" r="1" fill="rgba(125,224,234,0.15)"/></svg>'),
+    /* Tiny sparkles */
+    url('data:image/svg+xml,<svg width="60" height="60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="30" r="0.8" fill="rgba(255,255,255,0.2)"/></svg>');
+  background-size: 80px 80px, 120px 120px, 60px 60px;
+  background-position: 0 0, 40px 40px, 20px 20px;
+  opacity: 0.6;
   z-index: 1;
-  animation: patternMove 20s linear infinite;
+  animation: patternMove 25s linear infinite;
+  pointer-events: none;
 }
 
 @keyframes patternMove {
   from {
-    background-position: 0 0, 40px 40px;
+    background-position: 0 0, 40px 40px, 20px 20px;
   }
   to {
-    background-position: 80px 80px, 120px 120px;
+    background-position: 80px 80px, 160px 160px, 80px 80px;
   }
 }
 
