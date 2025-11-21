@@ -382,8 +382,8 @@
 
 /* Card 1 (light blue background) - small circle next to bottom ellipse */
 .portfolio-ellipse-7 {
-  bottom: -70px;
-  left: 80px;
+  bottom: -90px;
+  left: 100px;
   width: 160px;
   height: 160px;
 }
@@ -411,8 +411,8 @@
 
 /* Card 2 (light purple background) - small circle next to bottom ellipse */
 .portfolio-ellipse-8 {
-  bottom: -70px;
-  left: 80px;
+  bottom: -90px;
+  left: 100px;
   width: 160px;
   height: 160px;
 }
@@ -440,8 +440,8 @@
 
 /* Card 3 (light blue background) - small circle next to bottom ellipse */
 .portfolio-ellipse-9 {
-  bottom: -70px;
-  left: 80px;
+  bottom: -90px;
+  left: 100px;
   width: 160px;
   height: 160px;
 }
@@ -823,8 +823,8 @@
   .portfolio-ellipse-7,
   .portfolio-ellipse-8,
   .portfolio-ellipse-9 {
-    bottom: -50px;
-    left: 60px;
+    bottom: -65px;
+    left: 75px;
     width: 120px;
     height: 120px;
   }
@@ -887,8 +887,8 @@
   .portfolio-ellipse-7,
   .portfolio-ellipse-8,
   .portfolio-ellipse-9 {
-    bottom: -50px;
-    left: 50px;
+    bottom: -60px;
+    left: 65px;
     width: 100px;
     height: 100px;
   }
@@ -939,8 +939,8 @@
   .portfolio-ellipse-7,
   .portfolio-ellipse-8,
   .portfolio-ellipse-9 {
-    bottom: -40px;
-    left: 40px;
+    bottom: -50px;
+    left: 50px;
     width: 80px;
     height: 80px;
   }
