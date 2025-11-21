@@ -97,8 +97,21 @@
   padding: 2rem;
   position: relative;
   overflow: hidden;
-  transition: all 0.4s ease;
-  animation: fadeInUp 0.8s ease-out both;
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  animation: cardReveal 1s ease-out both;
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+@keyframes cardReveal {
+  from {
+    opacity: 0;
+    transform: translateY(50px) rotateX(10deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotateX(0deg);
+  }
 }
 
 .portfolio-item:nth-child(1) {
@@ -114,8 +127,8 @@
 }
 
 .portfolio-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  transform: translateY(-10px) rotateX(2deg) rotateY(-2deg);
+  box-shadow: 0 20px 40px rgba(88, 63, 188, 0.2);
 }
 
 /* Additional decorative pattern for portfolio items */
@@ -130,6 +143,18 @@
   border-radius: 50%;
   pointer-events: none;
   z-index: 0;
+  animation: floatGlow 6s ease-in-out infinite;
+}
+
+@keyframes floatGlow {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translate(10px, -10px) scale(1.1);
+    opacity: 0.3;
+  }
 }
 
 .portfolio-item::after {
@@ -143,6 +168,7 @@
   border-radius: 50%;
   pointer-events: none;
   z-index: 0;
+  animation: floatGlow 8s ease-in-out infinite reverse;
 }
 
 /* Decorative ellipse shapes for portfolio items */
@@ -184,6 +210,18 @@
   border: none;
   outline: none;
   box-shadow: none;
+  animation: ellipsePulse 4s ease-in-out infinite;
+}
+
+@keyframes ellipsePulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.8;
+  }
 }
 
 .portfolio-ellipse-1 img {
@@ -211,6 +249,7 @@
   border: none;
   outline: none;
   box-shadow: none;
+  animation: ellipsePulse 5s ease-in-out infinite 0.5s;
 }
 
 .portfolio-ellipse-2 img {
@@ -239,6 +278,7 @@
   border: none;
   outline: none;
   box-shadow: none;
+  animation: ellipsePulse 4.5s ease-in-out infinite;
 }
 
 .portfolio-ellipse-3 img {
@@ -266,6 +306,7 @@
   border: none;
   outline: none;
   box-shadow: none;
+  animation: ellipsePulse 5.5s ease-in-out infinite 0.3s;
 }
 
 .portfolio-ellipse-4 img {
@@ -294,6 +335,7 @@
   border: none;
   outline: none;
   box-shadow: none;
+  animation: ellipsePulse 4.2s ease-in-out infinite;
 }
 
 .portfolio-ellipse-5 img {
@@ -321,6 +363,7 @@
   border: none;
   outline: none;
   box-shadow: none;
+  animation: ellipsePulse 5.8s ease-in-out infinite 0.7s;
 }
 
 .portfolio-ellipse-6 img {
@@ -368,6 +411,34 @@
   font-family: var(--font-primary);
   font-size: 18px;
   font-weight: 600;
+  transition: all 0.3s ease;
+  animation: tagFadeIn 0.6s ease-out both;
+  transform-origin: center;
+}
+
+@keyframes tagFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.portfolio-tag:nth-child(1) {
+  animation-delay: 0.3s;
+}
+
+.portfolio-tag:nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+.portfolio-tag:hover {
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 5px 15px rgba(104, 120, 172, 0.3);
+  background: linear-gradient(135deg, var(--bg-white) 0%, rgba(255, 255, 255, 0.9) 100%);
 }
 
 .portfolio-item-description {
@@ -391,10 +462,11 @@
   font-family: var(--font-primary);
   font-size: 18px;
   font-weight: 700;
-  transition: all 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
   position: relative;
   z-index: 2;
   overflow: hidden;
+  cursor: pointer;
 }
 
 .portfolio-btn::before {
@@ -405,9 +477,20 @@
   width: 0;
   height: 0;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.3);
   transform: translate(-50%, -50%);
   transition: width 0.6s, height 0.6s;
+}
+
+.portfolio-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
 }
 
 .portfolio-btn:hover::before {
@@ -415,13 +498,26 @@
   height: 300px;
 }
 
+.portfolio-btn:hover::after {
+  left: 100%;
+}
+
 .portfolio-btn:hover {
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 10px 25px rgba(88, 63, 188, 0.4);
+  transform: translateY(-5px) scale(1.08);
+  box-shadow: 0 15px 35px rgba(88, 63, 188, 0.5);
+  background: linear-gradient(135deg, var(--primary-color) 0%, #6B3FC7 100%);
+}
+
+.portfolio-btn:hover svg {
+  transform: translateX(5px);
+}
+
+.portfolio-btn svg {
+  transition: transform 0.3s ease;
 }
 
 .portfolio-btn:active {
-  transform: translateY(-1px) scale(1.02);
+  transform: translateY(-2px) scale(1.05);
 }
 
 .portfolio-image {
@@ -431,6 +527,12 @@
   border-radius: 16px;
   overflow: hidden;
   z-index: 2;
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  transform-style: preserve-3d;
+}
+
+.portfolio-item:hover .portfolio-image {
+  transform: scale(1.05) rotateY(5deg);
 }
 
 .portfolio-bg {
@@ -439,10 +541,26 @@
   height: 100%;
   background: linear-gradient(135deg, var(--light-blue) 0%, var(--light-purple) 100%);
   border-radius: 20px;
+  animation: gradientShift 8s ease infinite;
+  background-size: 200% 200%;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 
 .portfolio-bg-2 {
   background: linear-gradient(135deg, var(--light-purple) 0%, var(--light-blue) 100%);
+  background-size: 200% 200%;
+  animation: gradientShift 10s ease infinite reverse;
 }
 
 .portfolio-pattern {
@@ -456,6 +574,16 @@
   background-position: 0 0, 40px 40px;
   opacity: 0.5;
   z-index: 1;
+  animation: patternMove 20s linear infinite;
+}
+
+@keyframes patternMove {
+  from {
+    background-position: 0 0, 40px 40px;
+  }
+  to {
+    background-position: 80px 80px, 120px 120px;
+  }
 }
 
 @media screen and (max-width: 768px) {
