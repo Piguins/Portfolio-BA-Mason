@@ -9,6 +9,7 @@ if (typeof window !== 'undefined') {
   // Create and start loading image immediately
   const img = new Image()
   img.src = IMAGES.heroImage
+  img.crossOrigin = 'anonymous'
   // This forces browser to start downloading immediately
 }
 

@@ -330,10 +330,6 @@
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
-  /* Remove white/light background using CSS filters and blend modes */
-  /* Try different blend modes: multiply, screen, darken, lighten, overlay */
-  mix-blend-mode: multiply;
-  filter: contrast(1.2) brightness(1.15) saturate(1.15) hue-rotate(-5deg);
 }
 
 .hero-main-image.loaded {
