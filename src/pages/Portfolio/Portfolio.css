@@ -235,6 +235,35 @@
   display: none;
 }
 
+/* Card 1 (light blue background) - full circle at bottom-left corner */
+.portfolio-ellipse-2 {
+  bottom: -100px;
+  left: -100px;
+  width: 250px;
+  height: 250px;
+}
+
+.portfolio-ellipse-2::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 250px;
+  height: 250px;
+  background-color: #7DE0EA;
+  border-radius: 50%;
+  opacity: 0.5;
+  z-index: 0;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  animation: ellipsePulse 4.5s ease-in-out infinite 0.5s;
+}
+
+.portfolio-ellipse-2 img {
+  display: none;
+}
+
 /* Card 2 (light purple background) - full circle at top-left corner */
 .portfolio-ellipse-3 {
   top: -100px;
@@ -264,6 +293,35 @@
   display: none;
 }
 
+/* Card 2 (light purple background) - full circle at bottom-left corner */
+.portfolio-ellipse-4 {
+  bottom: -100px;
+  left: -100px;
+  width: 250px;
+  height: 250px;
+}
+
+.portfolio-ellipse-4::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 250px;
+  height: 250px;
+  background-color: #583FBC;
+  border-radius: 50%;
+  opacity: 0.5;
+  z-index: 0;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  animation: ellipsePulse 5s ease-in-out infinite 0.7s;
+}
+
+.portfolio-ellipse-4 img {
+  display: none;
+}
+
 /* Card 3 (light blue background) - full circle at top-left corner */
 .portfolio-ellipse-5 {
   top: -100px;
@@ -290,6 +348,35 @@
 }
 
 .portfolio-ellipse-5 img {
+  display: none;
+}
+
+/* Card 3 (light blue background) - full circle at bottom-left corner */
+.portfolio-ellipse-6 {
+  bottom: -100px;
+  left: -100px;
+  width: 250px;
+  height: 250px;
+}
+
+.portfolio-ellipse-6::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 250px;
+  height: 250px;
+  background-color: #7DE0EA;
+  border-radius: 50%;
+  opacity: 0.5;
+  z-index: 0;
+  border: none;
+  outline: none;
+  box-shadow: none;
+  animation: ellipsePulse 4.8s ease-in-out infinite 0.6s;
+}
+
+.portfolio-ellipse-6 img {
   display: none;
 }
 
@@ -629,6 +716,22 @@
     width: 180px;
     height: 180px;
   }
+
+  .portfolio-ellipse-2,
+  .portfolio-ellipse-4,
+  .portfolio-ellipse-6 {
+    bottom: -70px;
+    left: -70px;
+    width: 180px;
+    height: 180px;
+  }
+
+  .portfolio-ellipse-2::after,
+  .portfolio-ellipse-4::after,
+  .portfolio-ellipse-6::after {
+    width: 180px;
+    height: 180px;
+  }
 }
 
 @media screen and (max-width: 768px) {
@@ -661,6 +764,22 @@
     width: 150px;
     height: 150px;
   }
+
+  .portfolio-ellipse-2,
+  .portfolio-ellipse-4,
+  .portfolio-ellipse-6 {
+    bottom: -60px;
+    left: -60px;
+    width: 150px;
+    height: 150px;
+  }
+
+  .portfolio-ellipse-2::after,
+  .portfolio-ellipse-4::after,
+  .portfolio-ellipse-6::after {
+    width: 150px;
+    height: 150px;
+  }
 }
 
 @media screen and (max-width: 480px) {
@@ -676,6 +795,23 @@
   .portfolio-ellipse-1::after,
   .portfolio-ellipse-3::after,
   .portfolio-ellipse-5::after {
+    width: 120px;
+    height: 120px;
+    opacity: 0.4;
+  }
+
+  .portfolio-ellipse-2,
+  .portfolio-ellipse-4,
+  .portfolio-ellipse-6 {
+    bottom: -50px;
+    left: -50px;
+    width: 120px;
+    height: 120px;
+  }
+
+  .portfolio-ellipse-2::after,
+  .portfolio-ellipse-4::after,
+  .portfolio-ellipse-6::after {
     width: 120px;
     height: 120px;
     opacity: 0.4;
