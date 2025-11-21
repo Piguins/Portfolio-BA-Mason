@@ -1,23 +1,27 @@
 import { FiArrowRight } from 'react-icons/fi'
+import { useTranslations } from '../../hooks/useTranslations'
 import './Portfolio.css'
 
 const Portfolio = () => {
+  const t = useTranslations()
+
   return (
     <section id="portfolio" className="portfolio-section">
-      <h2 className="portfolio-title">Portfolio</h2>
+      <h2 className="portfolio-title">{t.portfolio.title}</h2>
       <div className="portfolio-items">
         <div className="portfolio-item portfolio-item-1">
           <div className="portfolio-content">
-            <h3 className="portfolio-item-title">Re-Design For Business Analyst Portfolio</h3>
+            <h3 className="portfolio-item-title">{t.portfolio.project1.title}</h3>
             <div className="portfolio-tags">
-              <span className="portfolio-tag">Business Analysis</span>
-              <span className="portfolio-tag">Data Analysis</span>
+              {t.portfolio.project1.tags.map((tag, index) => (
+                <span key={index} className="portfolio-tag">{tag}</span>
+              ))}
             </div>
             <p className="portfolio-item-description">
-              It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.
+              {t.portfolio.project1.description}
             </p>
             <a href="#portfolio" className="portfolio-btn">
-              Read Case Study <FiArrowRight />
+              {t.portfolio.project1.button} <FiArrowRight />
             </a>
           </div>
           <div className="portfolio-image">
@@ -27,16 +31,17 @@ const Portfolio = () => {
         </div>
         <div className="portfolio-item portfolio-item-2">
           <div className="portfolio-content">
-            <h3 className="portfolio-item-title">Process Optimization Project</h3>
+            <h3 className="portfolio-item-title">{t.portfolio.project2.title}</h3>
             <div className="portfolio-tags">
-              <span className="portfolio-tag">Process Optimization</span>
-              <span className="portfolio-tag">Change Management</span>
+              {t.portfolio.project2.tags.map((tag, index) => (
+                <span key={index} className="portfolio-tag">{tag}</span>
+              ))}
             </div>
             <p className="portfolio-item-description">
-              It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.
+              {t.portfolio.project2.description}
             </p>
             <a href="#portfolio" className="portfolio-btn">
-              Read Case Study <FiArrowRight />
+              {t.portfolio.project2.button} <FiArrowRight />
             </a>
           </div>
           <div className="portfolio-image">
@@ -46,16 +51,17 @@ const Portfolio = () => {
         </div>
         <div className="portfolio-item portfolio-item-3">
           <div className="portfolio-content">
-            <h3 className="portfolio-item-title">Data Analytics Dashboard Design</h3>
+            <h3 className="portfolio-item-title">{t.portfolio.project3.title}</h3>
             <div className="portfolio-tags">
-              <span className="portfolio-tag">Data Analytics</span>
-              <span className="portfolio-tag">Dashboard Design</span>
+              {t.portfolio.project3.tags.map((tag, index) => (
+                <span key={index} className="portfolio-tag">{tag}</span>
+              ))}
             </div>
             <p className="portfolio-item-description">
-              It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.
+              {t.portfolio.project3.description}
             </p>
             <a href="#portfolio" className="portfolio-btn">
-              Read Case Study <FiArrowRight />
+              {t.portfolio.project3.button} <FiArrowRight />
             </a>
           </div>
           <div className="portfolio-image">

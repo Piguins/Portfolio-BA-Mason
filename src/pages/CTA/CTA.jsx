@@ -1,19 +1,21 @@
 import { FaLinkedin, FaGithub } from 'react-icons/fa'
+import { useTranslations } from '../../hooks/useTranslations'
 import './CTA.css'
 
 const CTA = () => {
+  const t = useTranslations()
+
   return (
     <>
       {/* CTA Section 1 */}
       <section className="cta-section cta-section-1">
         <div className="cta-content">
-          <h2 className="cta-title">Try me out, risk free!</h2>
+          <h2 className="cta-title">{t.cta.section1.title}</h2>
           <p className="cta-description">
-            If you're not happy with the analysis after the first draft,
-            I'll refund your deposit, <strong>no questions asked</strong>
+            {t.cta.section1.description}
           </p>
           <a href="#contact" className="cta-btn">
-            Contact
+            {t.cta.section1.button}
           </a>
         </div>
       </section>
@@ -25,20 +27,20 @@ const CTA = () => {
             <div className="cta-avatar">
               <div className="avatar-placeholder"></div>
             </div>
-            <h3 className="cta-heading">Let's build it together.</h3>
+            <h3 className="cta-heading">{t.cta.section2.heading}</h3>
             <div className="cta-buttons">
               <a href="mailto:youremail@gmail.com" className="cta-link-btn">
-                <FaLinkedin /> My Linkedin
+                <FaLinkedin /> {t.cta.section2.linkedin}
               </a>
               <a href="/resume.pdf" download className="cta-link-btn">
-                <FaGithub /> Download my resume
+                <FaGithub /> {t.cta.section2.resume}
               </a>
             </div>
           </div>
           <div className="cta-card">
-            <h3 className="cta-card-title">Try me out, risk free!</h3>
-            <p className="cta-card-description">Let's build something great together</p>
-            <a href="#contact" className="cta-card-btn">Contact</a>
+            <h3 className="cta-card-title">{t.cta.section2.card.title}</h3>
+            <p className="cta-card-description">{t.cta.section2.card.description}</p>
+            <a href="#contact" className="cta-card-btn">{t.cta.section2.card.button}</a>
           </div>
         </div>
       </section>

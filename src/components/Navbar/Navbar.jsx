@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
 import { FiMenu, FiX, FiArrowRight } from 'react-icons/fi'
+import { useTranslations } from '../../hooks/useTranslations'
 import './Navbar.css'
 
 const Navbar = () => {
+  const t = useTranslations()
   const [isOpen, setIsOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [activeSection, setActiveSection] = useState('home')
@@ -39,17 +41,17 @@ const Navbar = () => {
   }
 
   const navLinks = [
-    { id: 'home', label: 'Home' },
-    { id: 'about', label: 'About me' },
-    { id: 'portfolio', label: 'Portfolio' },
-    { id: 'faq', label: 'FAQ' },
+    { id: 'home', label: t.navbar.home },
+    { id: 'about', label: t.navbar.about },
+    { id: 'portfolio', label: t.navbar.portfolio },
+    { id: 'faq', label: t.navbar.faq },
   ]
 
   return (
     <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
       <div className="nav-container">
         <a href="#home" onClick={(e) => { e.preventDefault(); scrollToSection('home') }} className="nav-logo">
-          <span className="logo-text">Mason Portfolio</span>
+          <span className="logo-text">{t.navbar.logo}</span>
         </a>
         
         <div className={`nav-menu ${isOpen ? 'active' : ''}`}>
@@ -68,7 +70,7 @@ const Navbar = () => {
             onClick={(e) => { e.preventDefault(); scrollToSection('contact') }}
             className="nav-btn"
           >
-            Contact <FiArrowRight />
+            {t.navbar.contact} <FiArrowRight />
           </a>
         </div>
 

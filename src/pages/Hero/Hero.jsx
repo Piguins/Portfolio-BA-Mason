@@ -1,7 +1,9 @@
 import './Hero.css'
 import { IMAGES } from '../../constants/images'
+import { useTranslations } from '../../hooks/useTranslations'
 
 const Hero = () => {
+  const t = useTranslations()
 
   return (
     <section id="home" className="hero">
@@ -9,16 +11,15 @@ const Hero = () => {
         <div className="hero-content">
           <div className="hero-text">
             <h1 className="hero-title">
-              <span className="title-line-1">HEY! </span>
-              <span className="title-line-2">I'm </span>
-              <span className="title-line-2 bold">Mason</span>
+              <span className="title-line-1">{t.hero.greeting} </span>
+              <span className="title-line-2">{t.hero.greetingPart2} </span>
+              <span className="title-line-2 bold">{t.hero.name}</span>
               <span className="title-line-1">, </span>
               <br />
-              <span className="title-line-3">Business </span>
-              <span className="title-line-3">Analyst</span>
+              <span className="title-line-3">{t.hero.title}</span>
             </h1>
             <p className="hero-description">
-              Agency-quality business analysis with the personal touch of a freelancer.
+              {t.hero.description}
             </p>
             <div className="hero-social-buttons">
               <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="social-btn">
@@ -35,7 +36,7 @@ const Hero = () => {
           <div className="hero-image-section">
             <div className="hero-image-wrapper">
               <div className="hero-circle"></div>
-              <img src={IMAGES.heroImage} alt="Mason - Business Analyst" className="hero-main-image" />
+              <img src={IMAGES.heroImage} alt={`${t.hero.name} - ${t.hero.title}`} className="hero-main-image" />
               <div className="squers-decoration">
                 <img src={IMAGES.squersDecoration} alt="" />
               </div>

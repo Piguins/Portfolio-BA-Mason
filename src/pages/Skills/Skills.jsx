@@ -1,7 +1,10 @@
 import './Skills.css'
 import { IMAGES } from '../../constants/images'
+import { useTranslations } from '../../hooks/useTranslations'
 
 const Skills = () => {
+  const t = useTranslations()
+
   return (
     <section id="about" className="skills-section">
       <div className="skills-container">
@@ -27,26 +30,26 @@ const Skills = () => {
             </div>
           </div>
           <div className="skills-cards">
-            <h2 className="skills-title">I specialize in</h2>
+            <h2 className="skills-title">{t.skills.title}</h2>
             <div className="skill-card skill-card-1">
-              <div className="skill-card-number">1</div>
-              <h3 className="skill-card-title">Business Analysis</h3>
+              <div className="skill-card-number">{t.skills.skill1.number}</div>
+              <h3 className="skill-card-title">{t.skills.skill1.title}</h3>
               <p className="skill-card-description">
-                I analyze business processes and requirements, which allows me to build any project fast and conveniently.
+                {t.skills.skill1.description}
               </p>
             </div>
             <div className="skill-card skill-card-2">
-              <div className="skill-card-number">2</div>
-              <h3 className="skill-card-title">Data Analytics</h3>
+              <div className="skill-card-number">{t.skills.skill2.number}</div>
+              <h3 className="skill-card-title">{t.skills.skill2.title}</h3>
               <p className="skill-card-description">
-                Yes, I absolutely love data analytics solutions, and I use them in every single project.
+                {t.skills.skill2.description}
               </p>
             </div>
             <div className="skill-card skill-card-3">
-              <div className="skill-card-number">3</div>
-              <h3 className="skill-card-title">Process Optimization</h3>
+              <div className="skill-card-number">{t.skills.skill3.number}</div>
+              <h3 className="skill-card-title">{t.skills.skill3.title}</h3>
               <p className="skill-card-description">
-                I also use process optimization systems for workflow structure, which allows me to build any project fast and conveniently.
+                {t.skills.skill3.description}
               </p>
             </div>
           </div>
