@@ -1,8 +1,10 @@
-// Database connection using postgres library
-import postgres from 'postgres'
+// Database connection using pg library
+import pkg from 'pg'
 import dotenv from 'dotenv'
 
 dotenv.config()
+
+const { Client } = pkg
 
 const connectionString = process.env.DATABASE_URL
 
@@ -10,12 +12,34 @@ if (!connectionString) {
   throw new Error('DATABASE_URL is not configured in .env file')
 }
 
-const sql = postgres(connectionString, {
-  // Connection options
-  max: 10, // Maximum number of connections in the pool
-  idle_timeout: 20, // Close idle connections after 20 seconds
-  connect_timeout: 10, // Connection timeout in seconds
+const client = new Client({
+  connectionString: process.env.DATABASE_URL,
+  // SSL config for Supabase
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 })
 
-export default sql
+// Connect to database (lazy connection - will connect on first query)
+let isConnected = false
+
+async function ensureConnected() {
+  if (!isConnected) {
+    try {
+      await client.connect()
+      isConnected = true
+      console.log('✅ Database connected')
+    } catch (err) {
+      console.error('❌ Database connection error:', err.message)
+      throw err
+    }
+  }
+}
+
+// Auto-connect on first query
+const originalQuery = client.query.bind(client)
+client.query = async function(...args) {
+  await ensureConnected()
+  return originalQuery(...args)
+}
+
+export default client
 

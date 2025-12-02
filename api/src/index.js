@@ -1,9 +1,9 @@
 // Mason Portfolio API
-// Tech stack: Node.js + Express + PostgreSQL (Supabase via postgres)
+// Tech stack: Node.js + Express + PostgreSQL (Supabase via pg)
 
 import express from 'express'
 import cors from 'cors'
-import sql from './db.js'
+import client from './db.js'
 
 const app = express()
 const PORT = process.env.PORT || 4000
@@ -15,7 +15,7 @@ app.use(express.json())
 app.get('/health', async (req, res) => {
   try {
     // Simple DB ping
-    await sql`SELECT 1`
+    await client.query('SELECT 1')
     res.json({
       status: 'ok',
       service: 'portfolio-api',
@@ -40,7 +40,7 @@ app.get('/', (req, res) => {
 // Projects (portfolio items)
 app.get('/api/projects', async (req, res) => {
   try {
-    const rows = await sql`
+    const result = await client.query(`
       SELECT
         p.*,
         COALESCE(
@@ -53,8 +53,8 @@ app.get('/api/projects', async (req, res) => {
       FROM public.projects p
       WHERE p.is_published = TRUE
       ORDER BY p.order_index ASC, p.created_at DESC
-    `
-    res.json(rows)
+    `)
+    res.json(result.rows)
   } catch (err) {
     console.error('GET /api/projects error:', err)
     res.status(500).json({ error: 'Failed to fetch projects' })
@@ -64,12 +64,12 @@ app.get('/api/projects', async (req, res) => {
 // Skills (for skills section + tools orbit)
 app.get('/api/skills', async (req, res) => {
   try {
-    const rows = await sql`
+    const result = await client.query(`
       SELECT *
       FROM public.skills
       ORDER BY category ASC, order_index ASC, id ASC
-    `
-    res.json(rows)
+    `)
+    res.json(result.rows)
   } catch (err) {
     console.error('GET /api/skills error:', err)
     res.status(500).json({ error: 'Failed to fetch skills' })
@@ -79,7 +79,7 @@ app.get('/api/skills', async (req, res) => {
 // Experience timeline
 app.get('/api/experience', async (req, res) => {
   try {
-    const rows = await sql`
+    const result = await client.query(`
       SELECT
         e.*,
         COALESCE(
@@ -99,8 +99,8 @@ app.get('/api/experience', async (req, res) => {
         ) AS skills_used
       FROM public.experience e
       ORDER BY e.order_index ASC, e.start_date DESC
-    `
-    res.json(rows)
+    `)
+    res.json(result.rows)
   } catch (err) {
     console.error('GET /api/experience error:', err)
     res.status(500).json({ error: 'Failed to fetch experience' })
