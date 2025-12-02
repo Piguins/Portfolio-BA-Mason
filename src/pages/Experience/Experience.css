@@ -2,7 +2,7 @@
   padding: 3rem 1.5rem;
   background: var(--bg-white);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .experience-container {
@@ -63,6 +63,12 @@
   width: 2px;
   background: var(--bg-grey);
   z-index: 0;
+}
+
+@media screen and (max-width: 768px) {
+  .experience-timeline::before {
+    left: 15px;
+  }
 }
 
 .experience-item {
@@ -238,6 +244,17 @@
 @media screen and (max-width: 768px) {
   .experience-section {
     padding: 2rem 1rem;
+    overflow: visible;
+  }
+
+  .experience-content {
+    position: relative;
+    z-index: 10;
+  }
+
+  .experience-item {
+    position: relative;
+    z-index: 10;
   }
 
   .experience-title {

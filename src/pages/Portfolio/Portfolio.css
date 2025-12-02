@@ -2,7 +2,7 @@
   padding: 3rem 1.5rem;
   background: var(--bg-white);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* Decorative background patterns */
@@ -30,6 +30,13 @@
   border-radius: 50%;
   pointer-events: none;
   z-index: 0;
+}
+
+@media screen and (max-width: 768px) {
+  .portfolio-section::before,
+  .portfolio-section::after {
+    display: none;
+  }
 }
 
 /* Wavy decorative vector pattern */
@@ -96,7 +103,7 @@
   border-radius: 24px;
   padding: 2rem;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
   animation: cardReveal 1s ease-out both;
   transform-style: preserve-3d;
@@ -134,7 +141,7 @@
 /* Additional decorative patterns for portfolio items - base styles */
 .portfolio-item {
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* Soft glow effect top-right */
@@ -838,14 +845,26 @@
 }
 
 @media screen and (max-width: 768px) {
+  .portfolio-section {
+    overflow: visible;
+  }
+
   .portfolio-item {
     grid-template-columns: 1fr;
     min-height: auto;
     padding: 1.5rem;
+    overflow: visible;
+  }
+
+  .portfolio-content {
+    position: relative;
+    z-index: 10;
   }
 
   .portfolio-image {
     height: 240px;
+    position: relative;
+    z-index: 10;
   }
 
   .wavy-decoration-2 {

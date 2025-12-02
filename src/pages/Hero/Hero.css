@@ -483,6 +483,22 @@
 @media screen and (max-width: 768px) {
   .hero {
     padding: 2rem 1rem;
+    overflow: visible;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 10;
+  }
+
+  .hero-text {
+    position: relative;
+    z-index: 10;
+  }
+
+  .hero-image-section {
+    position: relative;
+    z-index: 10;
   }
 
   .hero-title {
