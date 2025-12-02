@@ -84,6 +84,44 @@
   justify-content: center;
 }
 
+/* Animated background particles */
+.skills-logos::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(2px 2px at 20% 30%, rgba(88, 63, 188, 0.3), transparent),
+    radial-gradient(2px 2px at 60% 70%, rgba(125, 224, 234, 0.3), transparent),
+    radial-gradient(1px 1px at 50% 50%, rgba(88, 63, 188, 0.2), transparent),
+    radial-gradient(1px 1px at 80% 10%, rgba(125, 224, 234, 0.2), transparent),
+    radial-gradient(2px 2px at 90% 60%, rgba(88, 63, 188, 0.2), transparent),
+    radial-gradient(1px 1px at 33% 80%, rgba(125, 224, 234, 0.2), transparent);
+  background-size: 200% 200%;
+  background-position: 0% 0%, 100% 100%, 50% 50%, 0% 100%, 100% 0%, 50% 0%;
+  animation: particleMove 20s ease infinite;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+@keyframes particleMove {
+  0%, 100% {
+    background-position: 0% 0%, 100% 100%, 50% 50%, 0% 100%, 100% 0%, 50% 0%;
+  }
+  25% {
+    background-position: 100% 0%, 0% 100%, 50% 0%, 100% 0%, 0% 100%, 50% 100%;
+  }
+  50% {
+    background-position: 100% 100%, 0% 0%, 50% 100%, 100% 100%, 0% 0%, 50% 50%;
+  }
+  75% {
+    background-position: 0% 100%, 100% 0%, 50% 50%, 0% 0%, 100% 100%, 50% 0%;
+  }
+}
+
 /* Orbital paths SVG */
 .orbital-paths {
   position: absolute;
@@ -96,6 +134,7 @@
   pointer-events: none;
   opacity: 0.6;
   animation: orbitPathRotate 60s linear infinite;
+  filter: drop-shadow(0 0 10px rgba(88, 63, 188, 0.2));
 }
 
 @keyframes orbitPathRotate {
@@ -109,6 +148,7 @@
 
 .orbit-path {
   animation: orbitPathPulse 3s ease-in-out infinite;
+  transition: all 0.3s ease;
 }
 
 .orbit-path:nth-child(odd) {
@@ -119,13 +159,18 @@
   animation-delay: 1.5s;
 }
 
+.orbit-path:hover {
+  stroke-width: 2;
+  opacity: 0.8;
+}
+
 @keyframes orbitPathPulse {
   0%, 100% {
     opacity: 0.4;
     stroke-width: 1;
   }
   50% {
-    opacity: 0.7;
+    opacity: 0.8;
     stroke-width: 1.5;
   }
 }
@@ -172,6 +217,39 @@
   pointer-events: auto;
   padding: 15px;
   box-sizing: border-box;
+}
+
+/* Particle trail effect */
+.logo-item::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(88, 63, 188, 0.2) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.logo-item:hover::before {
+  opacity: 1;
+  animation: particlePulse 1.5s ease-in-out infinite;
+}
+
+@keyframes particlePulse {
+  0%, 100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.3);
+    opacity: 0.6;
+  }
 }
 
 /* Background colors for each logo - official brand colors with light tint */
@@ -330,14 +408,27 @@
 }
 
 .logo-item:hover {
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  transform: scale(1.05) !important;
+  box-shadow: 0 8px 30px rgba(88, 63, 188, 0.4);
+  filter: brightness(1.1);
 }
 
 .logo-item:hover img {
   animation-play-state: paused;
-  transform: scale(1.2) rotate(0deg) !important;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
+  filter: drop-shadow(0 6px 20px rgba(88, 63, 188, 0.5));
+}
+
+/* Glow effect for hovered logos */
+.logo-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(88, 63, 188, 0.3) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: -1;
 }
 
 /* Pause orbit animation on hover */
@@ -459,6 +550,29 @@
   overflow: hidden;
   transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
   transform-style: preserve-3d;
+  cursor: pointer;
+}
+
+/* Ripple effect on click */
+.skill-card::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(88, 63, 188, 0.1);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.skill-card:active::before {
+  width: 300px;
+  height: 300px;
+  transition: width 0.3s, height 0.3s;
 }
 
 /* Xiên xẹo cho từng card */
@@ -555,8 +669,19 @@
   }
 }
 
-/* Decorative pattern overlay for skill cards */
-.skill-card::before {
+/* Pattern overlay removed - using ripple effect in ::before instead */
+
+@keyframes patternMove {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 60px 60px;
+  }
+}
+
+/* Pattern overlay - moved to separate element */
+.skill-card-pattern {
   content: '';
   position: absolute;
   top: 0;
@@ -568,15 +693,6 @@
   pointer-events: none;
   z-index: 0;
   animation: patternMove 20s linear infinite;
-}
-
-@keyframes patternMove {
-  from {
-    background-position: 0 0;
-  }
-  to {
-    background-position: 60px 60px;
-  }
 }
 
 /* Glowing effect on hover */
@@ -617,20 +733,23 @@
 
 .skill-card-1:hover {
   transform: rotate(-8deg) skew(-2deg, 1deg) translateX(10px) translateY(-10px) scale(1.05) !important;
-  box-shadow: 0 15px 30px rgba(88, 63, 188, 0.25);
+  box-shadow: 0 20px 40px rgba(88, 63, 188, 0.35);
   z-index: 10;
+  background: linear-gradient(135deg, var(--bg-grey) 0%, rgba(88, 63, 188, 0.05) 100%);
 }
 
 .skill-card-2:hover {
   transform: rotate(12deg) skew(3deg, -2deg) translateX(-15px) translateY(-10px) scale(1.05) !important;
-  box-shadow: 0 15px 30px rgba(88, 63, 188, 0.25);
+  box-shadow: 0 20px 40px rgba(88, 63, 188, 0.35);
   z-index: 10;
+  background: linear-gradient(135deg, var(--bg-grey) 0%, rgba(88, 63, 188, 0.05) 100%);
 }
 
 .skill-card-3:hover {
   transform: rotate(-5deg) skew(-1deg, 2deg) translateX(8px) translateY(-10px) scale(1.05) !important;
-  box-shadow: 0 15px 30px rgba(88, 63, 188, 0.25);
+  box-shadow: 0 20px 40px rgba(88, 63, 188, 0.35);
   z-index: 10;
+  background: linear-gradient(135deg, var(--bg-grey) 0%, rgba(88, 63, 188, 0.05) 100%);
 }
 
 .skill-card-number {

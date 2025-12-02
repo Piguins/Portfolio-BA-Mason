@@ -1,9 +1,65 @@
 import './Skills.css'
 import { IMAGES } from '../../constants/images'
 import { useTranslations } from '../../hooks/useTranslations'
+import { motion } from 'framer-motion'
+import { useState } from 'react'
 
 const Skills = () => {
   const t = useTranslations()
+  const [hoveredLogo, setHoveredLogo] = useState(null)
+
+  const logoVariants = {
+    initial: { scale: 0, opacity: 0, rotate: -180 },
+    animate: (i) => ({
+      scale: 1,
+      opacity: 1,
+      rotate: 0,
+      transition: {
+        delay: i * 0.1,
+        type: "spring",
+        stiffness: 200,
+        damping: 15
+      }
+    }),
+    hover: {
+      scale: 1.2,
+      rotate: [0, -10, 10, -10, 0],
+      transition: {
+        rotate: {
+          repeat: Infinity,
+          duration: 0.5,
+          ease: "easeInOut"
+        },
+        scale: {
+          type: "spring",
+          stiffness: 400,
+          damping: 10
+        }
+      }
+    }
+  }
+
+  const cardVariants = {
+    initial: { opacity: 0, y: 50 },
+    animate: (i) => ({
+      opacity: 1,
+      y: 0,
+      transition: {
+        delay: 0.3 + i * 0.1,
+        type: "spring",
+        stiffness: 100,
+        damping: 15
+      }
+    }),
+    hover: {
+      y: -10,
+      transition: {
+        type: "spring",
+        stiffness: 400,
+        damping: 10
+      }
+    }
+  }
 
   return (
     <section id="about" className="skills-section">
@@ -30,73 +86,221 @@ const Skills = () => {
               </div>
             )}
             {IMAGES.sqlLogo && (
-              <div className="logo-item logo-1">
-                <img src={IMAGES.sqlLogo} alt="SQL" onError={(e) => e.target.parentElement.style.display = 'none'} />
-              </div>
+              <motion.div
+                className="logo-item logo-1"
+                variants={logoVariants}
+                initial="initial"
+                animate="animate"
+                custom={0}
+                whileHover="hover"
+                onHoverStart={() => setHoveredLogo(1)}
+                onHoverEnd={() => setHoveredLogo(null)}
+              >
+                <motion.img
+                  src={IMAGES.sqlLogo}
+                  alt="SQL"
+                  onError={(e) => e.target.parentElement.style.display = 'none'}
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.6, ease: "easeInOut" }}
+                />
+                {hoveredLogo === 1 && (
+                  <motion.div
+                    className="logo-glow"
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 2, opacity: [0, 0.5, 0] }}
+                    transition={{ duration: 1, repeat: Infinity }}
+                  />
+                )}
+              </motion.div>
             )}
             {IMAGES.excelLogo && (
-              <div className="logo-item logo-2">
-                <img src={IMAGES.excelLogo} alt="Excel" onError={(e) => e.target.parentElement.style.display = 'none'} />
-              </div>
+              <motion.div
+                className="logo-item logo-2"
+                variants={logoVariants}
+                initial="initial"
+                animate="animate"
+                custom={1}
+                whileHover="hover"
+                onHoverStart={() => setHoveredLogo(2)}
+                onHoverEnd={() => setHoveredLogo(null)}
+              >
+                <motion.img src={IMAGES.excelLogo} alt="Excel" onError={(e) => e.target.parentElement.style.display = 'none'} />
+                {hoveredLogo === 2 && <motion.div className="logo-glow" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 2, opacity: [0, 0.5, 0] }} transition={{ duration: 1, repeat: Infinity }} />}
+              </motion.div>
             )}
             {IMAGES.powerBILogo && (
-              <div className="logo-item logo-3">
-                <img src={IMAGES.powerBILogo} alt="Power BI" onError={(e) => e.target.parentElement.style.display = 'none'} />
-              </div>
+              <motion.div
+                className="logo-item logo-3"
+                variants={logoVariants}
+                initial="initial"
+                animate="animate"
+                custom={2}
+                whileHover="hover"
+                onHoverStart={() => setHoveredLogo(3)}
+                onHoverEnd={() => setHoveredLogo(null)}
+              >
+                <motion.img src={IMAGES.powerBILogo} alt="Power BI" onError={(e) => e.target.parentElement.style.display = 'none'} />
+                {hoveredLogo === 3 && <motion.div className="logo-glow" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 2, opacity: [0, 0.5, 0] }} transition={{ duration: 1, repeat: Infinity }} />}
+              </motion.div>
             )}
             {IMAGES.tableauLogo && (
-              <div className="logo-item logo-4">
-                <img src={IMAGES.tableauLogo} alt="Tableau" onError={(e) => e.target.parentElement.style.display = 'none'} />
-              </div>
+              <motion.div
+                className="logo-item logo-4"
+                variants={logoVariants}
+                initial="initial"
+                animate="animate"
+                custom={3}
+                whileHover="hover"
+                onHoverStart={() => setHoveredLogo(4)}
+                onHoverEnd={() => setHoveredLogo(null)}
+              >
+                <motion.img src={IMAGES.tableauLogo} alt="Tableau" onError={(e) => e.target.parentElement.style.display = 'none'} />
+                {hoveredLogo === 4 && <motion.div className="logo-glow" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 2, opacity: [0, 0.5, 0] }} transition={{ duration: 1, repeat: Infinity }} />}
+              </motion.div>
             )}
             {IMAGES.jiraLogo && (
-              <div className="logo-item logo-5">
-                <img src={IMAGES.jiraLogo} alt="Jira" onError={(e) => e.target.parentElement.style.display = 'none'} />
-              </div>
+              <motion.div
+                className="logo-item logo-5"
+                variants={logoVariants}
+                initial="initial"
+                animate="animate"
+                custom={4}
+                whileHover="hover"
+                onHoverStart={() => setHoveredLogo(5)}
+                onHoverEnd={() => setHoveredLogo(null)}
+              >
+                <motion.img src={IMAGES.jiraLogo} alt="Jira" onError={(e) => e.target.parentElement.style.display = 'none'} />
+                {hoveredLogo === 5 && <motion.div className="logo-glow" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 2, opacity: [0, 0.5, 0] }} transition={{ duration: 1, repeat: Infinity }} />}
+              </motion.div>
             )}
             {IMAGES.figmaLogo && (
-              <div className="logo-item logo-6">
-                <img src={IMAGES.figmaLogo} alt="Figma" onError={(e) => e.target.parentElement.style.display = 'none'} />
-              </div>
+              <motion.div
+                className="logo-item logo-6"
+                variants={logoVariants}
+                initial="initial"
+                animate="animate"
+                custom={5}
+                whileHover="hover"
+                onHoverStart={() => setHoveredLogo(6)}
+                onHoverEnd={() => setHoveredLogo(null)}
+              >
+                <motion.img src={IMAGES.figmaLogo} alt="Figma" onError={(e) => e.target.parentElement.style.display = 'none'} />
+                {hoveredLogo === 6 && <motion.div className="logo-glow" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 2, opacity: [0, 0.5, 0] }} transition={{ duration: 1, repeat: Infinity }} />}
+              </motion.div>
             )}
             {IMAGES.postmanLogo && (
-              <div className="logo-item logo-7">
-                <img src={IMAGES.postmanLogo} alt="Postman" onError={(e) => e.target.parentElement.style.display = 'none'} />
-              </div>
+              <motion.div
+                className="logo-item logo-7"
+                variants={logoVariants}
+                initial="initial"
+                animate="animate"
+                custom={6}
+                whileHover="hover"
+                onHoverStart={() => setHoveredLogo(7)}
+                onHoverEnd={() => setHoveredLogo(null)}
+              >
+                <motion.img src={IMAGES.postmanLogo} alt="Postman" onError={(e) => e.target.parentElement.style.display = 'none'} />
+                {hoveredLogo === 7 && <motion.div className="logo-glow" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 2, opacity: [0, 0.5, 0] }} transition={{ duration: 1, repeat: Infinity }} />}
+              </motion.div>
             )}
             {IMAGES.postgresqlLogo && (
-              <div className="logo-item logo-8">
-                <img src={IMAGES.postgresqlLogo} alt="PostgreSQL" onError={(e) => e.target.parentElement.style.display = 'none'} />
-              </div>
+              <motion.div
+                className="logo-item logo-8"
+                variants={logoVariants}
+                initial="initial"
+                animate="animate"
+                custom={7}
+                whileHover="hover"
+                onHoverStart={() => setHoveredLogo(8)}
+                onHoverEnd={() => setHoveredLogo(null)}
+              >
+                <motion.img src={IMAGES.postgresqlLogo} alt="PostgreSQL" onError={(e) => e.target.parentElement.style.display = 'none'} />
+                {hoveredLogo === 8 && <motion.div className="logo-glow" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 2, opacity: [0, 0.5, 0] }} transition={{ duration: 1, repeat: Infinity }} />}
+              </motion.div>
             )}
             {IMAGES.metabaseLogo && (
-              <div className="logo-item logo-9">
-                <img src={IMAGES.metabaseLogo} alt="Metabase" onError={(e) => e.target.parentElement.style.display = 'none'} />
-              </div>
+              <motion.div
+                className="logo-item logo-9"
+                variants={logoVariants}
+                initial="initial"
+                animate="animate"
+                custom={8}
+                whileHover="hover"
+                onHoverStart={() => setHoveredLogo(9)}
+                onHoverEnd={() => setHoveredLogo(null)}
+              >
+                <motion.img src={IMAGES.metabaseLogo} alt="Metabase" onError={(e) => e.target.parentElement.style.display = 'none'} />
+                {hoveredLogo === 9 && <motion.div className="logo-glow" initial={{ scale: 0, opacity: 0 }} animate={{ scale: 2, opacity: [0, 0.5, 0] }} transition={{ duration: 1, repeat: Infinity }} />}
+              </motion.div>
             )}
           </div>
           <div className="skills-cards">
-            <div className="skill-card skill-card-1">
-              <div className="skill-card-number">{t.skills.skill1.number}</div>
+            <motion.div
+              className="skill-card skill-card-1"
+              variants={cardVariants}
+              initial="initial"
+              animate="animate"
+              custom={0}
+              whileHover="hover"
+              whileTap={{ scale: 0.95 }}
+            >
+              <motion.div
+                className="skill-card-number"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
+              >
+                {t.skills.skill1.number}
+              </motion.div>
               <h3 className="skill-card-title">{t.skills.skill1.title}</h3>
               <p className="skill-card-description">
                 {t.skills.skill1.description}
               </p>
-            </div>
-            <div className="skill-card skill-card-2">
-              <div className="skill-card-number">{t.skills.skill2.number}</div>
+            </motion.div>
+            <motion.div
+              className="skill-card skill-card-2"
+              variants={cardVariants}
+              initial="initial"
+              animate="animate"
+              custom={1}
+              whileHover="hover"
+              whileTap={{ scale: 0.95 }}
+            >
+              <motion.div
+                className="skill-card-number"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.6, type: "spring", stiffness: 200 }}
+              >
+                {t.skills.skill2.number}
+              </motion.div>
               <h3 className="skill-card-title">{t.skills.skill2.title}</h3>
               <p className="skill-card-description">
                 {t.skills.skill2.description}
               </p>
-            </div>
-            <div className="skill-card skill-card-3">
-              <div className="skill-card-number">{t.skills.skill3.number}</div>
+            </motion.div>
+            <motion.div
+              className="skill-card skill-card-3"
+              variants={cardVariants}
+              initial="initial"
+              animate="animate"
+              custom={2}
+              whileHover="hover"
+              whileTap={{ scale: 0.95 }}
+            >
+              <motion.div
+                className="skill-card-number"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.7, type: "spring", stiffness: 200 }}
+              >
+                {t.skills.skill3.number}
+              </motion.div>
               <h3 className="skill-card-title">{t.skills.skill3.title}</h3>
               <p className="skill-card-description">
                 {t.skills.skill3.description}
               </p>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>
