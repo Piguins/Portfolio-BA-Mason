@@ -31,4 +31,12 @@ dist-ssr
 *.sln
 *.sw?
 
+# Claude/OpenCode config folders
+.claude/
+.opencode/
+
+# Plans folder (empty/unused)
+plans/
+
+# Vercel
 .vercel
