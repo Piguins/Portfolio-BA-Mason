@@ -27,13 +27,17 @@ export const IMAGES = {
   blurGradient: "/images/blur-gradient.png", // TODO: Export từ Figma
   linesDecoration: "/images/lines-decoration.png", // TODO: Export từ Figma
   
-  // Skills Section - Export từ Figma
-  skillsCirclesBg: "/images/skills-circles-bg.png", // TODO: Export từ Figma
-  sqlLogo: "/images/sql-logo.png", // TODO: Export từ Figma
-  excelLogo: "/images/excel-logo.png", // TODO: Export từ Figma
-  powerBILogo: "/images/powerbi-logo.png", // TODO: Export từ Figma
-  tableauLogo: "/images/tableau-logo.png", // TODO: Export từ Figma
-  jiraLogo: "/images/jira-logo.png", // TODO: Export từ Figma
+  // Skills Section - Export từ Figma hoặc download từ internet
+  skillsCirclesBg: "/images/skills-circles-bg.png",
+  sqlLogo: "/images/sql-logo.png", // TODO: Export từ Figma hoặc download
+  excelLogo: "/images/excel-logo.png", // TODO: Export từ Figma hoặc download
+  powerBILogo: "/images/powerbi-logo.png", // TODO: Export từ Figma hoặc download
+  tableauLogo: "/images/tableau-logo.png", // TODO: Export từ Figma hoặc download
+  jiraLogo: "/images/jira-logo.svg", // ✅ Downloaded
+  figmaLogo: "/images/figma-logo.svg", // ✅ Downloaded
+  postmanLogo: "/images/postman-logo.svg", // ✅ Downloaded
+  postgresqlLogo: "/images/postgresql-logo.svg", // ✅ Downloaded
+  metabaseLogo: "/images/metabase-logo.svg", // ✅ Downloaded
   
   // Decorative Vector Patterns - Export từ Figma
   wavyVector1: "/images/wavy-vector-1.png", // TODO: Export từ Figma

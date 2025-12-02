@@ -252,6 +252,87 @@
   animation-play-state: paused !important;
 }
 
+/* New logos - logo-6 to logo-9 */
+.logo-6 {
+  animation: orbit6 24s linear infinite;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes orbit6 {
+  from {
+    transform: translate(-50%, -50%) rotate(60deg) translateX(170px) rotate(-60deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(420deg) translateX(170px) rotate(-420deg);
+  }
+}
+
+.logo-7 {
+  animation: orbit7 28s linear infinite;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes orbit7 {
+  from {
+    transform: translate(-50%, -50%) rotate(300deg) translateX(210px) rotate(-300deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(660deg) translateX(210px) rotate(-660deg);
+  }
+}
+
+.logo-8 {
+  animation: orbit8 26s linear infinite;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes orbit8 {
+  from {
+    transform: translate(-50%, -50%) rotate(45deg) translateX(185px) rotate(-45deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(405deg) translateX(185px) rotate(-405deg);
+  }
+}
+
+.logo-9 {
+  animation: orbit9 32s linear infinite;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes orbit9 {
+  from {
+    transform: translate(-50%, -50%) rotate(270deg) translateX(195px) rotate(-270deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(630deg) translateX(195px) rotate(-630deg);
+  }
+}
+
+.logo-6:hover {
+  animation-play-state: paused !important;
+}
+
+.logo-7:hover {
+  animation-play-state: paused !important;
+}
+
+.logo-8:hover {
+  animation-play-state: paused !important;
+}
+
+.logo-9:hover {
+  animation-play-state: paused !important;
+}
+
 .skills-cards {
   position: relative;
   display: flex;

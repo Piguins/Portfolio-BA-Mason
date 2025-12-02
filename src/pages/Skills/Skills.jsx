@@ -41,6 +41,26 @@ const Skills = () => {
                 <img src={IMAGES.jiraLogo} alt="Jira" onError={(e) => e.target.parentElement.style.display = 'none'} />
               </div>
             )}
+            {IMAGES.figmaLogo && (
+              <div className="logo-item logo-6">
+                <img src={IMAGES.figmaLogo} alt="Figma" onError={(e) => e.target.parentElement.style.display = 'none'} />
+              </div>
+            )}
+            {IMAGES.postmanLogo && (
+              <div className="logo-item logo-7">
+                <img src={IMAGES.postmanLogo} alt="Postman" onError={(e) => e.target.parentElement.style.display = 'none'} />
+              </div>
+            )}
+            {IMAGES.postgresqlLogo && (
+              <div className="logo-item logo-8">
+                <img src={IMAGES.postgresqlLogo} alt="PostgreSQL" onError={(e) => e.target.parentElement.style.display = 'none'} />
+              </div>
+            )}
+            {IMAGES.metabaseLogo && (
+              <div className="logo-item logo-9">
+                <img src={IMAGES.metabaseLogo} alt="Metabase" onError={(e) => e.target.parentElement.style.display = 'none'} />
+              </div>
+            )}
           </div>
           <div className="skills-cards">
             <div className="skill-card skill-card-1">
