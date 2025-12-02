@@ -13,9 +13,11 @@ const Home = () => {
       <div className="top-shapes">
         <div className="gradient-shape gradient-shape-1"></div>
         <div className="gradient-shape gradient-shape-2"></div>
-        <div className="lines-decoration">
-          <img src={IMAGES.linesDecoration} alt="" />
-        </div>
+        {IMAGES.linesDecoration && (
+          <div className="lines-decoration">
+            <img src={IMAGES.linesDecoration} alt="" onError={(e) => e.target.parentElement.style.display = 'none'} />
+          </div>
+        )}
       </div>
 
       <Hero />

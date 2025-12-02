@@ -11,9 +11,11 @@ const CTA = () => {
       {/* CTA Section 1 */}
       <section className="cta-section cta-section-1">
         {/* Decorative wavy vector pattern */}
-        <div className="wavy-decoration wavy-decoration-cta1">
-          <img src={IMAGES.wavyVector3} alt="" />
-        </div>
+        {IMAGES.wavyVector3 && (
+          <div className="wavy-decoration wavy-decoration-cta1">
+            <img src={IMAGES.wavyVector3} alt="" onError={(e) => e.target.parentElement.style.display = 'none'} />
+          </div>
+        )}
         
         <div className="cta-content">
           <h2 className="cta-title">{t.cta.section1.title}</h2>
@@ -29,9 +31,11 @@ const CTA = () => {
       {/* CTA Section 2 / Contact */}
       <section id="contact" className="cta-section cta-section-2">
         {/* Decorative wavy vector pattern */}
-        <div className="wavy-decoration wavy-decoration-cta2">
-          <img src={IMAGES.wavyVector1} alt="" />
-        </div>
+        {IMAGES.wavyVector1 && (
+          <div className="wavy-decoration wavy-decoration-cta2">
+            <img src={IMAGES.wavyVector1} alt="" onError={(e) => e.target.parentElement.style.display = 'none'} />
+          </div>
+        )}
         
         <div className="cta-wrapper">
           <div className="cta-info">
