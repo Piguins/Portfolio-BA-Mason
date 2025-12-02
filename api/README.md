@@ -31,7 +31,20 @@ DATABASE_URL=postgresql://postgres:YOUR_ACTUAL_PASSWORD@db.qeqjowagaybaejjyqjkg.
 ```
 
 **Lưu ý:** 
-- Password có thể chứa ký tự đặc biệt, nếu vậy cần URL encode
+- ⚠️ **QUAN TRỌNG:** Nếu password có ký tự đặc biệt (`@`, `#`, `%`, `&`, `+`, `=`, `:`, `/`, `?`), **BẮT BUỘC** phải URL encode:
+  - `@` → `%40`
+  - `#` → `%23`
+  - `%` → `%25`
+  - `&` → `%26`
+  - `+` → `%2B`
+  - `=` → `%3D`
+  - `:` → `%3A`
+  - `/` → `%2F`
+  - `?` → `%3F`
+  
+  **Ví dụ:** Nếu password là `Kiethongngu@1`, dùng `Kiethongngu%401`
+  
+- Có thể dùng helper script: `node encode-password.js "your@password"`
 - Nếu không nhớ password, có thể reset trong Supabase Dashboard → Settings → Database → Reset database password
 
 ### 3. Test kết nối
@@ -100,15 +113,28 @@ Trả về nội dung CMS cho các section của trang.
 ### Lỗi: `getaddrinfo ENOTFOUND db.qeqjowagaybaejjyqjkg.supabase.co`
 
 **Nguyên nhân:**
+- Direct connection của Supabase mặc định dùng **IPv6**, mạng của bạn có thể không support IPv6
 - Password chưa được thay thế đúng trong `.env`
 - Format connection string sai
 - Network/DNS issue
 
 **Giải pháp:**
-1. Kiểm tra lại file `.env` - đảm bảo `DATABASE_URL` có format đúng
-2. Đảm bảo đã thay `[YOUR_PASSWORD]` hoặc `YOUR_PASSWORD_HERE` bằng password thực tế
-3. Test connection string từ Supabase Dashboard → SQL Editor → New query → thử query đơn giản
-4. Nếu vẫn lỗi, reset database password và cập nhật lại `.env`
+1. **Thử dùng Session Mode Pooler (IPv4 compatible):**
+   - Vào Supabase Dashboard → Settings → Database → Connection string
+   - Chọn **Session mode** (port 5432) thay vì Direct connection
+   - Copy connection string và thay vào `.env`
+   - Format: `postgresql://postgres.[PROJECT_REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres`
+
+2. **Hoặc kiểm tra IPv6 support:**
+   ```bash
+   ping6 db.qeqjowagaybaejjyqjkg.supabase.co
+   ```
+   Nếu không ping được, mạng của bạn không support IPv6 → dùng Session Mode Pooler
+
+3. Kiểm tra lại file `.env` - đảm bảo `DATABASE_URL` có format đúng
+4. Đảm bảo đã thay password bằng password thực tế
+5. Test connection string từ Supabase Dashboard → SQL Editor → New query → thử query đơn giản
+6. Nếu vẫn lỗi, reset database password và cập nhật lại `.env`
 
 ### Lỗi: `password authentication failed`
 
