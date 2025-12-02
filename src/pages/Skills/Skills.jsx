@@ -11,6 +11,19 @@ const Skills = () => {
         <h2 className="skills-title">{t.skills.title}</h2>
         <div className="skills-content-wrapper">
           <div className="skills-logos">
+            {/* Orbital paths - quỹ đạo */}
+            <svg className="orbital-paths" viewBox="0 0 500 500" preserveAspectRatio="xMidYMid meet">
+              {/* Outer orbit paths */}
+              <circle className="orbit-path orbit-path-1" cx="250" cy="250" r="180" fill="none" stroke="rgba(88, 63, 188, 0.15)" strokeWidth="1" strokeDasharray="5,5" />
+              <circle className="orbit-path orbit-path-2" cx="250" cy="250" r="220" fill="none" stroke="rgba(125, 224, 234, 0.15)" strokeWidth="1" strokeDasharray="5,5" />
+              <circle className="orbit-path orbit-path-3" cx="250" cy="250" r="160" fill="none" stroke="rgba(88, 63, 188, 0.12)" strokeWidth="1" strokeDasharray="5,5" />
+              <circle className="orbit-path orbit-path-4" cx="250" cy="250" r="190" fill="none" stroke="rgba(125, 224, 234, 0.12)" strokeWidth="1" strokeDasharray="5,5" />
+              <circle className="orbit-path orbit-path-5" cx="250" cy="250" r="200" fill="none" stroke="rgba(88, 63, 188, 0.1)" strokeWidth="1" strokeDasharray="5,5" />
+              <circle className="orbit-path orbit-path-6" cx="250" cy="250" r="170" fill="none" stroke="rgba(125, 224, 234, 0.1)" strokeWidth="1" strokeDasharray="5,5" />
+              <circle className="orbit-path orbit-path-7" cx="250" cy="250" r="210" fill="none" stroke="rgba(88, 63, 188, 0.08)" strokeWidth="1" strokeDasharray="5,5" />
+              <circle className="orbit-path orbit-path-8" cx="250" cy="250" r="185" fill="none" stroke="rgba(125, 224, 234, 0.08)" strokeWidth="1" strokeDasharray="5,5" />
+              <circle className="orbit-path orbit-path-9" cx="250" cy="250" r="195" fill="none" stroke="rgba(88, 63, 188, 0.08)" strokeWidth="1" strokeDasharray="5,5" />
+            </svg>
             {IMAGES.skillsCirclesBg && (
               <div className="skills-circles-bg">
                 <img src={IMAGES.skillsCirclesBg} alt="" onError={(e) => e.target.parentElement.style.display = 'none'} />

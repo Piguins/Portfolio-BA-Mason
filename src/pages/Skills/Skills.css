@@ -84,6 +84,52 @@
   justify-content: center;
 }
 
+/* Orbital paths SVG */
+.orbital-paths {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 500px;
+  height: 500px;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.6;
+  animation: orbitPathRotate 60s linear infinite;
+}
+
+@keyframes orbitPathRotate {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+.orbit-path {
+  animation: orbitPathPulse 3s ease-in-out infinite;
+}
+
+.orbit-path:nth-child(odd) {
+  animation-delay: 0s;
+}
+
+.orbit-path:nth-child(even) {
+  animation-delay: 1.5s;
+}
+
+@keyframes orbitPathPulse {
+  0%, 100% {
+    opacity: 0.4;
+    stroke-width: 1;
+  }
+  50% {
+    opacity: 0.7;
+    stroke-width: 1.5;
+  }
+}
+
 .skills-circles-bg {
   position: absolute;
   width: 725px;
@@ -92,6 +138,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   animation: rotateBackground 60s linear infinite;
+  z-index: 2;
 }
 
 @keyframes rotateBackground {
@@ -121,7 +168,7 @@
   transition: all 0.3s ease;
   transform-origin: center center;
   cursor: pointer;
-  z-index: 5;
+  z-index: 6;
   pointer-events: auto;
   padding: 15px;
   box-sizing: border-box;
@@ -173,9 +220,10 @@
   border: 3px solid #509EE3; /* Metabase - Light Blue border */
 }
 
-/* Orbit animation - quỹ đạo vũ trụ */
+/* Orbit animation - quỹ đạo vũ trụ với spacing đều nhau */
+/* 9 logos, mỗi logo cách nhau 40 độ (360/9 = 40) */
 .logo-1 {
-  animation: orbit1 20s linear infinite;
+  animation: orbit1 25s linear infinite;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -199,15 +247,15 @@
 
 @keyframes orbit2 {
   from {
-    transform: translate(-50%, -50%) rotate(0deg) translateX(220px) rotate(0deg);
+    transform: translate(-50%, -50%) rotate(40deg) translateX(220px) rotate(-40deg);
   }
   to {
-    transform: translate(-50%, -50%) rotate(360deg) translateX(220px) rotate(-360deg);
+    transform: translate(-50%, -50%) rotate(400deg) translateX(220px) rotate(-400deg);
   }
 }
 
 .logo-3 {
-  animation: orbit3 30s linear infinite;
+  animation: orbit3 25s linear infinite;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -215,15 +263,15 @@
 
 @keyframes orbit3 {
   from {
-    transform: translate(-50%, -50%) rotate(120deg) translateX(160px) rotate(-120deg);
+    transform: translate(-50%, -50%) rotate(80deg) translateX(160px) rotate(-80deg);
   }
   to {
-    transform: translate(-50%, -50%) rotate(480deg) translateX(160px) rotate(-480deg);
+    transform: translate(-50%, -50%) rotate(440deg) translateX(160px) rotate(-440deg);
   }
 }
 
 .logo-4 {
-  animation: orbit4 18s linear infinite;
+  animation: orbit4 25s linear infinite;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -231,15 +279,15 @@
 
 @keyframes orbit4 {
   from {
-    transform: translate(-50%, -50%) rotate(240deg) translateX(190px) rotate(-240deg);
+    transform: translate(-50%, -50%) rotate(120deg) translateX(190px) rotate(-120deg);
   }
   to {
-    transform: translate(-50%, -50%) rotate(600deg) translateX(190px) rotate(-600deg);
+    transform: translate(-50%, -50%) rotate(480deg) translateX(190px) rotate(-480deg);
   }
 }
 
 .logo-5 {
-  animation: orbit5 22s linear infinite;
+  animation: orbit5 25s linear infinite;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -247,10 +295,10 @@
 
 @keyframes orbit5 {
   from {
-    transform: translate(-50%, -50%) rotate(180deg) translateX(200px) rotate(-180deg);
+    transform: translate(-50%, -50%) rotate(160deg) translateX(200px) rotate(-160deg);
   }
   to {
-    transform: translate(-50%, -50%) rotate(540deg) translateX(200px) rotate(-540deg);
+    transform: translate(-50%, -50%) rotate(520deg) translateX(200px) rotate(-520deg);
   }
 }
 
@@ -313,9 +361,9 @@
   animation-play-state: paused !important;
 }
 
-/* New logos - logo-6 to logo-9 */
+/* New logos - logo-6 to logo-9 với spacing đều nhau */
 .logo-6 {
-  animation: orbit6 24s linear infinite;
+  animation: orbit6 25s linear infinite;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -323,15 +371,15 @@
 
 @keyframes orbit6 {
   from {
-    transform: translate(-50%, -50%) rotate(60deg) translateX(170px) rotate(-60deg);
+    transform: translate(-50%, -50%) rotate(200deg) translateX(170px) rotate(-200deg);
   }
   to {
-    transform: translate(-50%, -50%) rotate(420deg) translateX(170px) rotate(-420deg);
+    transform: translate(-50%, -50%) rotate(560deg) translateX(170px) rotate(-560deg);
   }
 }
 
 .logo-7 {
-  animation: orbit7 28s linear infinite;
+  animation: orbit7 25s linear infinite;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -339,15 +387,15 @@
 
 @keyframes orbit7 {
   from {
-    transform: translate(-50%, -50%) rotate(300deg) translateX(210px) rotate(-300deg);
+    transform: translate(-50%, -50%) rotate(240deg) translateX(210px) rotate(-240deg);
   }
   to {
-    transform: translate(-50%, -50%) rotate(660deg) translateX(210px) rotate(-660deg);
+    transform: translate(-50%, -50%) rotate(600deg) translateX(210px) rotate(-600deg);
   }
 }
 
 .logo-8 {
-  animation: orbit8 26s linear infinite;
+  animation: orbit8 25s linear infinite;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -355,15 +403,15 @@
 
 @keyframes orbit8 {
   from {
-    transform: translate(-50%, -50%) rotate(45deg) translateX(185px) rotate(-45deg);
+    transform: translate(-50%, -50%) rotate(280deg) translateX(185px) rotate(-280deg);
   }
   to {
-    transform: translate(-50%, -50%) rotate(405deg) translateX(185px) rotate(-405deg);
+    transform: translate(-50%, -50%) rotate(640deg) translateX(185px) rotate(-640deg);
   }
 }
 
 .logo-9 {
-  animation: orbit9 32s linear infinite;
+  animation: orbit9 25s linear infinite;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -371,10 +419,10 @@
 
 @keyframes orbit9 {
   from {
-    transform: translate(-50%, -50%) rotate(270deg) translateX(195px) rotate(-270deg);
+    transform: translate(-50%, -50%) rotate(320deg) translateX(195px) rotate(-320deg);
   }
   to {
-    transform: translate(-50%, -50%) rotate(630deg) translateX(195px) rotate(-630deg);
+    transform: translate(-50%, -50%) rotate(680deg) translateX(195px) rotate(-680deg);
   }
 }
 
@@ -659,6 +707,16 @@
   .skills-logos {
     min-height: 250px;
     overflow: visible;
+  }
+
+  .orbital-paths {
+    width: 350px;
+    height: 350px;
+  }
+
+  .orbit-path {
+    stroke-width: 0.5;
+    opacity: 0.3;
   }
 
   .logo-item {
