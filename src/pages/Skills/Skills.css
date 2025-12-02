@@ -116,6 +116,54 @@
   cursor: pointer;
   z-index: 5;
   pointer-events: auto;
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+/* Background colors for each logo - official brand colors with light tint */
+.logo-1 {
+  background: #FFF4E6; /* SQL - Light Orange background */
+  border: 3px solid #F29111; /* SQL - Orange border */
+}
+
+.logo-2 {
+  background: #E8F5E9; /* Excel - Light Green background */
+  border: 3px solid #217346; /* Excel - Green border */
+}
+
+.logo-3 {
+  background: #FFF9E6; /* Power BI - Light Yellow background */
+  border: 3px solid #F2C811; /* Power BI - Yellow border */
+}
+
+.logo-4 {
+  background: #FFF3E0; /* Tableau - Light Orange background */
+  border: 3px solid #E97627; /* Tableau - Orange border */
+}
+
+.logo-5 {
+  background: #E3F2FD; /* Jira - Light Blue background */
+  border: 3px solid #0052CC; /* Jira - Blue border */
+}
+
+.logo-6 {
+  background: #FFF1ED; /* Figma - Light Red Orange background */
+  border: 3px solid #F24E1E; /* Figma - Red Orange border */
+}
+
+.logo-7 {
+  background: #FFF4F0; /* Postman - Light Orange background */
+  border: 3px solid #FF6C37; /* Postman - Orange border */
+}
+
+.logo-8 {
+  background: #E8EDF2; /* PostgreSQL - Light Blue background */
+  border: 3px solid #336791; /* PostgreSQL - Blue border */
+}
+
+.logo-9 {
+  background: #E8F4FD; /* Metabase - Light Blue background */
+  border: 3px solid #509EE3; /* Metabase - Light Blue border */
 }
 
 /* Orbit animation - quỹ đạo vũ trụ */
@@ -200,11 +248,12 @@
 }
 
 .logo-item img {
-  width: 100%;
-  height: 100%;
+  width: 70%;
+  height: 70%;
   object-fit: contain;
   animation: logoSpin 8s linear infinite reverse;
   transition: transform 0.3s ease;
+  /* Keep original logo colors - no filter */
 }
 
 @keyframes logoSpin {
@@ -225,10 +274,15 @@
   z-index: 100 !important;
 }
 
+.logo-item:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  transform: scale(1.05) !important;
+}
+
 .logo-item:hover img {
   animation-play-state: paused;
-  transform: scale(1.3) rotate(0deg) !important;
-  filter: brightness(1.2) drop-shadow(0 5px 15px rgba(88, 63, 188, 0.4));
+  transform: scale(1.2) rotate(0deg) !important;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
 }
 
 /* Pause orbit animation on hover */
