@@ -1,5 +1,10 @@
 // Swagger/OpenAPI configuration
 import swaggerJsdoc from 'swagger-jsdoc'
+import path from 'path'
+import { fileURLToPath } from 'url'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const options = {
   definition: {
@@ -142,8 +147,8 @@ const options = {
     ],
   },
   apis: [
-    './src/index.js', // Path to the API files
-    './src/**/*.js' // Include all JS files in src directory
+    path.join(__dirname, 'index.js'), // Absolute path for Vercel compatibility
+    path.join(__dirname, '**/*.js'), // Include all JS files
   ],
 }
 
