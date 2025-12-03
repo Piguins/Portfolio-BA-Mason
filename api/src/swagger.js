@@ -141,7 +141,10 @@ const options = {
       },
     ],
   },
-  apis: ['./src/index.js'], // Path to the API files
+  apis: [
+    './src/index.js', // Path to the API files
+    './src/**/*.js' // Include all JS files in src directory
+  ],
 }
 
 export const swaggerSpec = swaggerJsdoc(options)
