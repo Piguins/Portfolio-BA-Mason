@@ -25,12 +25,14 @@ app.get('/api-docs.json', (req, res) => {
   res.send(swaggerSpec)
 })
 
-// Swagger UI - Setup for Vercel serverless
+// Swagger UI - Setup for Vercel serverless with CDN assets
 const swaggerOptions = {
   customCss: '.swagger-ui .topbar { display: none }',
   customSiteTitle: 'Mason Portfolio API Documentation',
+  customCssUrl: 'https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui.css',
   customJs: [
-    // Custom initialization to ensure spec loads
+    'https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-bundle.js',
+    'https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-standalone-preset.js',
   ],
   swaggerOptions: {
     // Don't use url, pass spec directly via setup()
