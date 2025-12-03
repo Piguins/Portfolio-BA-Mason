@@ -21,6 +21,7 @@ app.use(express.json())
 // Serve Swagger JSON spec FIRST
 app.get('/api-docs.json', (req, res) => {
   res.setHeader('Content-Type', 'application/json')
+  res.setHeader('Access-Control-Allow-Origin', '*')
   res.send(swaggerSpec)
 })
 
@@ -28,19 +29,25 @@ app.get('/api-docs.json', (req, res) => {
 const swaggerOptions = {
   customCss: '.swagger-ui .topbar { display: none }',
   customSiteTitle: 'Mason Portfolio API Documentation',
+  customJs: [
+    // Custom initialization to ensure spec loads
+  ],
   swaggerOptions: {
-    url: '/api-docs.json', // Explicitly set the spec URL
+    // Don't use url, pass spec directly via setup()
     persistAuthorization: true,
     displayRequestDuration: true,
     filter: true,
     tryItOutEnabled: true,
     docExpansion: 'list',
     deepLinking: true,
+    defaultModelsExpandDepth: 2,
+    defaultModelExpandDepth: 2,
   },
 }
 
-// Setup Swagger UI - Use setup method with spec directly
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, swaggerOptions))
+// Setup Swagger UI - Use setup method with spec directly (not URL)
+app.use('/api-docs', swaggerUi.serve)
+app.get('/api-docs', swaggerUi.setup(swaggerSpec, swaggerOptions))
 
 /**
  * @swagger
