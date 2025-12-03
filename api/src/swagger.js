@@ -15,11 +15,13 @@ const options = {
     },
     servers: [
       {
-        url: process.env.API_URL || 'http://localhost:4000',
-        description: 'Development server',
+        url: process.env.VERCEL_URL 
+          ? `https://${process.env.VERCEL_URL}` 
+          : process.env.API_URL || 'http://localhost:4000',
+        description: 'Current server',
       },
       {
-        url: 'https://portfolio-api-mason.vercel.app',
+        url: 'https://api-beta-green-19.vercel.app',
         description: 'Production server',
       },
     ],

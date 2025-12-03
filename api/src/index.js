@@ -13,11 +13,21 @@ const PORT = process.env.PORT || 4000
 app.use(cors())
 app.use(express.json())
 
-// Swagger UI
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+// Swagger UI - Setup for Vercel serverless
+const swaggerOptions = {
   customCss: '.swagger-ui .topbar { display: none }',
   customSiteTitle: 'Mason Portfolio API Documentation',
-}))
+  customCssUrl: null, // Disable custom CSS URL
+  swaggerOptions: {
+    persistAuthorization: true,
+    displayRequestDuration: true,
+    filter: true,
+    tryItOutEnabled: true,
+  },
+}
+
+app.use('/api-docs', swaggerUi.serve)
+app.get('/api-docs', swaggerUi.setup(swaggerSpec, swaggerOptions))
 
 /**
  * @swagger
