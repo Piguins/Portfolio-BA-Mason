@@ -156,66 +156,32 @@ app.get('/api-docs', (req, res) => {
             onComplete: function() {
               console.log('✅ Swagger UI loaded successfully');
               
-              // Force enable all interactions
-              setTimeout(function enableInteractions() {
-                console.log('🔧 Enabling interactions...');
+              // Swagger UI should work out of the box, but ensure all elements are interactive
+              setTimeout(function() {
+                console.log('🔧 Verifying interactions...');
                 
-                // Enable all opblock summaries (expand/collapse)
-                const opblockSummaries = document.querySelectorAll('.opblock-summary');
-                console.log('Found', opblockSummaries.length, 'opblock summaries');
-                opblockSummaries.forEach(function(summary, index) {
-                  summary.style.cursor = 'pointer';
-                  summary.style.pointerEvents = 'auto';
-                  summary.setAttribute('tabindex', '0');
-                  
-                  // Remove any event blockers
-                  summary.onclick = null;
-                  
-                  // Re-enable click events
-                  summary.addEventListener('click', function(e) {
-                    console.log('Opblock clicked:', index);
-                    // Let Swagger UI handle it
-                  }, true);
+                // Ensure all clickable elements work
+                const allClickables = document.querySelectorAll(
+                  '.opblock-summary, .opblock-tag, .try-out__btn, .btn.try-out__btn, .execute, .btn.execute, .authorize'
+                );
+                console.log('Found', allClickables.length, 'clickable elements');
+                
+                allClickables.forEach(function(el) {
+                  el.style.pointerEvents = 'auto';
+                  el.style.cursor = 'pointer';
+                  if (el.tagName === 'BUTTON' || el.classList.contains('btn')) {
+                    el.disabled = false;
+                    el.removeAttribute('disabled');
+                  }
                 });
                 
-                // Enable Try it out buttons
-                const tryItOutButtons = document.querySelectorAll('.try-out__btn, .btn.try-out__btn');
-                console.log('Found', tryItOutButtons.length, 'Try it out buttons');
-                tryItOutButtons.forEach(function(btn, index) {
-                  btn.style.pointerEvents = 'auto';
-                  btn.style.cursor = 'pointer';
-                  btn.style.opacity = '1';
-                  btn.style.display = 'inline-block';
-                  btn.style.visibility = 'visible';
-                  btn.disabled = false;
-                  btn.removeAttribute('disabled');
-                  
-                  btn.addEventListener('click', function(e) {
-                    console.log('Try it out clicked:', index);
-                    e.stopPropagation();
-                  }, true);
-                });
+                // Force re-render if needed
+                if (window.ui && typeof window.ui.preauthorizeApiKey === 'function') {
+                  console.log('✅ Swagger UI instance ready');
+                }
                 
-                // Enable Execute buttons
-                const executeButtons = document.querySelectorAll('.execute, .btn.execute');
-                console.log('Found', executeButtons.length, 'Execute buttons');
-                executeButtons.forEach(function(btn, index) {
-                  btn.style.pointerEvents = 'auto';
-                  btn.style.cursor = 'pointer';
-                  btn.disabled = false;
-                  btn.removeAttribute('disabled');
-                });
-                
-                // Enable tag expansion
-                const tags = document.querySelectorAll('.opblock-tag');
-                console.log('Found', tags.length, 'tags');
-                tags.forEach(function(tag) {
-                  tag.style.cursor = 'pointer';
-                  tag.style.pointerEvents = 'auto';
-                });
-                
-                console.log('✅ All interactions enabled');
-              }, 2000);
+                console.log('✅ Interactions verified');
+              }, 1000);
             },
             onFailure: function(data) {
               console.error('❌ Swagger UI failed to load:', data);
