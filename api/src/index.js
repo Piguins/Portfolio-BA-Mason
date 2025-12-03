@@ -18,36 +18,29 @@ const PORT = process.env.PORT || 4000
 app.use(cors())
 app.use(express.json())
 
-// Swagger UI - Setup for Vercel serverless
-const swaggerOptions = {
-  customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: 'Mason Portfolio API Documentation',
-  swaggerOptions: {
-    persistAuthorization: true,
-    displayRequestDuration: true,
-    filter: true,
-    tryItOutEnabled: true,
-    docExpansion: 'list',
-  },
-}
-
-// Serve Swagger JSON spec
+// Serve Swagger JSON spec FIRST
 app.get('/api-docs.json', (req, res) => {
   res.setHeader('Content-Type', 'application/json')
   res.send(swaggerSpec)
 })
 
-// Setup Swagger UI - MUST be before static files
-app.use('/api-docs', swaggerUi.serve)
-app.get('/api-docs', (req, res) => {
-  const html = swaggerUi.generateHTML(swaggerSpec, swaggerOptions)
-  res.send(html)
-})
+// Swagger UI - Setup for Vercel serverless
+const swaggerOptions = {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Mason Portfolio API Documentation',
+  swaggerOptions: {
+    url: '/api-docs.json', // Explicitly set the spec URL
+    persistAuthorization: true,
+    displayRequestDuration: true,
+    filter: true,
+    tryItOutEnabled: true,
+    docExpansion: 'list',
+    deepLinking: true,
+  },
+}
 
-// Serve Swagger UI static files (CSS, JS) - MUST be after main route
-app.use('/api-docs', express.static(path.join(__dirname, '../node_modules/swagger-ui-dist'), {
-  index: false, // Don't serve index.html, we handle it above
-}))
+// Setup Swagger UI - Use setup method with spec directly
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, swaggerOptions))
 
 /**
  * @swagger
