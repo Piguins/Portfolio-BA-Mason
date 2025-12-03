@@ -3,9 +3,23 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
+// Get environment variables with defaults
+const getPort = () => {
+  const port = process.env.PORT
+  return port ? parseInt(port, 10) : 4000
+}
+
+const getNodeEnv = () => {
+  return process.env.NODE_ENV || 'development'
+}
+
+const getApiUrl = () => {
+  return process.env.API_URL || 'http://localhost:4000'
+}
+
 export const config = {
-  port: process.env.PORT || 4000,
-  nodeEnv: process.env.NODE_ENV || 'development',
+  port: getPort(),
+  nodeEnv: getNodeEnv(),
   isVercel: process.env.VERCEL === '1',
   
   database: {
@@ -13,7 +27,7 @@ export const config = {
   },
   
   api: {
-    baseUrl: process.env.API_URL || 'http://localhost:4000',
+    baseUrl: getApiUrl(),
   },
   
   vercel: {
