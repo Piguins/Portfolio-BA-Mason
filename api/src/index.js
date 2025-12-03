@@ -45,30 +45,50 @@ app.get('/api-docs', (req, res) => {
   <style>
     .swagger-ui .topbar { display: none; }
     body { margin: 0; }
+    /* Remove any blocking styles */
+    * { box-sizing: border-box; }
+    .swagger-ui * { pointer-events: auto !important; }
     /* Ensure Try it out buttons are visible and clickable */
-    .swagger-ui .try-out__btn {
+    .swagger-ui .try-out__btn,
+    .swagger-ui .btn.try-out__btn {
       cursor: pointer !important;
       pointer-events: auto !important;
       opacity: 1 !important;
+      display: inline-block !important;
+      visibility: visible !important;
     }
     .swagger-ui .opblock.opblock-get .opblock-summary,
     .swagger-ui .opblock.opblock-post .opblock-summary,
     .swagger-ui .opblock.opblock-put .opblock-summary,
-    .swagger-ui .opblock.opblock-delete .opblock-summary {
+    .swagger-ui .opblock.opblock-delete .opblock-summary,
+    .swagger-ui .opblock.opblock-patch .opblock-summary {
       cursor: pointer !important;
+      pointer-events: auto !important;
     }
     /* Ensure operations are expandable */
     .swagger-ui .opblock {
       margin-bottom: 10px;
+      pointer-events: auto !important;
     }
     .swagger-ui .opblock-summary {
-      cursor: pointer;
+      cursor: pointer !important;
+      pointer-events: auto !important;
     }
     .swagger-ui .opblock-summary:hover {
       background-color: rgba(0,0,0,0.05);
     }
-    /* Ensure buttons are visible */
-    .swagger-ui button {
+    /* Ensure all buttons are clickable */
+    .swagger-ui button,
+    .swagger-ui .btn {
+      cursor: pointer !important;
+      pointer-events: auto !important;
+    }
+    .swagger-ui .execute {
+      cursor: pointer !important;
+      pointer-events: auto !important;
+    }
+    /* Ensure expand/collapse works */
+    .swagger-ui .opblock-tag {
       cursor: pointer !important;
     }
   </style>
@@ -78,75 +98,140 @@ app.get('/api-docs', (req, res) => {
   <script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-bundle.js"></script>
   <script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-standalone-preset.js"></script>
   <script>
-    window.onload = function() {
-      // Load spec from URL instead of embedding (safer and more reliable)
-      const specUrl = '${baseUrl}/api-docs.json';
+    (function() {
+      'use strict';
       
-      window.ui = SwaggerUIBundle({
-        url: specUrl,
-        dom_id: '#swagger-ui',
-        deepLinking: true,
-        presets: [
-          SwaggerUIBundle.presets.apis,
-          SwaggerUIStandalonePreset
-        ],
-        plugins: [
-          SwaggerUIBundle.plugins.DownloadUrl
-        ],
-        layout: "StandaloneLayout",
-        persistAuthorization: true,
-        displayRequestDuration: true,
-        filter: true,
-        tryItOutEnabled: true,
-        requestInterceptor: function(request) {
-          // Enable CORS for all requests
-          return request;
-        },
-        responseInterceptor: function(response) {
-          return response;
-        },
-        docExpansion: 'list',
-        defaultModelsExpandDepth: 2,
-        defaultModelExpandDepth: 2,
-        supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch', 'head', 'options'],
-        validatorUrl: null,
-        onComplete: function() {
-          console.log('Swagger UI loaded successfully');
-          
-          // Ensure all interactive elements are enabled
-          setTimeout(function() {
-            // Make sure all opblock summaries are clickable
-            const opblockSummaries = document.querySelectorAll('.opblock-summary');
-            opblockSummaries.forEach(function(summary) {
-              summary.style.cursor = 'pointer';
-              summary.addEventListener('click', function() {
-                // This will be handled by Swagger UI, but ensure it's clickable
-              });
-            });
-            
-            // Ensure Try it out buttons are enabled and visible
-            const tryItOutButtons = document.querySelectorAll('.try-out__btn');
-            tryItOutButtons.forEach(function(btn) {
-              btn.style.pointerEvents = 'auto';
-              btn.style.cursor = 'pointer';
-              btn.style.opacity = '1';
-              btn.disabled = false;
-            });
-            
-            // Ensure Execute buttons are enabled
-            const executeButtons = document.querySelectorAll('.execute');
-            executeButtons.forEach(function(btn) {
-              btn.style.pointerEvents = 'auto';
-              btn.style.cursor = 'pointer';
-              btn.disabled = false;
-            });
-          }, 1500);
-        },
-        onFailure: function(data) {
-          console.error('Swagger UI failed to load:', data);
+      // Wait for DOM and Swagger UI to be ready
+      function initSwagger() {
+        if (typeof SwaggerUIBundle === 'undefined') {
+          console.error('SwaggerUIBundle not loaded');
+          setTimeout(initSwagger, 100);
+          return;
         }
-      });
-    };
+        
+        const specUrl = '${baseUrl}/api-docs.json';
+        console.log('Loading Swagger spec from:', specUrl);
+        
+        try {
+          window.ui = SwaggerUIBundle({
+            url: specUrl,
+            dom_id: '#swagger-ui',
+            deepLinking: true,
+            presets: [
+              SwaggerUIBundle.presets.apis,
+              SwaggerUIStandalonePreset
+            ],
+            plugins: [
+              SwaggerUIBundle.plugins.DownloadUrl
+            ],
+            layout: "StandaloneLayout",
+            persistAuthorization: true,
+            displayRequestDuration: true,
+            filter: true,
+            tryItOutEnabled: true,
+            requestInterceptor: function(request) {
+              console.log('Request:', request.method, request.url);
+              return request;
+            },
+            responseInterceptor: function(response) {
+              console.log('Response:', response.status);
+              return response;
+            },
+            docExpansion: 'list',
+            defaultModelsExpandDepth: 2,
+            defaultModelExpandDepth: 2,
+            supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch', 'head', 'options'],
+            validatorUrl: null,
+            onComplete: function() {
+              console.log('✅ Swagger UI loaded successfully');
+              
+              // Force enable all interactions
+              setTimeout(function enableInteractions() {
+                console.log('🔧 Enabling interactions...');
+                
+                // Enable all opblock summaries (expand/collapse)
+                const opblockSummaries = document.querySelectorAll('.opblock-summary');
+                console.log('Found', opblockSummaries.length, 'opblock summaries');
+                opblockSummaries.forEach(function(summary, index) {
+                  summary.style.cursor = 'pointer';
+                  summary.style.pointerEvents = 'auto';
+                  summary.setAttribute('tabindex', '0');
+                  
+                  // Remove any event blockers
+                  summary.onclick = null;
+                  
+                  // Re-enable click events
+                  summary.addEventListener('click', function(e) {
+                    console.log('Opblock clicked:', index);
+                    // Let Swagger UI handle it
+                  }, true);
+                });
+                
+                // Enable Try it out buttons
+                const tryItOutButtons = document.querySelectorAll('.try-out__btn, .btn.try-out__btn');
+                console.log('Found', tryItOutButtons.length, 'Try it out buttons');
+                tryItOutButtons.forEach(function(btn, index) {
+                  btn.style.pointerEvents = 'auto';
+                  btn.style.cursor = 'pointer';
+                  btn.style.opacity = '1';
+                  btn.style.display = 'inline-block';
+                  btn.style.visibility = 'visible';
+                  btn.disabled = false;
+                  btn.removeAttribute('disabled');
+                  
+                  btn.addEventListener('click', function(e) {
+                    console.log('Try it out clicked:', index);
+                    e.stopPropagation();
+                  }, true);
+                });
+                
+                // Enable Execute buttons
+                const executeButtons = document.querySelectorAll('.execute, .btn.execute');
+                console.log('Found', executeButtons.length, 'Execute buttons');
+                executeButtons.forEach(function(btn, index) {
+                  btn.style.pointerEvents = 'auto';
+                  btn.style.cursor = 'pointer';
+                  btn.disabled = false;
+                  btn.removeAttribute('disabled');
+                });
+                
+                // Enable tag expansion
+                const tags = document.querySelectorAll('.opblock-tag');
+                console.log('Found', tags.length, 'tags');
+                tags.forEach(function(tag) {
+                  tag.style.cursor = 'pointer';
+                  tag.style.pointerEvents = 'auto';
+                });
+                
+                console.log('✅ All interactions enabled');
+              }, 2000);
+            },
+            onFailure: function(data) {
+              console.error('❌ Swagger UI failed to load:', data);
+              document.getElementById('swagger-ui').innerHTML = 
+                '<div style="padding: 20px; color: red;">' +
+                '<h2>Failed to load API definition</h2>' +
+                '<pre>' + JSON.stringify(data, null, 2) + '</pre>' +
+                '</div>';
+            }
+          });
+        } catch (error) {
+          console.error('❌ Error initializing Swagger UI:', error);
+          document.getElementById('swagger-ui').innerHTML = 
+            '<div style="padding: 20px; color: red;">' +
+            '<h2>Error initializing Swagger UI</h2>' +
+            '<pre>' + error.toString() + '</pre>' +
+            '</div>';
+        }
+      }
+      
+      // Start initialization
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSwagger);
+      } else {
+        initSwagger();
+      }
+    })();
   </script>
 </body>
 </html>`
