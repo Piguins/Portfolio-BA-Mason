@@ -3,8 +3,10 @@
 
 import express from 'express'
 import cors from 'cors'
-import { config } from './config/index.js'
+import { getConfig } from './config/index.js'
 import { errorHandler } from './middleware/errorHandler.js'
+
+const config = getConfig()
 
 // Routes
 import healthRoutes from './routes/healthRoutes.js'
