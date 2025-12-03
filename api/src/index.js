@@ -18,15 +18,6 @@ const PORT = process.env.PORT || 4000
 app.use(cors())
 app.use(express.json())
 
-// Serve Swagger JSON spec
-app.get('/api-docs.json', (req, res) => {
-  res.setHeader('Content-Type', 'application/json')
-  res.send(swaggerSpec)
-})
-
-// Serve Swagger UI static files
-app.use('/api-docs', express.static(path.join(__dirname, '../node_modules/swagger-ui-dist')))
-
 // Swagger UI - Setup for Vercel serverless
 const swaggerOptions = {
   customCss: '.swagger-ui .topbar { display: none }',
@@ -40,12 +31,23 @@ const swaggerOptions = {
   },
 }
 
-// Setup Swagger UI with explicit spec
+// Serve Swagger JSON spec
+app.get('/api-docs.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json')
+  res.send(swaggerSpec)
+})
+
+// Setup Swagger UI - MUST be before static files
 app.use('/api-docs', swaggerUi.serve)
-app.get('/api-docs', (req, res, next) => {
+app.get('/api-docs', (req, res) => {
   const html = swaggerUi.generateHTML(swaggerSpec, swaggerOptions)
   res.send(html)
 })
+
+// Serve Swagger UI static files (CSS, JS) - MUST be after main route
+app.use('/api-docs', express.static(path.join(__dirname, '../node_modules/swagger-ui-dist'), {
+  index: false, // Don't serve index.html, we handle it above
+}))
 
 /**
  * @swagger
