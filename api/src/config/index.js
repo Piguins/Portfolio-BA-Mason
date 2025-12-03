@@ -21,8 +21,9 @@ export const config = {
   },
 }
 
-// Validate required config
-if (!config.database.url) {
+// Validate required config (only in non-Vercel environments or if explicitly checking)
+// In Vercel, env vars are set at deployment time, so we don't throw during module load
+if (!config.isVercel && !config.database.url) {
   throw new Error('DATABASE_URL is required in environment variables')
 }
 
