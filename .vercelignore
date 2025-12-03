@@ -1,5 +1,4 @@
 api/**
-cms/**
 *.md
 node_modules
 .git
