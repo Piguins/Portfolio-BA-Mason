@@ -12,6 +12,99 @@ const options = {
         name: 'Mason',
         url: 'https://github.com/Piguins/Portfolio-BA-Mason',
       },
+      license: {
+        name: 'MIT',
+      },
+    },
+    components: {
+      schemas: {
+        Error: {
+          type: 'object',
+          properties: {
+            error: {
+              type: 'string',
+              description: 'Error message',
+            },
+          },
+        },
+        Project: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            slug: { type: 'string' },
+            title: { type: 'string' },
+            subtitle: { type: 'string', nullable: true },
+            summary: { type: 'string', nullable: true },
+            content: { type: 'string', nullable: true },
+            hero_image_url: { type: 'string', nullable: true },
+            case_study_url: { type: 'string', nullable: true },
+            external_url: { type: 'string', nullable: true },
+            order_index: { type: 'integer' },
+            is_published: { type: 'boolean' },
+            tags: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  id: { type: 'integer' },
+                  name: { type: 'string' },
+                  color: { type: 'string' },
+                },
+              },
+            },
+          },
+        },
+        Skill: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer' },
+            name: { type: 'string' },
+            slug: { type: 'string' },
+            category: { type: 'string' },
+            level: { type: 'integer', minimum: 1, maximum: 5 },
+            icon_url: { type: 'string', nullable: true },
+            description: { type: 'string', nullable: true },
+            order_index: { type: 'integer' },
+            is_highlight: { type: 'boolean' },
+          },
+        },
+        Experience: {
+          type: 'object',
+          properties: {
+            id: { type: 'string', format: 'uuid' },
+            company: { type: 'string' },
+            role: { type: 'string' },
+            location: { type: 'string', nullable: true },
+            start_date: { type: 'string', format: 'date' },
+            end_date: { type: 'string', format: 'date', nullable: true },
+            is_current: { type: 'boolean' },
+            description: { type: 'string', nullable: true },
+            bullets: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  id: { type: 'integer' },
+                  text: { type: 'string' },
+                  order_index: { type: 'integer' },
+                },
+              },
+            },
+            skills_used: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  id: { type: 'integer' },
+                  name: { type: 'string' },
+                  slug: { type: 'string' },
+                  icon_url: { type: 'string', nullable: true },
+                },
+              },
+            },
+          },
+        },
+      },
     },
     servers: [
       {
