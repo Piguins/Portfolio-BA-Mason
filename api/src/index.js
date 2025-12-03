@@ -62,9 +62,26 @@ app.get('/api-docs', (req, res) => {
         displayRequestDuration: true,
         filter: true,
         tryItOutEnabled: true,
+        requestInterceptor: (request) => {
+          // Enable CORS for all requests
+          return request;
+        },
         docExpansion: 'list',
         defaultModelsExpandDepth: 2,
-        defaultModelExpandDepth: 2
+        defaultModelExpandDepth: 2,
+        supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
+        validatorUrl: null, // Disable validator to avoid external requests
+        onComplete: function() {
+          // Force enable Try it out for all operations
+          setTimeout(function() {
+            const tryItOutButtons = document.querySelectorAll('.try-out__btn');
+            tryItOutButtons.forEach(function(btn) {
+              if (btn && !btn.classList.contains('cancel')) {
+                btn.click();
+              }
+            });
+          }, 500);
+        }
       });
     };
   </script>
