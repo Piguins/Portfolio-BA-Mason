@@ -17,7 +17,8 @@
   },
   "functions": {
     "src/index.js": {
-      "includeFiles": "src/**"
+      "includeFiles": "src/**",
+      "maxDuration": 10
     }
   }
 }
