@@ -11,15 +11,5 @@
       "src": "/(.*)",
       "dest": "src/index.js"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  },
-  "functions": {
-    "src/index.js": {
-      "includeFiles": "src/**",
-      "maxDuration": 10
-    }
-  }
+  ]
 }
-
