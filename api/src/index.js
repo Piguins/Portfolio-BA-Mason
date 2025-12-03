@@ -28,9 +28,12 @@ app.get('/api-docs.json', (req, res) => {
 // Custom Swagger UI HTML for Vercel serverless (using CDN)
 app.get('/api-docs', (req, res) => {
   // Get the base URL (protocol + host)
-  const protocol = req.protocol || 'https'
-  const host = req.get('host') || 'api.mason.id.vn'
-  const baseUrl = `${protocol}://${host}`
+  // In Vercel, check X-Forwarded-Proto header for HTTPS
+  const protocol = req.get('x-forwarded-proto') || req.protocol || 'https'
+  const host = req.get('host') || req.get('x-forwarded-host') || 'api.mason.id.vn'
+  // Always use HTTPS for production, or match the request protocol
+  const finalProtocol = protocol === 'https' || host.includes('vercel.app') || host.includes('mason.id.vn') ? 'https' : protocol
+  const baseUrl = `${finalProtocol}://${host}`
   
   const html = `<!DOCTYPE html>
 <html lang="en">
