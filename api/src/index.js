@@ -18,13 +18,6 @@ const PORT = process.env.PORT || 4000
 app.use(cors())
 app.use(express.json())
 
-// Serve Swagger JSON spec FIRST
-app.get('/api-docs.json', (req, res) => {
-  res.setHeader('Content-Type', 'application/json')
-  res.setHeader('Access-Control-Allow-Origin', '*')
-  res.send(swaggerSpec)
-})
-
 // Serve Swagger JSON spec
 app.get('/api-docs.json', (req, res) => {
   res.setHeader('Content-Type', 'application/json')
