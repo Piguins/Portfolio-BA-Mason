@@ -25,31 +25,61 @@ app.get('/api-docs.json', (req, res) => {
   res.send(swaggerSpec)
 })
 
-// Swagger UI - Setup for Vercel serverless with CDN assets
-const swaggerOptions = {
-  customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: 'Mason Portfolio API Documentation',
-  customCssUrl: 'https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui.css',
-  customJs: [
-    'https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-bundle.js',
-    'https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-standalone-preset.js',
-  ],
-  swaggerOptions: {
-    // Don't use url, pass spec directly via setup()
-    persistAuthorization: true,
-    displayRequestDuration: true,
-    filter: true,
-    tryItOutEnabled: true,
-    docExpansion: 'list',
-    deepLinking: true,
-    defaultModelsExpandDepth: 2,
-    defaultModelExpandDepth: 2,
-  },
-}
+// Serve Swagger JSON spec
+app.get('/api-docs.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json')
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.send(swaggerSpec)
+})
 
-// Setup Swagger UI - Use setup method with spec directly (not URL)
-app.use('/api-docs', swaggerUi.serve)
-app.get('/api-docs', swaggerUi.setup(swaggerSpec, swaggerOptions))
+// Custom Swagger UI HTML for Vercel serverless (using CDN)
+app.get('/api-docs', (req, res) => {
+  const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mason Portfolio API Documentation</title>
+  <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui.css" />
+  <style>
+    .swagger-ui .topbar { display: none; }
+    body { margin: 0; }
+  </style>
+</head>
+<body>
+  <div id="swagger-ui"></div>
+  <script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-bundle.js"></script>
+  <script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-standalone-preset.js"></script>
+  <script>
+    window.onload = function() {
+      const spec = ${JSON.stringify(swaggerSpec)};
+      window.ui = SwaggerUIBundle({
+        spec: spec,
+        dom_id: '#swagger-ui',
+        deepLinking: true,
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIStandalonePreset
+        ],
+        plugins: [
+          SwaggerUIBundle.plugins.DownloadUrl
+        ],
+        layout: "StandaloneLayout",
+        persistAuthorization: true,
+        displayRequestDuration: true,
+        filter: true,
+        tryItOutEnabled: true,
+        docExpansion: 'list',
+        defaultModelsExpandDepth: 2,
+        defaultModelExpandDepth: 2
+      });
+    };
+  </script>
+</body>
+</html>
+  `
+  res.send(html)
+})
 
 /**
  * @swagger
