@@ -3,7 +3,9 @@
 
 import express from 'express'
 import cors from 'cors'
+import swaggerUi from 'swagger-ui-express'
 import client from './db.js'
+import { swaggerSpec } from './swagger.js'
 
 const app = express()
 const PORT = process.env.PORT || 4000
@@ -11,7 +13,39 @@ const PORT = process.env.PORT || 4000
 app.use(cors())
 app.use(express.json())
 
-// Health check
+// Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Mason Portfolio API Documentation',
+}))
+
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     summary: Health check endpoint
+ *     tags: [Health]
+ *     description: Check API and database connection status
+ *     responses:
+ *       200:
+ *         description: API is healthy and database is connected
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: ok
+ *                 service:
+ *                   type: string
+ *                   example: portfolio-api
+ *                 database:
+ *                   type: string
+ *                   example: connected
+ *       500:
+ *         description: Database connection failed
+ */
 app.get('/health', async (req, res) => {
   try {
     // Simple DB ping
@@ -27,17 +61,95 @@ app.get('/health', async (req, res) => {
   }
 })
 
-// Root
+/**
+ * @swagger
+ * /:
+ *   get:
+ *     summary: API root endpoint
+ *     tags: [Health]
+ *     description: Get API information and available endpoints
+ *     responses:
+ *       200:
+ *         description: API information
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Mason Portfolio API
+ *                 docs:
+ *                   type: string
+ *                   example: "Available endpoints: /health, /api/projects, /api/skills, /api/experience"
+ *                 swagger:
+ *                   type: string
+ *                   example: /api-docs
+ */
 app.get('/', (req, res) => {
   res.json({
     message: 'Mason Portfolio API',
     docs: 'Available endpoints: /health, /api/projects, /api/skills, /api/experience',
+    swagger: '/api-docs',
   })
 })
 
 // === Public read-only endpoints for FE & CMS ===
 
-// Projects (portfolio items)
+/**
+ * @swagger
+ * /api/projects:
+ *   get:
+ *     summary: Get all published projects
+ *     tags: [Projects]
+ *     description: Retrieve all published portfolio projects with their tags
+ *     responses:
+ *       200:
+ *         description: List of published projects
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     format: uuid
+ *                   slug:
+ *                     type: string
+ *                   title:
+ *                     type: string
+ *                   subtitle:
+ *                     type: string
+ *                   summary:
+ *                     type: string
+ *                   content:
+ *                     type: string
+ *                   hero_image_url:
+ *                     type: string
+ *                   case_study_url:
+ *                     type: string
+ *                   external_url:
+ *                     type: string
+ *                   order_index:
+ *                     type: integer
+ *                   is_published:
+ *                     type: boolean
+ *                   tags:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: integer
+ *                         name:
+ *                           type: string
+ *                         color:
+ *                           type: string
+ *       500:
+ *         description: Failed to fetch projects
+ */
 app.get('/api/projects', async (req, res) => {
   try {
     const result = await client.query(`
@@ -61,7 +173,46 @@ app.get('/api/projects', async (req, res) => {
   }
 })
 
-// Skills (for skills section + tools orbit)
+/**
+ * @swagger
+ * /api/skills:
+ *   get:
+ *     summary: Get all skills
+ *     tags: [Skills]
+ *     description: Retrieve all skills/tools used in the portfolio
+ *     responses:
+ *       200:
+ *         description: List of skills
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   name:
+ *                     type: string
+ *                   slug:
+ *                     type: string
+ *                   category:
+ *                     type: string
+ *                   level:
+ *                     type: integer
+ *                     minimum: 1
+ *                     maximum: 5
+ *                   icon_url:
+ *                     type: string
+ *                   description:
+ *                     type: string
+ *                   order_index:
+ *                     type: integer
+ *                   is_highlight:
+ *                     type: boolean
+ *       500:
+ *         description: Failed to fetch skills
+ */
 app.get('/api/skills', async (req, res) => {
   try {
     const result = await client.query(`
@@ -76,7 +227,69 @@ app.get('/api/skills', async (req, res) => {
   }
 })
 
-// Experience timeline
+/**
+ * @swagger
+ * /api/experience:
+ *   get:
+ *     summary: Get all work experience
+ *     tags: [Experience]
+ *     description: Retrieve all work experience entries with bullets and skills used
+ *     responses:
+ *       200:
+ *         description: List of work experience
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                     format: uuid
+ *                   company:
+ *                     type: string
+ *                   role:
+ *                     type: string
+ *                   location:
+ *                     type: string
+ *                   start_date:
+ *                     type: string
+ *                     format: date
+ *                   end_date:
+ *                     type: string
+ *                     format: date
+ *                   is_current:
+ *                     type: boolean
+ *                   description:
+ *                     type: string
+ *                   bullets:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: integer
+ *                         text:
+ *                           type: string
+ *                         order_index:
+ *                           type: integer
+ *                   skills_used:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: integer
+ *                         name:
+ *                           type: string
+ *                         slug:
+ *                           type: string
+ *                         icon_url:
+ *                           type: string
+ *       500:
+ *         description: Failed to fetch experience
+ */
 app.get('/api/experience', async (req, res) => {
   try {
     const result = await client.query(`
@@ -107,8 +320,15 @@ app.get('/api/experience', async (req, res) => {
   }
 })
 
-app.listen(PORT, () => {
-  console.log(`🚀 API server running on http://localhost:${PORT}`)
-})
+// Export for Vercel serverless
+export default app
+
+// Start server only if not in Vercel environment
+if (process.env.VERCEL !== '1') {
+  app.listen(PORT, () => {
+    console.log(`🚀 API server running on http://localhost:${PORT}`)
+    console.log(`📚 Swagger docs available at http://localhost:${PORT}/api-docs`)
+  })
+}
 
 
