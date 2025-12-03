@@ -27,11 +27,16 @@ app.get('/api-docs.json', (req, res) => {
 
 // Custom Swagger UI HTML for Vercel serverless (using CDN)
 app.get('/api-docs', (req, res) => {
-  const html = `
-<!DOCTYPE html>
+  // Get the base URL (protocol + host)
+  const protocol = req.protocol || 'https'
+  const host = req.get('host') || 'api.mason.id.vn'
+  const baseUrl = `${protocol}://${host}`
+  
+  const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mason Portfolio API Documentation</title>
   <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui.css" />
   <style>
@@ -41,8 +46,12 @@ app.get('/api-docs', (req, res) => {
     .swagger-ui .try-out__btn {
       cursor: pointer !important;
       pointer-events: auto !important;
+      opacity: 1 !important;
     }
-    .swagger-ui .opblock.opblock-get .opblock-summary {
+    .swagger-ui .opblock.opblock-get .opblock-summary,
+    .swagger-ui .opblock.opblock-post .opblock-summary,
+    .swagger-ui .opblock.opblock-put .opblock-summary,
+    .swagger-ui .opblock.opblock-delete .opblock-summary {
       cursor: pointer !important;
     }
     /* Ensure operations are expandable */
@@ -52,6 +61,13 @@ app.get('/api-docs', (req, res) => {
     .swagger-ui .opblock-summary {
       cursor: pointer;
     }
+    .swagger-ui .opblock-summary:hover {
+      background-color: rgba(0,0,0,0.05);
+    }
+    /* Ensure buttons are visible */
+    .swagger-ui button {
+      cursor: pointer !important;
+    }
   </style>
 </head>
 <body>
@@ -60,9 +76,11 @@ app.get('/api-docs', (req, res) => {
   <script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-standalone-preset.js"></script>
   <script>
     window.onload = function() {
-      const spec = ${JSON.stringify(swaggerSpec)};
+      // Load spec from URL instead of embedding (safer and more reliable)
+      const specUrl = '${baseUrl}/api-docs.json';
+      
       window.ui = SwaggerUIBundle({
-        spec: spec,
+        url: specUrl,
         dom_id: '#swagger-ui',
         deepLinking: true,
         presets: [
@@ -77,46 +95,58 @@ app.get('/api-docs', (req, res) => {
         displayRequestDuration: true,
         filter: true,
         tryItOutEnabled: true,
-        requestInterceptor: (request) => {
+        requestInterceptor: function(request) {
           // Enable CORS for all requests
           return request;
+        },
+        responseInterceptor: function(response) {
+          return response;
         },
         docExpansion: 'list',
         defaultModelsExpandDepth: 2,
         defaultModelExpandDepth: 2,
-        supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
-        validatorUrl: null, // Disable validator to avoid external requests
+        supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch', 'head', 'options'],
+        validatorUrl: null,
         onComplete: function() {
-          // Ensure all operations are expandable and Try it out is enabled
           console.log('Swagger UI loaded successfully');
           
-          // Make sure operations can be expanded
+          // Ensure all interactive elements are enabled
           setTimeout(function() {
-            // Expand all operations by default (optional)
+            // Make sure all opblock summaries are clickable
             const opblockSummaries = document.querySelectorAll('.opblock-summary');
             opblockSummaries.forEach(function(summary) {
-              if (summary && summary.getAttribute('aria-expanded') === 'false') {
-                // Don't auto-expand, let user click
-                summary.style.cursor = 'pointer';
-              }
+              summary.style.cursor = 'pointer';
+              summary.addEventListener('click', function() {
+                // This will be handled by Swagger UI, but ensure it's clickable
+              });
             });
             
-            // Ensure Try it out buttons are enabled
+            // Ensure Try it out buttons are enabled and visible
             const tryItOutButtons = document.querySelectorAll('.try-out__btn');
             tryItOutButtons.forEach(function(btn) {
-              if (btn) {
-                btn.style.pointerEvents = 'auto';
-                btn.style.cursor = 'pointer';
-              }
+              btn.style.pointerEvents = 'auto';
+              btn.style.cursor = 'pointer';
+              btn.style.opacity = '1';
+              btn.disabled = false;
             });
-          }, 1000);
+            
+            // Ensure Execute buttons are enabled
+            const executeButtons = document.querySelectorAll('.execute');
+            executeButtons.forEach(function(btn) {
+              btn.style.pointerEvents = 'auto';
+              btn.style.cursor = 'pointer';
+              btn.disabled = false;
+            });
+          }, 1500);
+        },
+        onFailure: function(data) {
+          console.error('Swagger UI failed to load:', data);
         }
       });
     };
   </script>
 </body>
-</html>
-  `
+</html>`
   res.send(html)
 })
 
