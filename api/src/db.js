@@ -19,26 +19,46 @@ const client = new Client({
 })
 
 // Connect to database (lazy connection - will connect on first query)
+// For Vercel serverless, connections are reused across invocations
 let isConnected = false
+let connectionPromise = null
 
 async function ensureConnected() {
-  if (!isConnected) {
+  if (isConnected) {
+    return
+  }
+  
+  if (connectionPromise) {
+    return connectionPromise
+  }
+  
+  connectionPromise = (async () => {
     try {
       await client.connect()
       isConnected = true
       console.log('✅ Database connected')
     } catch (err) {
       console.error('❌ Database connection error:', err.message)
+      connectionPromise = null
       throw err
     }
-  }
+  })()
+  
+  return connectionPromise
 }
 
 // Auto-connect on first query
 const originalQuery = client.query.bind(client)
 client.query = async function(...args) {
-  await ensureConnected()
-  return originalQuery(...args)
+  try {
+    await ensureConnected()
+    return originalQuery(...args)
+  } catch (err) {
+    // Reset connection state on error
+    isConnected = false
+    connectionPromise = null
+    throw err
+  }
 }
 
 export default client
