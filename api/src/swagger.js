@@ -21,7 +21,7 @@ const options = {
         description: 'Current server',
       },
       {
-        url: 'https://api-beta-green-19.vercel.app',
+        url: 'https://portfolioapi-brown.vercel.app',
         description: 'Production server',
       },
     ],
