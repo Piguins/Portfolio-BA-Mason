@@ -3,45 +3,41 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
-// Simple config object - Vercel-compatible (no expressions in object literal)
-export const config = {
-  port: process.env.PORT,
-  nodeEnv: process.env.NODE_ENV,
-  isVercel: process.env.VERCEL === '1',
-  
-  database: {
-    url: process.env.DATABASE_URL,
-  },
-  
-  api: {
-    baseUrl: process.env.API_URL,
-  },
-  
-  vercel: {
-    url: process.env.VERCEL_URL,
-  },
-}
-
-// Get config values with defaults (called when needed, not at module load)
+// Get config values with defaults - Vercel-compatible (no object literal with expressions)
 export const getConfig = () => {
+  // Read env vars directly in function (not in object literal)
+  const envPort = process.env.PORT
+  const envNodeEnv = process.env.NODE_ENV
+  const envVercel = process.env.VERCEL
+  const envDatabaseUrl = process.env.DATABASE_URL
+  const envApiUrl = process.env.API_URL
+  const envVercelUrl = process.env.VERCEL_URL
+  
+  // Build config object with defaults
+  const port = envPort ? parseInt(envPort, 10) : 4000
+  const nodeEnv = envNodeEnv || 'development'
+  const isVercel = envVercel === '1'
+  const apiBaseUrl = envApiUrl || 'http://localhost:4000'
+  
+  // Validate required config (only in non-Vercel environments)
+  if (!isVercel && !envDatabaseUrl) {
+    throw new Error('DATABASE_URL is required in environment variables')
+  }
+  
+  // Return config object
   return {
-    port: config.port ? parseInt(config.port, 10) : 4000,
-    nodeEnv: config.nodeEnv || 'development',
-    isVercel: config.isVercel,
+    port: port,
+    nodeEnv: nodeEnv,
+    isVercel: isVercel,
     database: {
-      url: config.database.url,
+      url: envDatabaseUrl,
     },
     api: {
-      baseUrl: config.api.baseUrl || 'http://localhost:4000',
+      baseUrl: apiBaseUrl,
     },
     vercel: {
-      url: config.vercel.url,
+      url: envVercelUrl,
     },
   }
-}
-
-// Validate required config (only in non-Vercel environments)
-if (!config.isVercel && !config.database.url) {
-  throw new Error('DATABASE_URL is required in environment variables')
 }
 
