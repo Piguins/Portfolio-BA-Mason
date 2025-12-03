@@ -4,8 +4,13 @@
 import express from 'express'
 import cors from 'cors'
 import swaggerUi from 'swagger-ui-express'
+import path from 'path'
+import { fileURLToPath } from 'url'
 import client from './db.js'
 import { swaggerSpec } from './swagger.js'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const app = express()
 const PORT = process.env.PORT || 4000
@@ -13,21 +18,24 @@ const PORT = process.env.PORT || 4000
 app.use(cors())
 app.use(express.json())
 
+// Serve Swagger UI static files
+app.use('/api-docs', express.static(path.join(__dirname, '../node_modules/swagger-ui-dist')))
+
 // Swagger UI - Setup for Vercel serverless
 const swaggerOptions = {
   customCss: '.swagger-ui .topbar { display: none }',
   customSiteTitle: 'Mason Portfolio API Documentation',
-  customCssUrl: null, // Disable custom CSS URL
   swaggerOptions: {
     persistAuthorization: true,
     displayRequestDuration: true,
     filter: true,
     tryItOutEnabled: true,
+    docExpansion: 'list',
   },
 }
 
-app.use('/api-docs', swaggerUi.serve)
-app.get('/api-docs', swaggerUi.setup(swaggerSpec, swaggerOptions))
+// Setup Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, swaggerOptions))
 
 /**
  * @swagger
