@@ -45,9 +45,17 @@ app.get('/api-docs', (req, res) => {
   <style>
     .swagger-ui .topbar { display: none; }
     body { margin: 0; }
-    /* Remove any blocking styles */
+    /* Ensure all elements are interactive */
     * { box-sizing: border-box; }
-    .swagger-ui * { pointer-events: auto !important; }
+    .swagger-ui * { 
+      pointer-events: auto !important; 
+      user-select: auto !important;
+    }
+    /* Remove any z-index blocking */
+    .swagger-ui .opblock {
+      position: relative !important;
+      z-index: auto !important;
+    }
     /* Ensure Try it out buttons are visible and clickable */
     .swagger-ui .try-out__btn,
     .swagger-ui .btn.try-out__btn {
@@ -129,6 +137,9 @@ app.get('/api-docs', (req, res) => {
             displayRequestDuration: true,
             filter: true,
             tryItOutEnabled: true,
+            showExtensions: true,
+            showCommonExtensions: true,
+            withCredentials: false,
             requestInterceptor: function(request) {
               console.log('Request:', request.method, request.url);
               return request;
