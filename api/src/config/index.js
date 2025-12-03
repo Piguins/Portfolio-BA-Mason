@@ -3,41 +3,41 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
-// Get environment variables with defaults
-const getPort = () => {
-  const port = process.env.PORT
-  return port ? parseInt(port, 10) : 4000
-}
+// Extract environment variables to avoid BinaryExpression in object literal
+const envPort = process.env.PORT
+const envNodeEnv = process.env.NODE_ENV
+const envApiUrl = process.env.API_URL
+const envVercel = process.env.VERCEL
+const envDatabaseUrl = process.env.DATABASE_URL
+const envVercelUrl = process.env.VERCEL_URL
 
-const getNodeEnv = () => {
-  return process.env.NODE_ENV || 'development'
-}
-
-const getApiUrl = () => {
-  return process.env.API_URL || 'http://localhost:4000'
-}
+// Set defaults using ternary operators (Vercel-compatible)
+const port = envPort ? parseInt(envPort, 10) : 4000
+const nodeEnv = envNodeEnv ? envNodeEnv : 'development'
+const apiBaseUrl = envApiUrl ? envApiUrl : 'http://localhost:4000'
+const isVercel = envVercel === '1'
 
 export const config = {
-  port: getPort(),
-  nodeEnv: getNodeEnv(),
-  isVercel: process.env.VERCEL === '1',
+  port: port,
+  nodeEnv: nodeEnv,
+  isVercel: isVercel,
   
   database: {
-    url: process.env.DATABASE_URL,
+    url: envDatabaseUrl,
   },
   
   api: {
-    baseUrl: getApiUrl(),
+    baseUrl: apiBaseUrl,
   },
   
   vercel: {
-    url: process.env.VERCEL_URL,
+    url: envVercelUrl,
   },
 }
 
 // Validate required config (only in non-Vercel environments or if explicitly checking)
 // In Vercel, env vars are set at deployment time, so we don't throw during module load
-if (!config.isVercel && !config.database.url) {
+if (!isVercel && !envDatabaseUrl) {
   throw new Error('DATABASE_URL is required in environment variables')
 }
 
