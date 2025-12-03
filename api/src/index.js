@@ -42,7 +42,10 @@ const swaggerOptions = {
 
 // Setup Swagger UI with explicit spec
 app.use('/api-docs', swaggerUi.serve)
-app.get('/api-docs', swaggerUi.setup(swaggerSpec, swaggerOptions))
+app.get('/api-docs', (req, res, next) => {
+  const html = swaggerUi.generateHTML(swaggerSpec, swaggerOptions)
+  res.send(html)
+})
 
 /**
  * @swagger
