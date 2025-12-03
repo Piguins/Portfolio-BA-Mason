@@ -14,8 +14,8 @@ if (!connectionString) {
 
 const client = new Client({
   connectionString: process.env.DATABASE_URL,
-  // SSL config for Supabase
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  // SSL config for Supabase (required for pooler)
+  ssl: { rejectUnauthorized: false },
 })
 
 // Connect to database (lazy connection - will connect on first query)
