@@ -108,14 +108,18 @@ const options = {
     },
     servers: [
       {
+        url: 'https://api.mason.id.vn',
+        description: 'Production API (Custom Domain)',
+      },
+      {
+        url: 'https://portfolioapi-brown.vercel.app',
+        description: 'Production server (Vercel)',
+      },
+      {
         url: process.env.VERCEL_URL 
           ? `https://${process.env.VERCEL_URL}` 
           : process.env.API_URL || 'http://localhost:4000',
         description: 'Current server',
-      },
-      {
-        url: 'https://portfolioapi-brown.vercel.app',
-        description: 'Production server',
       },
     ],
     tags: [
