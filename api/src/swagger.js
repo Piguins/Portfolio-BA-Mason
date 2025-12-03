@@ -147,8 +147,10 @@ const options = {
     ],
   },
   apis: [
-    path.join(__dirname, 'index.js'), // Absolute path for Vercel compatibility
-    path.join(__dirname, '**/*.js'), // Include all JS files
+    path.join(__dirname, 'index.js'),
+    path.join(__dirname, 'routes/*.js'),
+    path.join(__dirname, 'controllers/*.js'),
+    path.join(__dirname, 'services/*.js'),
   ],
 }
 
