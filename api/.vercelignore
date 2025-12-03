@@ -2,3 +2,11 @@ node_modules
 *.md
 test-*.js
 encode-*.js
+src/routes/*.js
+src/controllers/*.js
+src/services/*.js
+src/middleware/*.js
+src/config/*.js
+src/utils/*.js
+src/db.js
+src/swagger.js
