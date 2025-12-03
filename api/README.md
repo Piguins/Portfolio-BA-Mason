@@ -1,155 +1,248 @@
-# Portfolio API
+# Mason Portfolio API
 
-Backend API cho Portfolio website của Mason - sử dụng Node.js + Express + PostgreSQL (Supabase).
+Backend API for Mason Portfolio website - Business Analyst Portfolio
 
-## 🚀 Setup
+## Tech Stack
 
-### 1. Cài đặt dependencies
+- **Runtime**: Node.js (ES Modules)
+- **Framework**: Express.js
+- **Database**: PostgreSQL (via Supabase)
+- **ORM**: pg (PostgreSQL client)
+- **Documentation**: Swagger/OpenAPI 3.0
+
+## Project Structure
+
+```
+api/src/
+├── config/
+│   └── index.js              # Application configuration
+├── controllers/              # Request handlers (business logic)
+│   ├── healthController.js
+│   ├── projectsController.js
+│   ├── skillsController.js
+│   └── experienceController.js
+├── services/                 # Data access layer (database operations)
+│   ├── projectsService.js
+│   ├── skillsService.js
+│   └── experienceService.js
+├── routes/                   # Route definitions with Swagger docs
+│   ├── healthRoutes.js
+│   ├── projectsRoutes.js
+│   ├── skillsRoutes.js
+│   ├── experienceRoutes.js
+│   └── swaggerRoutes.js
+├── middleware/               # Express middleware
+│   └── errorHandler.js      # Global error handling
+├── utils/                    # Utility functions
+│   ├── swaggerHtml.js       # Swagger UI HTML template
+│   └── urlHelper.js         # URL helper functions
+├── db.js                     # Database connection
+├── swagger.js                # Swagger/OpenAPI configuration
+└── index.js                  # Main application entry point
+```
+
+## Architecture
+
+### Clean Architecture Pattern
+
+1. **Routes** (`routes/`)
+   - Define API endpoints
+   - Include Swagger documentation
+   - Map URLs to controllers
+
+2. **Controllers** (`controllers/`)
+   - Handle HTTP requests/responses
+   - Validate input
+   - Call services
+   - Return formatted responses
+
+3. **Services** (`services/`)
+   - Business logic
+   - Database operations
+   - Data transformation
+   - Reusable across controllers
+
+4. **Middleware** (`middleware/`)
+   - Error handling
+   - Authentication (future)
+   - Validation (future)
+   - Logging (future)
+
+5. **Utils** (`utils/`)
+   - Helper functions
+   - Shared utilities
+   - Templates
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+ 
+- PostgreSQL database (Supabase)
+- Environment variables configured
+
+### Installation
 
 ```bash
+cd api
 npm install
 ```
 
-### 2. Cấu hình Environment Variables
+### Environment Variables
 
-Tạo file `.env` từ `.env.example`:
+Create `.env` file:
 
-```bash
-cp .env.example .env
+```env
+PORT=4000
+DATABASE_URL=postgresql://user:password@host:port/database
+NODE_ENV=development
 ```
 
-**Quan trọng:** Cập nhật `DATABASE_URL` trong file `.env`:
+### Development
 
-1. Vào [Supabase Dashboard](https://supabase.com/dashboard/project/qeqjowagaybaejjyqjkg/settings/database)
-2. Vào **Settings → Database**
-3. Tìm phần **Connection string** → chọn **URI**
-4. Copy connection string và thay `[YOUR_PASSWORD]` bằng password thực tế của bạn
-
-**Format đúng:**
-```
-DATABASE_URL=postgresql://postgres:YOUR_ACTUAL_PASSWORD@db.qeqjowagaybaejjyqjkg.supabase.co:5432/postgres
-```
-
-**Lưu ý:** 
-- ⚠️ **QUAN TRỌNG:** Nếu password có ký tự đặc biệt (`@`, `#`, `%`, `&`, `+`, `=`, `:`, `/`, `?`), **BẮT BUỘC** phải URL encode:
-  - `@` → `%40`
-  - `#` → `%23`
-  - `%` → `%25`
-  - `&` → `%26`
-  - `+` → `%2B`
-  - `=` → `%3D`
-  - `:` → `%3A`
-  - `/` → `%2F`
-  - `?` → `%3F`
-  
-  **Ví dụ:** Nếu password là `Kiethongngu@1`, dùng `Kiethongngu%401`
-  
-- Có thể dùng helper script: `node encode-password.js "your@password"`
-- Nếu không nhớ password, có thể reset trong Supabase Dashboard → Settings → Database → Reset database password
-
-### 3. Test kết nối
-
-```bash
-node test-connection.js
-```
-
-Nếu thành công, bạn sẽ thấy:
-```
-✅ Database connection successful!
-✅ Found X tables
-✅ Skills: X records
-✅ Published Projects: X records
-✅ Experience: X records
-🎉 All tests passed! API is ready to use.
-```
-
-### 4. Chạy API server
-
-**Development mode (với auto-reload):**
 ```bash
 npm run dev
 ```
 
-**Production mode:**
+API will be available at `http://localhost:4000`
+
+### Production
+
 ```bash
 npm start
 ```
 
-API sẽ chạy tại: `http://localhost:4000`
-
-## 📡 API Endpoints
+## API Endpoints
 
 ### Health Check
-```
-GET /health
-```
+- `GET /health` - Check API and database status
+- `GET /` - API information
 
 ### Projects
-```
-GET /api/projects
-```
-Trả về danh sách projects đã publish, kèm tags.
+- `GET /api/projects` - Get all published projects
+- `GET /api/projects/:slug` - Get project by slug
 
 ### Skills
-```
-GET /api/skills
-```
-Trả về danh sách skills, sắp xếp theo `order_index`.
+- `GET /api/skills` - Get all skills
+  - Query params: `category`, `highlight`
 
 ### Experience
+- `GET /api/experience` - Get all work experience
+  - Query params: `current`, `company`
+
+### Documentation
+- `GET /api-docs` - Swagger UI
+- `GET /api-docs.json` - OpenAPI spec
+
+## Adding New Features
+
+### 1. Add a new endpoint
+
+**Create service** (`services/newService.js`):
+```javascript
+import client from '../db.js'
+
+export const newService = {
+  async getAll() {
+    const result = await client.query('SELECT * FROM table')
+    return result.rows
+  },
+}
 ```
-GET /api/experience
+
+**Create controller** (`controllers/newController.js`):
+```javascript
+import { newService } from '../services/newService.js'
+import { asyncHandler } from '../middleware/errorHandler.js'
+
+export const newController = {
+  getAll: asyncHandler(async (req, res) => {
+    const data = await newService.getAll()
+    res.json(data)
+  }),
+}
 ```
-Trả về danh sách experience, kèm bullets và skills used.
 
-### Page Sections (CMS Content)
+**Create route** (`routes/newRoutes.js`):
+```javascript
+import express from 'express'
+import { newController } from '../controllers/newController.js'
+
+const router = express.Router()
+
+/**
+ * @swagger
+ * /api/new:
+ *   get:
+ *     summary: Get all items
+ *     tags: [New]
+ *     responses:
+ *       200:
+ *         description: Success
+ */
+router.get('/api/new', newController.getAll)
+
+export default router
 ```
-GET /api/page-sections?page=home&section=hero&locale=vi
+
+**Register route** (`index.js`):
+```javascript
+import newRoutes from './routes/newRoutes.js'
+app.use('/', newRoutes)
 ```
-Trả về nội dung CMS cho các section của trang.
 
-## 🛠️ Troubleshooting
+## Error Handling
 
-### Lỗi: `getaddrinfo ENOTFOUND db.qeqjowagaybaejjyqjkg.supabase.co`
+All errors are handled by `errorHandler` middleware:
 
-**Nguyên nhân:**
-- Direct connection của Supabase mặc định dùng **IPv6**, mạng của bạn có thể không support IPv6
-- Password chưa được thay thế đúng trong `.env`
-- Format connection string sai
-- Network/DNS issue
+- Database errors → 500 with generic message
+- Validation errors → 400 with error details
+- Custom errors → Custom status code
 
-**Giải pháp:**
-1. **Thử dùng Session Mode Pooler (IPv4 compatible):**
-   - Vào Supabase Dashboard → Settings → Database → Connection string
-   - Chọn **Session mode** (port 5432) thay vì Direct connection
-   - Copy connection string và thay vào `.env`
-   - Format: `postgresql://postgres.[PROJECT_REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres`
+Use `asyncHandler` wrapper for async controllers:
 
-2. **Hoặc kiểm tra IPv6 support:**
-   ```bash
-   ping6 db.qeqjowagaybaejjyqjkg.supabase.co
-   ```
-   Nếu không ping được, mạng của bạn không support IPv6 → dùng Session Mode Pooler
+```javascript
+import { asyncHandler } from '../middleware/errorHandler.js'
 
-3. Kiểm tra lại file `.env` - đảm bảo `DATABASE_URL` có format đúng
-4. Đảm bảo đã thay password bằng password thực tế
-5. Test connection string từ Supabase Dashboard → SQL Editor → New query → thử query đơn giản
-6. Nếu vẫn lỗi, reset database password và cập nhật lại `.env`
+export const controller = {
+  handler: asyncHandler(async (req, res) => {
+    // Your code here
+    // Errors will be automatically caught
+  }),
+}
+```
 
-### Lỗi: `password authentication failed`
+## Database
 
-**Nguyên nhân:** Password không đúng
+Uses PostgreSQL via `pg` library. Connection is managed in `db.js`:
 
-**Giải pháp:** Reset password trong Supabase Dashboard và cập nhật lại `.env`
+- Lazy connection (connects on first query)
+- Automatic reconnection on errors
+- SSL enabled for Supabase
 
-### Lỗi: `relation "public.xxx" does not exist`
+## Deployment
 
-**Nguyên nhân:** Tables chưa được tạo
+### Vercel
 
-**Giải pháp:** Chạy lại migration SQL trong Supabase SQL Editor
+1. Set Root Directory to `api`
+2. Environment variables in Vercel Dashboard
+3. Auto-deploy on git push
 
-## 📝 Notes
+### Environment Variables
 
-- File `.env` đã được gitignore, không commit lên git (an toàn)
-- File `.env.example` là template, có thể commit
-- API sử dụng connection pooling với `pg.Pool` để tối ưu performance
+- `DATABASE_URL` - PostgreSQL connection string
+- `PORT` - Server port (optional, default: 4000)
+- `NODE_ENV` - Environment (development/production)
+- `VERCEL` - Set to "1" on Vercel (auto-detected)
+
+## Best Practices
+
+1. **Separation of Concerns**: Routes → Controllers → Services
+2. **Error Handling**: Always use `asyncHandler` for async functions
+3. **Swagger Docs**: Add JSDoc comments to all routes
+4. **Code Reusability**: Put shared logic in services
+5. **Configuration**: Use `config/index.js` for all settings
+
+## License
+
+MIT
