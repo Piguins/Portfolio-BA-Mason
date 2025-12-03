@@ -37,6 +37,21 @@ app.get('/api-docs', (req, res) => {
   <style>
     .swagger-ui .topbar { display: none; }
     body { margin: 0; }
+    /* Ensure Try it out buttons are visible and clickable */
+    .swagger-ui .try-out__btn {
+      cursor: pointer !important;
+      pointer-events: auto !important;
+    }
+    .swagger-ui .opblock.opblock-get .opblock-summary {
+      cursor: pointer !important;
+    }
+    /* Ensure operations are expandable */
+    .swagger-ui .opblock {
+      margin-bottom: 10px;
+    }
+    .swagger-ui .opblock-summary {
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -72,15 +87,29 @@ app.get('/api-docs', (req, res) => {
         supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
         validatorUrl: null, // Disable validator to avoid external requests
         onComplete: function() {
-          // Force enable Try it out for all operations
+          // Ensure all operations are expandable and Try it out is enabled
+          console.log('Swagger UI loaded successfully');
+          
+          // Make sure operations can be expanded
           setTimeout(function() {
-            const tryItOutButtons = document.querySelectorAll('.try-out__btn');
-            tryItOutButtons.forEach(function(btn) {
-              if (btn && !btn.classList.contains('cancel')) {
-                btn.click();
+            // Expand all operations by default (optional)
+            const opblockSummaries = document.querySelectorAll('.opblock-summary');
+            opblockSummaries.forEach(function(summary) {
+              if (summary && summary.getAttribute('aria-expanded') === 'false') {
+                // Don't auto-expand, let user click
+                summary.style.cursor = 'pointer';
               }
             });
-          }, 500);
+            
+            // Ensure Try it out buttons are enabled
+            const tryItOutButtons = document.querySelectorAll('.try-out__btn');
+            tryItOutButtons.forEach(function(btn) {
+              if (btn) {
+                btn.style.pointerEvents = 'auto';
+                btn.style.cursor = 'pointer';
+              }
+            });
+          }, 1000);
         }
       });
     };
