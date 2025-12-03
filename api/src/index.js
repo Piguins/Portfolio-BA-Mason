@@ -18,6 +18,12 @@ const PORT = process.env.PORT || 4000
 app.use(cors())
 app.use(express.json())
 
+// Serve Swagger JSON spec
+app.get('/api-docs.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json')
+  res.send(swaggerSpec)
+})
+
 // Serve Swagger UI static files
 app.use('/api-docs', express.static(path.join(__dirname, '../node_modules/swagger-ui-dist')))
 
@@ -34,8 +40,9 @@ const swaggerOptions = {
   },
 }
 
-// Setup Swagger UI
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, swaggerOptions))
+// Setup Swagger UI with explicit spec
+app.use('/api-docs', swaggerUi.serve)
+app.get('/api-docs', swaggerUi.setup(swaggerSpec, swaggerOptions))
 
 /**
  * @swagger
