@@ -2,7 +2,6 @@
   "buildCommand": "cd apps/portfolio && npm install && npm run build",
   "outputDirectory": "apps/portfolio/dist",
   "framework": "vite",
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- api/ cms/",
   "rewrites": [
     {
       "source": "/(.*)",
