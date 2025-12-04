@@ -50,6 +50,21 @@ You can add multiple origins separated by commas:
 https://cms.vercel.app,https://portfolio.vercel.app,https://staging.vercel.app
 ```
 
+### Wildcard Support (Vercel Preview URLs)
+
+For Vercel preview deployments with random URLs, you can use wildcards:
+
+```
+https://cms.vercel.app,https://*.vercel.app
+```
+
+This will allow:
+- ✅ `https://cms.vercel.app` (exact match)
+- ✅ `https://cms-git-main-yourname.vercel.app` (preview URL)
+- ✅ `https://cms-abc123.vercel.app` (any Vercel preview)
+
+**Note**: Wildcards only work for subdomains, not paths.
+
 ## 🔍 Debugging
 
 ### Check Current Allowed Origins

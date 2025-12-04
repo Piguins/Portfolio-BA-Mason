@@ -5,6 +5,7 @@ import cors from 'cors'
 
 // Get allowed origins from environment variable
 // Format: "https://domain1.com,https://domain2.com" (comma-separated, no spaces)
+// Supports wildcards: "https://*.vercel.app" for Vercel preview URLs
 const getAllowedOrigins = () => {
   const originsEnv = process.env.CORS_ORIGINS
   
@@ -25,6 +26,37 @@ const getAllowedOrigins = () => {
 const allowedOrigins = getAllowedOrigins()
 
 /**
+ * Check if origin matches allowed pattern
+ * Supports exact match and wildcard patterns (e.g., https://*.vercel.app)
+ */
+const isOriginAllowed = (origin) => {
+  if (!origin) return false
+  
+  // Exact match
+  if (allowedOrigins.includes(origin)) {
+    return true
+  }
+  
+  // Wildcard pattern matching (for Vercel preview URLs, etc.)
+  for (const pattern of allowedOrigins) {
+    if (pattern.includes('*')) {
+      // Convert wildcard pattern to regex
+      // e.g., "https://*.vercel.app" -> /^https:\/\/.*\.vercel\.app$/
+      const regexPattern = pattern
+        .replace(/\./g, '\\.') // Escape dots
+        .replace(/\*/g, '.*')   // Convert * to .*
+      const regex = new RegExp(`^${regexPattern}$`)
+      
+      if (regex.test(origin)) {
+        return true
+      }
+    }
+  }
+  
+  return false
+}
+
+/**
  * CORS configuration
  * Only allows requests from origins specified in CORS_ORIGINS env variable
  */
@@ -35,22 +67,27 @@ export const corsMiddleware = cors({
       return callback(null, true)
     }
     
-    // Check if origin is in allowed list
-    if (origin && allowedOrigins.includes(origin)) {
+    // Check if origin is allowed
+    if (isOriginAllowed(origin)) {
       callback(null, true)
     } else {
-      // Origin not allowed
-      // Always log in production for debugging (but don't expose allowed origins)
-      if (process.env.NODE_ENV === 'development') {
-        console.warn(`⚠️  CORS blocked origin: ${origin}`)
-        console.warn(`   Allowed origins: ${allowedOrigins.join(', ')}`)
+      // Origin not allowed - always log for debugging
+      console.warn(`⚠️  CORS blocked origin: ${origin || '(no origin)'}`)
+      
+      if (allowedOrigins.length === 0) {
+        console.error('❌ CORS_ORIGINS environment variable is not set!')
+        console.error('   Set CORS_ORIGINS in Vercel: Settings → Environment Variables')
       } else {
-        // Production: Log blocked origin but not allowed list (security)
-        console.warn(`⚠️  CORS blocked origin: ${origin}`)
-        if (allowedOrigins.length === 0) {
-          console.error('❌ CORS_ORIGINS environment variable is not set!')
+        // In development, show allowed origins
+        if (process.env.NODE_ENV === 'development') {
+          console.warn(`   Allowed origins: ${allowedOrigins.join(', ')}`)
+        } else {
+          // In production, just show count (security)
+          console.warn(`   Configured ${allowedOrigins.length} allowed origin(s)`)
+          console.warn('   Check CORS_SETUP.md for troubleshooting')
         }
       }
+      
       callback(new Error('Not allowed by CORS'))
     }
   },
