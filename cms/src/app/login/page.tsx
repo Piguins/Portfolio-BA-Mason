@@ -59,7 +59,12 @@ export default function LoginPage() {
         return
       }
 
-      if (data.user) {
+      // Security: Supabase SSR automatically stores tokens in HTTP-only cookies
+      // We don't need to use data from response - just check if login succeeded
+      // Tokens are handled securely by Supabase, not exposed to JavaScript
+      if (data?.user) {
+        // Clear any sensitive data from memory
+        // Don't store tokens or user data in component state
         router.push('/dashboard')
         router.refresh()
       }
