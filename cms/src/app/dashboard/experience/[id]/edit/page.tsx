@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
-import Link from 'next/link'
 import { motion } from 'framer-motion'
+import BackButton from '@/components/BackButton'
+import LoadingButton from '@/components/LoadingButton'
 import '../../experience.css'
 
 interface Experience {
@@ -52,7 +53,16 @@ export default function EditExperiencePage() {
     try {
       setLoading(true)
       setError(null)
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/experience/${id}`)
+      
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s timeout
+      
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/experience/${id}`, {
+        signal: controller.signal,
+        cache: 'no-store',
+      })
+      
+      clearTimeout(timeoutId)
       
       if (!response.ok) {
         throw new Error('Failed to fetch experience')
@@ -79,7 +89,11 @@ export default function EditExperiencePage() {
         skill_ids: data.skills_used?.map(s => s.id) || [],
       })
     } catch (err: any) {
-      setError(err.message || 'Failed to load experience')
+      if (err.name === 'AbortError') {
+        setError('Request timeout. Vui lòng thử lại.')
+      } else {
+        setError(err.message || 'Failed to load experience')
+      }
     } finally {
       setLoading(false)
     }
@@ -91,20 +105,30 @@ export default function EditExperiencePage() {
     setError(null)
 
     try {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 15000) // 15s timeout
+      
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/experience/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
+        signal: controller.signal,
       })
+
+      clearTimeout(timeoutId)
 
       if (!response.ok) {
         const errorData = await response.json()
         throw new Error(errorData.error || 'Failed to update experience')
       }
 
-      router.push('/dashboard/experience')
+      router.replace('/dashboard/experience')
     } catch (err: any) {
-      setError(err.message || 'Failed to update experience')
+      if (err.name === 'AbortError') {
+        setError('Request timeout. Vui lòng thử lại.')
+      } else {
+        setError(err.message || 'Failed to update experience')
+      }
     } finally {
       setSaving(false)
     }
@@ -152,9 +176,7 @@ export default function EditExperiencePage() {
       <div className="page-container">
         <div className="page-header">
           <div className="header-content">
-            <Link href="/dashboard/experience" className="back-link">
-              ← Quay lại Experience
-            </Link>
+            <BackButton href="/dashboard/experience">Quay lại Experience</BackButton>
             <div className="header-text">
               <h1>Sửa Experience</h1>
               <p>Cập nhật thông tin experience</p>
@@ -292,9 +314,13 @@ export default function EditExperiencePage() {
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addBullet())}
                   placeholder="Nhập thành tựu và nhấn Enter hoặc nút Thêm"
                 />
-                <button type="button" onClick={addBullet} className="btn-add">
+                <LoadingButton
+                  type="button"
+                  onClick={addBullet}
+                  variant="primary"
+                >
                   Thêm
-                </button>
+                </LoadingButton>
               </div>
               {formData.bullets.length > 0 && (
                 <ul className="bullets-list-form">
@@ -318,12 +344,20 @@ export default function EditExperiencePage() {
           </div>
 
           <div className="form-actions">
-            <Link href="/dashboard/experience" className="btn-cancel">
+            <LoadingButton
+              type="button"
+              onClick={() => router.push('/dashboard/experience')}
+              variant="secondary"
+            >
               Hủy
-            </Link>
-            <button type="submit" disabled={saving} className="btn-primary">
-              {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
-            </button>
+            </LoadingButton>
+            <LoadingButton
+              type="submit"
+              loading={saving}
+              variant="primary"
+            >
+              Lưu thay đổi
+            </LoadingButton>
           </div>
         </motion.form>
       </div>

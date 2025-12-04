@@ -2,8 +2,9 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { motion } from 'framer-motion'
+import BackButton from '@/components/BackButton'
+import LoadingButton from '@/components/LoadingButton'
 import '../experience.css'
 
 export default function NewExperiencePage() {
@@ -30,20 +31,30 @@ export default function NewExperiencePage() {
     setError(null)
 
     try {
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 15000) // 15s timeout
+      
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/experience`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
+        signal: controller.signal,
       })
+
+      clearTimeout(timeoutId)
 
       if (!response.ok) {
         const errorData = await response.json()
         throw new Error(errorData.error || 'Failed to create experience')
       }
 
-      router.push('/dashboard/experience')
+      router.replace('/dashboard/experience')
     } catch (err: any) {
-      setError(err.message || 'Failed to create experience')
+      if (err.name === 'AbortError') {
+        setError('Request timeout. Vui lòng thử lại.')
+      } else {
+        setError(err.message || 'Failed to create experience')
+      }
     } finally {
       setLoading(false)
     }
@@ -72,9 +83,7 @@ export default function NewExperiencePage() {
       <div className="page-container">
         <div className="page-header">
           <div className="header-content">
-            <Link href="/dashboard/experience" className="back-link">
-              ← Quay lại Experience
-            </Link>
+            <BackButton href="/dashboard/experience">Quay lại Experience</BackButton>
             <div className="header-text">
               <h1>Thêm Experience mới</h1>
               <p>Điền thông tin để tạo experience mới</p>
@@ -212,9 +221,13 @@ export default function NewExperiencePage() {
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addBullet())}
                   placeholder="Nhập thành tựu và nhấn Enter hoặc nút Thêm"
                 />
-                <button type="button" onClick={addBullet} className="btn-add">
+                <LoadingButton
+                  type="button"
+                  onClick={addBullet}
+                  variant="primary"
+                >
                   Thêm
-                </button>
+                </LoadingButton>
               </div>
               {formData.bullets.length > 0 && (
                 <ul className="bullets-list-form">
@@ -232,12 +245,20 @@ export default function NewExperiencePage() {
           </div>
 
           <div className="form-actions">
-            <Link href="/dashboard/experience" className="btn-cancel">
+            <LoadingButton
+              type="button"
+              onClick={() => router.push('/dashboard/experience')}
+              variant="secondary"
+            >
               Hủy
-            </Link>
-            <button type="submit" disabled={loading} className="btn-primary">
-              {loading ? 'Đang tạo...' : 'Tạo Experience'}
-            </button>
+            </LoadingButton>
+            <LoadingButton
+              type="submit"
+              loading={loading}
+              variant="primary"
+            >
+              Tạo Experience
+            </LoadingButton>
           </div>
         </motion.form>
       </div>

@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { getAuthErrorMessage } from '@/lib/auth-errors'
 import { motion } from 'framer-motion'
+import LoadingButton from '@/components/LoadingButton'
 import './login.css'
 
 export default function LoginPage() {
@@ -15,12 +16,13 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [errorType, setErrorType] = useState<'email' | 'password' | 'network' | 'unknown' | null>(null)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setErrorType(null)
     setLoading(true)
 
+    // Quick validation before API call
     if (!email.trim()) {
       setError('Vui lòng nhập email')
       setErrorType('email')
@@ -59,8 +61,8 @@ export default function LoginPage() {
       }
 
       if (data?.user) {
-        router.push('/dashboard')
-        router.refresh()
+        // Use replace instead of push for faster navigation
+        router.replace('/dashboard')
       }
     } catch (err: any) {
       const errorInfo = getAuthErrorMessage(err)
@@ -68,7 +70,7 @@ export default function LoginPage() {
       setErrorType(errorInfo.type)
       setLoading(false)
     }
-  }
+  }, [email, password, router])
 
   return (
     <main className="login-page">
@@ -134,13 +136,14 @@ export default function LoginPage() {
             />
           </div>
 
-          <button
+          <LoadingButton
             type="submit"
-            disabled={loading}
-            className="btn-primary"
+            loading={loading}
+            variant="primary"
+            className="btn-primary-full"
           >
-            {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
-          </button>
+            Đăng nhập
+          </LoadingButton>
         </form>
       </motion.div>
     </main>

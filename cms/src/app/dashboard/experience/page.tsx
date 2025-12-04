@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { motion } from 'framer-motion'
+import BackButton from '@/components/BackButton'
+import LoadingButton from '@/components/LoadingButton'
 import './experience.css'
 
 interface Experience {
@@ -25,37 +26,54 @@ export default function ExperiencePage() {
   const [experiences, setExperiences] = useState<Experience[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
 
   useEffect(() => {
     fetchExperiences()
   }, [])
 
-  const fetchExperiences = async () => {
+  const fetchExperiences = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/experience`)
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s timeout
+      
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/experience`, {
+        signal: controller.signal,
+        cache: 'no-store',
+      })
+      
+      clearTimeout(timeoutId)
+      
       if (!response.ok) throw new Error('Failed to fetch experiences')
       const data = await response.json()
       setExperiences(data)
     } catch (err: any) {
-      setError(err.message || 'Failed to load experiences')
+      if (err.name === 'AbortError') {
+        setError('Request timeout. Vui lòng thử lại.')
+      } else {
+        setError(err.message || 'Failed to load experiences')
+      }
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   const handleDelete = async (id: string) => {
     if (!confirm('Bạn có chắc chắn muốn xóa experience này?')) return
 
     try {
+      setDeletingId(id)
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/experience/${id}`, {
         method: 'DELETE',
       })
       if (!response.ok) throw new Error('Failed to delete experience')
-      fetchExperiences()
+      await fetchExperiences()
     } catch (err: any) {
       alert(err.message || 'Failed to delete experience')
+    } finally {
+      setDeletingId(null)
     }
   }
 
@@ -84,22 +102,18 @@ export default function ExperiencePage() {
       <div className="page-container">
         <div className="page-header">
           <div className="header-content">
-            <Link href="/dashboard" className="back-link">
-              ← Quay lại Dashboard
-            </Link>
+            <BackButton href="/dashboard">Quay lại Dashboard</BackButton>
             <div className="header-text">
               <h1>Quản lý Experience</h1>
               <p>Quản lý kinh nghiệm làm việc và timeline</p>
             </div>
           </div>
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
+          <LoadingButton
             onClick={() => router.push('/dashboard/experience/new')}
-            className="btn-primary"
+            variant="primary"
           >
             + Thêm Experience
-          </motion.button>
+          </LoadingButton>
         </div>
 
         {error && (
@@ -117,14 +131,12 @@ export default function ExperiencePage() {
             <div className="empty-icon">📋</div>
             <h3>Chưa có experience nào</h3>
             <p>Hãy thêm experience đầu tiên để bắt đầu quản lý!</p>
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+            <LoadingButton
               onClick={() => router.push('/dashboard/experience/new')}
-              className="btn-primary"
+              variant="primary"
             >
               + Thêm Experience đầu tiên
-            </motion.button>
+            </LoadingButton>
           </div>
         ) : (
           <div className="experience-list">
@@ -162,18 +174,19 @@ export default function ExperiencePage() {
                     </div>
                   </div>
                   <div className="card-actions">
-                    <button
+                    <LoadingButton
                       onClick={() => router.push(`/dashboard/experience/${exp.id}/edit`)}
-                      className="btn-edit"
+                      variant="primary"
                     >
                       Sửa
-                    </button>
-                    <button
+                    </LoadingButton>
+                    <LoadingButton
                       onClick={() => handleDelete(exp.id)}
-                      className="btn-delete"
+                      variant="danger"
+                      loading={deletingId === exp.id}
                     >
                       Xóa
-                    </button>
+                    </LoadingButton>
                   </div>
                 </div>
 

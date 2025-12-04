@@ -112,32 +112,9 @@
   color: var(--gray-400);
 }
 
-.btn-primary {
+.btn-primary-full {
   width: 100%;
-  padding: 0.875rem;
-  background: var(--primary-blue);
-  color: var(--white);
-  border-radius: var(--radius-md);
-  font-size: 0.9375rem;
-  font-weight: 500;
   margin-top: var(--spacing-sm);
-  transition: all var(--transition-base);
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: var(--primary-blue-dark);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-.btn-primary:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.btn-primary:disabled {
-  background: var(--gray-400);
-  cursor: not-allowed;
-  transform: none;
 }
 
 @media (max-width: 640px) {

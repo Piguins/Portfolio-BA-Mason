@@ -220,38 +220,7 @@
   display: flex;
   gap: var(--spacing-sm);
   flex-shrink: 0;
-}
-
-.btn-edit,
-.btn-delete {
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all var(--transition-base);
-  white-space: nowrap;
-}
-
-.btn-edit {
-  background: var(--primary-blue);
-  color: var(--white);
-}
-
-.btn-edit:hover {
-  background: var(--primary-blue-dark);
-}
-
-.btn-delete {
-  background: #FEE2E2;
-  color: #DC2626;
-  border: 1.5px solid #FCA5A5;
-}
-
-.btn-delete:hover {
-  background: #FCA5A5;
-  border-color: #DC2626;
+  align-items: center;
 }
 
 .card-description {
@@ -331,6 +300,7 @@
   box-shadow: var(--shadow);
   border: 1px solid var(--gray-200);
   max-width: 900px;
+  margin: 0 auto;
 }
 
 .form-section {
@@ -356,6 +326,8 @@
 
 .form-group {
   margin-bottom: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
 }
 
 .form-group:last-child {
@@ -413,6 +385,12 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--spacing-lg);
+  align-items: start;
+}
+
+.form-row .form-group {
+  display: flex;
+  flex-direction: column;
 }
 
 .checkbox-group label {
@@ -435,28 +413,15 @@
   display: flex;
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-md);
+  align-items: stretch;
 }
 
 .bullets-input input {
   flex: 1;
+  min-width: 0;
 }
 
-.btn-add {
-  padding: 0.75rem 1.25rem;
-  background: var(--primary-blue);
-  color: var(--white);
-  border: none;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  font-weight: 500;
-  font-size: 0.875rem;
-  transition: all var(--transition-base);
-  white-space: nowrap;
-}
-
-.btn-add:hover {
-  background: var(--primary-blue-dark);
-}
+/* Removed - using LoadingButton component */
 
 .bullets-list-form {
   list-style: none;
@@ -541,25 +506,7 @@
   border-top: 1px solid var(--gray-200);
 }
 
-.btn-cancel {
-  padding: 0.75rem 1.5rem;
-  background: var(--white);
-  color: var(--gray-700);
-  border: 1.5px solid var(--gray-300);
-  border-radius: var(--radius-md);
-  text-decoration: none;
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-  font-size: 0.875rem;
-  transition: all var(--transition-base);
-}
-
-.btn-cancel:hover {
-  background: var(--gray-50);
-  border-color: var(--gray-400);
-  color: var(--gray-900);
-}
+/* Removed - using LoadingButton component */
 
 /* Responsive */
 @media (max-width: 768px) {
@@ -586,9 +533,12 @@
     margin-top: var(--spacing-md);
   }
 
-  .btn-edit,
-  .btn-delete {
-    flex: 1;
+  .card-actions {
+    flex-direction: column;
+  }
+  
+  .card-actions .btn-loading {
+    width: 100%;
   }
 
   .form-row {
