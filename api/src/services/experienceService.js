@@ -32,17 +32,17 @@ export const experienceService = {
         ) AS bullets,
         COALESCE(
           json_agg(DISTINCT jsonb_build_object(
-            'id', s.id,
-            'name', s.name,
-            'slug', s.slug,
-            'icon_url', s.icon_url
-          )) FILTER (WHERE s.id IS NOT NULL),
+            'id', ws.id,
+            'name', ws.name,
+            'slug', ws.slug,
+            'category', ws.category
+          )) FILTER (WHERE ws.id IS NOT NULL),
           '[]'
         ) AS skills_used
       FROM public.experience e
       LEFT JOIN public.experience_bullets eb ON eb.experience_id = e.id
-      LEFT JOIN public.experience_skills es ON es.experience_id = e.id
-      LEFT JOIN public.skills s ON s.id = es.skill_id
+      LEFT JOIN public.experience_work_skills_map ewsm ON ewsm.experience_id = e.id
+      LEFT JOIN public.work_skills ws ON ws.id = ewsm.work_skill_id
       WHERE 1=1
     `
     const params = []
@@ -230,17 +230,17 @@ export const experienceService = {
         }
       }
 
-      // Delete existing skills
-      await client.query('DELETE FROM public.experience_skills WHERE experience_id = $1', [id])
+      // Delete existing work skills (separate from Skills section)
+      await client.query('DELETE FROM public.experience_work_skills_map WHERE experience_id = $1', [id])
 
-      // Insert new skills
-      if (skill_ids.length > 0) {
-        for (const skillId of skill_ids) {
+      // Insert new work skills
+      if (skill_ids && skill_ids.length > 0) {
+        for (const workSkillId of skill_ids) {
           await client.query(
-            `INSERT INTO public.experience_skills (experience_id, skill_id)
+            `INSERT INTO public.experience_work_skills_map (experience_id, work_skill_id)
              VALUES ($1, $2)
              ON CONFLICT DO NOTHING`,
-            [id, skillId]
+            [id, workSkillId]
           )
         }
       }
@@ -262,7 +262,7 @@ export const experienceService = {
       
       // Delete related records first
       await client.query('DELETE FROM public.experience_bullets WHERE experience_id = $1', [id])
-      await client.query('DELETE FROM public.experience_skills WHERE experience_id = $1', [id])
+      await client.query('DELETE FROM public.experience_work_skills_map WHERE experience_id = $1', [id])
       
       // Delete experience
       const result = await client.query('DELETE FROM public.experience WHERE id = $1 RETURNING *', [id])
