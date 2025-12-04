@@ -31,27 +31,153 @@ const router = express.Router()
  *               type: array
  *               items:
  *                 $ref: '#/components/schemas/Experience'
- *             examples:
- *               success:
- *                 summary: Successful response
- *                 value:
- *                   - id: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
- *                     company: "ABC Company"
- *                     role: "Senior Business Analyst"
- *                     bullets:
- *                       - id: 1
- *                         text: "Analyzed business requirements"
- *                     skills_used:
- *                       - id: 1
- *                         name: "SQL"
- *       500:
- *         description: Failed to fetch experience
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
  */
 router.get('/api/experience', experienceController.getAll)
 
-export default router
+/**
+ * @swagger
+ * /api/experience/{id}:
+ *   get:
+ *     summary: Get experience by ID
+ *     tags: [Experience]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Experience ID
+ *     responses:
+ *       200:
+ *         description: Experience details
+ *       404:
+ *         description: Experience not found
+ */
+router.get('/api/experience/:id', experienceController.getById)
 
+/**
+ * @swagger
+ * /api/experience:
+ *   post:
+ *     summary: Create new experience
+ *     tags: [Experience]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - company
+ *               - role
+ *               - start_date
+ *             properties:
+ *               company:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *               location:
+ *                 type: string
+ *               start_date:
+ *                 type: string
+ *                 format: date
+ *               end_date:
+ *                 type: string
+ *                 format: date
+ *               is_current:
+ *                 type: boolean
+ *               description:
+ *                 type: string
+ *               order_index:
+ *                 type: integer
+ *               bullets:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     text:
+ *                       type: string
+ *                     order_index:
+ *                       type: integer
+ *               skill_ids:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *     responses:
+ *       201:
+ *         description: Experience created successfully
+ *       400:
+ *         description: Invalid input
+ */
+router.post('/api/experience', experienceController.create)
+
+/**
+ * @swagger
+ * /api/experience/{id}:
+ *   put:
+ *     summary: Update experience
+ *     tags: [Experience]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               company:
+ *                 type: string
+ *               role:
+ *                 type: string
+ *               location:
+ *                 type: string
+ *               start_date:
+ *                 type: string
+ *                 format: date
+ *               end_date:
+ *                 type: string
+ *                 format: date
+ *               is_current:
+ *                 type: boolean
+ *               description:
+ *                 type: string
+ *               order_index:
+ *                 type: integer
+ *               bullets:
+ *                 type: array
+ *               skill_ids:
+ *                 type: array
+ *     responses:
+ *       200:
+ *         description: Experience updated successfully
+ *       404:
+ *         description: Experience not found
+ */
+router.put('/api/experience/:id', experienceController.update)
+
+/**
+ * @swagger
+ * /api/experience/{id}:
+ *   delete:
+ *     summary: Delete experience
+ *     tags: [Experience]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Experience deleted successfully
+ *       404:
+ *         description: Experience not found
+ */
+router.delete('/api/experience/:id', experienceController.delete)
+
+export default router

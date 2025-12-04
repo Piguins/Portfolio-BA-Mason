@@ -15,9 +15,8 @@ export default async function DashboardPage() {
       style={{
         minHeight: '100vh',
         padding: '2rem',
-        background: 'radial-gradient(circle at top, #E1DAFE 0, #FFFFFF 45%, #DEFCFF 100%)',
-        fontFamily:
-          '-apple-system, BlinkMacSystemFont, system-ui, -system-ui, "Segoe UI", Roboto, sans-serif',
+        background: 'radial-gradient(circle at top, var(--light-purple) 0, var(--bg-white) 45%, var(--light-blue) 100%)',
+        fontFamily: 'var(--font-secondary)',
       }}
     >
       <div style={{ maxWidth: 1200, margin: '0 auto' }}>
@@ -35,13 +34,14 @@ export default async function DashboardPage() {
               style={{
                 fontSize: '2rem',
                 marginBottom: '0.5rem',
-                color: '#242A41',
+                color: 'var(--dark-blue)',
                 fontWeight: 700,
+                fontFamily: 'var(--font-primary)',
               }}
             >
               Mason Portfolio CMS
             </h1>
-            <p style={{ color: '#6B7280', fontSize: 14 }}>
+            <p style={{ color: 'var(--text-light)', fontSize: 14 }}>
               Xin chào, <strong>{user.name || user.email?.split('@')[0] || 'User'}</strong>
             </p>
           </div>
@@ -68,6 +68,7 @@ export default async function DashboardPage() {
           <DashboardCard
             title="Experience"
             description="Quản lý Experience / Timeline"
+            link="/dashboard/experience"
           />
         </div>
 
@@ -75,19 +76,20 @@ export default async function DashboardPage() {
         <div
           style={{
             marginTop: '2rem',
-            background: 'rgba(255,255,255,0.9)',
+            background: 'var(--bg-white)',
             borderRadius: 16,
             padding: '2rem',
-            boxShadow: '0 20px 45px rgba(0,0,0,0.08)',
-            border: '1px solid rgba(88,63,188,0.08)',
+            boxShadow: 'var(--shadow-lg)',
+            border: '1px solid rgba(88,63,188,0.1)',
           }}
         >
           <h3
             style={{
               fontSize: '1.25rem',
               marginBottom: '1rem',
-              color: '#242A41',
+              color: 'var(--dark-blue)',
               fontWeight: 600,
+              fontFamily: 'var(--font-primary)',
             }}
           >
             Thông tin hệ thống
@@ -101,13 +103,13 @@ export default async function DashboardPage() {
               gap: '0.75rem',
             }}
           >
-            <li style={{ color: '#242A41', fontSize: 14 }}>
+            <li style={{ color: 'var(--text-dark)', fontSize: 14 }}>
               ✓ Kết nối tới API Node.js + PostgreSQL (apps/api)
             </li>
-            <li style={{ color: '#242A41', fontSize: 14 }}>
+            <li style={{ color: 'var(--text-dark)', fontSize: 14 }}>
               ✓ Authentication với Supabase
             </li>
-            <li style={{ color: '#242A41', fontSize: 14 }}>
+            <li style={{ color: 'var(--text-dark)', fontSize: 14 }}>
               ✓ Protected routes và middleware
             </li>
           </ul>

@@ -1,18 +1,66 @@
-*,
-*::before,
-*::after {
+/* Import Manrope font - match Portfolio website */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
 }
 
-html,
-body {
-  padding: 0;
-  margin: 0;
+:root {
+  /* Color scheme - match Portfolio website */
+  --primary-color: #583FBC;
+  --secondary-color: #7DE0EA;
+  --accent-color: #2CCCC8;
+  --dark-blue: #242A41;
+  --text-dark: #1D2130;
+  --text-light: #585F6F;
+  --grey: #656D72;
+  --cinder: #232E35;
+  --cinder-light: #656D72;
+  --bg-light: #FBFBFB;
+  --bg-white: #FFFFFF;
+  --bg-grey: #EDF0F9;
+  --light-blue: #DEFCFF;
+  --light-purple: #E1DAFE;
+  
+  /* Shadows */
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  
+  /* Fonts - match Portfolio */
+  --font-primary: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  --font-secondary: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 body {
-  min-height: 100vh;
+  font-family: var(--font-secondary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--text-dark);
+  line-height: 1.6;
+  overflow-x: hidden;
+  background: var(--bg-white);
 }
 
+html {
+  scroll-behavior: smooth;
+}
 
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
 
+::-webkit-scrollbar-track {
+  background: var(--bg-light);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary-color);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--secondary-color);
+}

@@ -187,11 +187,11 @@ export default function LoginPage() {
         <motion.div
           variants={cardVariants}
           style={{
-            background: 'rgba(255, 255, 255, 0.95)',
+            background: 'var(--bg-white)',
             backdropFilter: 'blur(20px)',
             borderRadius: 24,
             padding: '3rem',
-            boxShadow: '0 25px 50px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(255, 255, 255, 0.5)',
+            boxShadow: 'var(--shadow-lg), 0 0 0 1px rgba(255, 255, 255, 0.5)',
             border: '1px solid rgba(88, 63, 188, 0.1)',
             transformStyle: 'preserve-3d',
             perspective: '1000px',
@@ -207,7 +207,7 @@ export default function LoginPage() {
               style={{
                 fontSize: '2rem',
                 marginBottom: '0.5rem',
-                background: 'linear-gradient(135deg, #583FBC 0%, #7DE0EA 50%, #FF8C69 100%)',
+                background: 'linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 50%, var(--accent-color) 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
                 backgroundClip: 'text',
@@ -219,7 +219,7 @@ export default function LoginPage() {
             </h1>
             <p
               style={{
-                color: '#6B7280',
+                color: 'var(--text-light)',
                 marginBottom: '2rem',
                 fontSize: 15,
                 lineHeight: 1.6,
