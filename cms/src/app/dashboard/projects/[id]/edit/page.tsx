@@ -284,7 +284,7 @@ export default function EditProjectPage() {
             <LoadingButton
               type="button"
               onClick={() => router.push('/dashboard/projects')}
-              variant="tertiary"
+              variant="secondary"
             >
               Hủy
             </LoadingButton>

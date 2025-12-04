@@ -201,7 +201,7 @@ export default function NewSkillPage() {
             <LoadingButton
               type="button"
               onClick={() => router.push('/dashboard/skills')}
-              variant="tertiary"
+              variant="secondary"
             >
               Hủy
             </LoadingButton>
