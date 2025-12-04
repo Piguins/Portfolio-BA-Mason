@@ -97,10 +97,9 @@ PORT=4000
 DATABASE_URL=postgresql://user:password@host:port/database
 NODE_ENV=development
 
-# CORS Configuration (REQUIRED for production)
-# Comma-separated list of allowed origins (no spaces)
-# Example: https://your-cms.vercel.app,https://your-portfolio.vercel.app
-CORS_ORIGINS=https://your-cms.vercel.app,https://your-portfolio.vercel.app
+# API Key (REQUIRED for production)
+# Used to protect API endpoints
+API_KEY=your_secret_api_key_here
 
 # Supabase Configuration
 SUPABASE_URL=your_supabase_url
@@ -108,19 +107,24 @@ SUPABASE_ANON_KEY=your_supabase_anon_key
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 ```
 
-**⚠️ IMPORTANT: CORS Configuration**
+**⚠️ IMPORTANT: API Key Authentication**
 
-The API uses strict CORS policy. You **must** set `CORS_ORIGINS` environment variable in production:
+The API uses **API Key** for authentication. You **must** set `API_KEY` environment variable in production:
 
-- **Format**: Comma-separated URLs (no spaces): `https://domain1.com,https://domain2.com`
-- **Development**: Defaults to `http://localhost:3000,http://localhost:3001` if not set
-- **Production**: If not set, **all origins will be blocked** (fail-secure)
+- **Format**: Any secure string (recommend using a long random string)
+- **Development**: If not set, API key check is disabled (for easier development)
+- **Production**: If not set, API will be unprotected (not recommended)
 
 **Vercel Deployment:**
-Add `CORS_ORIGINS` to your Vercel project environment variables:
+Add `API_KEY` to your Vercel project environment variables:
 1. Go to Vercel Dashboard → Your Project → Settings → Environment Variables
-2. Add `CORS_ORIGINS` with your CMS and Portfolio URLs
-3. Example: `https://your-cms.vercel.app,https://your-portfolio.vercel.app`
+2. Add `API_KEY` with a secure random string
+3. Example: Generate with: `openssl rand -hex 32`
+
+**Using API Key:**
+- **Header**: `X-API-Key: your_api_key_here`
+- **Query Parameter**: `?api_key=your_api_key_here`
+- **Example**: `curl -H "X-API-Key: your_key" https://api.mason.id.vn/api/hero`
 
 ### Development
 

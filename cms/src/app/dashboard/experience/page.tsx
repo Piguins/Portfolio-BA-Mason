@@ -32,6 +32,7 @@ export default async function ExperiencePage() {
       next: { revalidate: 300 }, // Cache 5 minutes (increased from 60s)
       headers: {
         'Content-Type': 'application/json',
+        ...(process.env.NEXT_PUBLIC_API_KEY ? { 'X-API-Key': process.env.NEXT_PUBLIC_API_KEY } : {}),
       },
     }),
   ])

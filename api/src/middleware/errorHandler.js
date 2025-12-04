@@ -30,14 +30,11 @@ export const errorHandler = (err, req, res, next) => {
     })
   }
   
-  // CORS errors
-  if (err.message && err.message.includes('CORS')) {
-    return res.status(403).json({
-      error: 'Forbidden',
-      message: 'Origin not allowed',
-      ...(isDevelopment && {
-        hint: 'Check CORS_ORIGINS environment variable. See api/README.md for setup instructions.',
-      }),
+  // API Key errors (already handled by apiKey middleware, but catch here too)
+  if (err.message && (err.message.includes('API key') || err.message.includes('API_KEY'))) {
+    return res.status(401).json({
+      error: 'Unauthorized',
+      message: err.message || 'API key required',
     })
   }
   

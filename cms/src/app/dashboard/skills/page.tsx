@@ -26,6 +26,7 @@ export default async function SkillsPage() {
       next: { revalidate: 300 }, // Cache 5 minutes
       headers: {
         'Content-Type': 'application/json',
+        ...(process.env.NEXT_PUBLIC_API_KEY ? { 'X-API-Key': process.env.NEXT_PUBLIC_API_KEY } : {}),
       },
     }),
   ])

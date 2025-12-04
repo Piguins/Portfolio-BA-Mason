@@ -14,6 +14,7 @@ import { corsMiddleware } from './middleware/cors.js'
 import { hppMiddleware } from './middleware/hpp.js'
 import { apiLimiter, authLimiter } from './middleware/rateLimiter.js'
 import { swaggerAuth } from './middleware/swaggerAuth.js'
+import { apiKeyAuth } from './middleware/apiKey.js'
 
 const config = getConfig()
 
@@ -36,7 +37,7 @@ const app = express()
 // 1. Helmet - Secure HTTP headers (must be first)
 app.use(helmetMiddleware)
 
-// 2. CORS - Strict origin checking
+// 2. CORS - Allow all origins (security handled by API key)
 app.use(corsMiddleware)
 
 // 3. HPP - HTTP Parameter Pollution protection
@@ -80,7 +81,8 @@ app.use('/', healthRoutes)
 app.use('/api/auth', authLimiter)
 app.use('/', authRoutes)
 
-// Protected API routes
+// Protected API routes (require API key)
+app.use('/api', apiKeyAuth)
 app.use('/', heroRoutes)
 app.use('/', specializationsRoutes)
 app.use('/', projectsRoutes)

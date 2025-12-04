@@ -47,6 +47,10 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 NEXT_PUBLIC_API_URL=http://localhost:4000
 # For production: NEXT_PUBLIC_API_URL=https://api.mason.id.vn
 
+# API Key (required for production)
+NEXT_PUBLIC_API_KEY=your_api_key_here
+# Get this from Vercel environment variables (same as API_KEY in API project)
+
 # App Configuration
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 # For production: NEXT_PUBLIC_APP_URL=https://admin.mason.id.vn

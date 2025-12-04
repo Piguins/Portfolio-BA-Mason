@@ -1,154 +1,19 @@
-// CORS configuration middleware
-// Strict CORS policy - only allows requests from specified origins
+// Simple CORS middleware - allow all origins
+// Security is handled by API key authentication instead
 
 import cors from 'cors'
 
-// Get allowed origins from environment variable
-// Format: "https://domain1.com,https://domain2.com" (comma-separated, no spaces)
-// Supports wildcards: "https://*.vercel.app" for Vercel preview URLs
-const getAllowedOrigins = () => {
-  const originsEnv = process.env.CORS_ORIGINS
-  
-  if (!originsEnv) {
-    // Development fallback - allow localhost
-    if (process.env.NODE_ENV === 'development') {
-      return ['http://localhost:3000', 'http://localhost:3001']
-    }
-    // Production: if not set, deny all (fail secure)
-    console.warn('⚠️  CORS_ORIGINS not set. CORS will be restrictive.')
-    return []
-  }
-  
-  // Split by comma and trim whitespace
-  return originsEnv.split(',').map(origin => origin.trim()).filter(Boolean)
-}
-
-const allowedOrigins = getAllowedOrigins()
-
 /**
- * Check if origin matches allowed pattern
- * Supports exact match and wildcard patterns (e.g., https://*.vercel.app)
- * Also supports domain-based matching (e.g., allow *.mason.id.vn if api.mason.id.vn is allowed)
- */
-const isOriginAllowed = (origin) => {
-  if (!origin) return false
-  
-  // Exact match
-  if (allowedOrigins.includes(origin)) {
-    return true
-  }
-  
-  // Wildcard pattern matching (for Vercel preview URLs, etc.)
-  for (const pattern of allowedOrigins) {
-    if (pattern.includes('*')) {
-      // Convert wildcard pattern to regex
-      // e.g., "https://*.vercel.app" -> /^https:\/\/.*\.vercel\.app$/
-      const regexPattern = pattern
-        .replace(/\./g, '\\.') // Escape dots
-        .replace(/\*/g, '.*')   // Convert * to .*
-      const regex = new RegExp(`^${regexPattern}$`)
-      
-      if (regex.test(origin)) {
-        return true
-      }
-    } else {
-      // Domain-based matching: if api.mason.id.vn is allowed, also allow *.mason.id.vn
-      try {
-        const patternUrl = new URL(pattern)
-        const originUrl = new URL(origin)
-        
-        // Check if same domain (e.g., both are *.mason.id.vn)
-        const patternDomain = patternUrl.hostname.split('.').slice(-3).join('.') // Get last 3 parts (mason.id.vn)
-        const originDomain = originUrl.hostname.split('.').slice(-3).join('.')
-        
-        if (patternDomain === originDomain && patternUrl.protocol === originUrl.protocol) {
-          // Same domain and protocol, allow it
-          return true
-        }
-      } catch (e) {
-        // Invalid URL, skip
-      }
-    }
-  }
-  
-  return false
-}
-
-/**
- * Get API base URL for self-referencing origin check
- */
-const getApiBaseUrl = () => {
-  // Check Vercel URL first (production)
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`
-  }
-  // Check custom API URL
-  if (process.env.API_URL) {
-    return process.env.API_URL
-  }
-  // Development fallback
-  return 'http://localhost:4000'
-}
-
-const apiBaseUrl = getApiBaseUrl()
-
-/**
- * CORS configuration
- * Only allows requests from origins specified in CORS_ORIGINS env variable
- * Allows direct API access (no origin) and self-referencing requests
+ * Simple CORS configuration - allow all origins
+ * Security is handled by API key authentication
  */
 export const corsMiddleware = cors({
-  origin: (origin, callback) => {
-    // Allow requests with no origin (direct API access, Postman, curl, mobile apps, etc.)
-    // This is safe because CORS only applies to browser cross-origin requests
-    if (!origin) {
-      return callback(null, true)
-    }
-    
-    // Allow self-referencing requests (API calling itself)
-    // Extract base URL from origin (remove path if any)
-    try {
-      const originUrl = new URL(origin)
-      const originBase = `${originUrl.protocol}//${originUrl.host}`
-      const apiBase = new URL(apiBaseUrl)
-      const apiBaseHost = `${apiBase.protocol}//${apiBase.host}`
-      
-      if (originBase === apiBaseHost) {
-        return callback(null, true)
-      }
-    } catch (e) {
-      // Invalid URL, continue with normal check
-    }
-    
-    // Check if origin is allowed
-    if (isOriginAllowed(origin)) {
-      callback(null, true)
-    } else {
-      // Origin not allowed - always log for debugging
-      console.warn(`⚠️  CORS blocked origin: ${origin}`)
-      
-      if (allowedOrigins.length === 0) {
-        console.error('❌ CORS_ORIGINS environment variable is not set!')
-        console.error('   Set CORS_ORIGINS in Vercel: Settings → Environment Variables')
-      } else {
-        // In development, show allowed origins
-        if (process.env.NODE_ENV === 'development') {
-          console.warn(`   Allowed origins: ${allowedOrigins.join(', ')}`)
-        } else {
-          // In production, just show count (security)
-          console.warn(`   Configured ${allowedOrigins.length} allowed origin(s)`)
-          console.warn('   Check CORS_SETUP.md for troubleshooting')
-        }
-      }
-      
-      callback(new Error('Not allowed by CORS'))
-    }
-  },
-  credentials: true, // Allow cookies/credentials
+  origin: true, // Allow all origins
+  credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key', 'X-Requested-With'],
   exposedHeaders: ['X-Response-Time', 'X-Query-Time'],
-  maxAge: 86400, // Cache preflight requests for 24 hours
-  optionsSuccessStatus: 200, // Some legacy browsers (IE11) choke on 204
+  maxAge: 86400,
+  optionsSuccessStatus: 200,
 })
 

@@ -1,4 +1,5 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+const API_KEY = process.env.NEXT_PUBLIC_API_KEY || ''
 
 export interface ApiResponse<T = any> {
   success: boolean
@@ -12,12 +13,19 @@ export async function apiRequest<T = any>(
   options: RequestInit = {}
 ): Promise<ApiResponse<T>> {
   try {
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    }
+
+    // Add API key if available
+    if (API_KEY) {
+      headers['X-API-Key'] = API_KEY
+    }
+
     const response = await fetch(`${API_URL}${endpoint}`, {
       ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
+      headers,
     })
 
     const data = await response.json()
