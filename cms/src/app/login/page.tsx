@@ -89,7 +89,7 @@ export default function LoginPage() {
       opacity: 1,
       y: 0,
       transition: {
-        type: 'spring',
+        type: 'spring' as const,
         stiffness: 100,
         damping: 15,
       },
@@ -103,10 +103,9 @@ export default function LoginPage() {
       scale: 1,
       rotateX: 0,
       transition: {
-        type: 'spring',
+        type: 'spring' as const,
         stiffness: 200,
         damping: 20,
-        duration: 0.6,
       },
     },
   }
