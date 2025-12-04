@@ -17,8 +17,15 @@ If you're seeing this error, it means your frontend origin is not in the allowed
    - **Value**: Your CMS and Portfolio URLs (comma-separated, no spaces)
    - **Example**: 
      ```
-     https://your-cms.vercel.app,https://your-portfolio.vercel.app
+     https://admin.mason.id.vn,https://mason.id.vn
      ```
+   
+   **For Mason Portfolio:**
+   ```
+   https://admin.mason.id.vn,https://mason.id.vn
+   ```
+   
+   **Note**: If you add `https://api.mason.id.vn` to CORS_ORIGINS, all subdomains of `*.mason.id.vn` will automatically be allowed (e.g., `admin.mason.id.vn`, `www.mason.id.vn`, etc.)
 
 3. **Redeploy**
    - After adding the variable, redeploy your API

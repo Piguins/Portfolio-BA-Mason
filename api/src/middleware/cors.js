@@ -28,6 +28,7 @@ const allowedOrigins = getAllowedOrigins()
 /**
  * Check if origin matches allowed pattern
  * Supports exact match and wildcard patterns (e.g., https://*.vercel.app)
+ * Also supports domain-based matching (e.g., allow *.mason.id.vn if api.mason.id.vn is allowed)
  */
 const isOriginAllowed = (origin) => {
   if (!origin) return false
@@ -49,6 +50,23 @@ const isOriginAllowed = (origin) => {
       
       if (regex.test(origin)) {
         return true
+      }
+    } else {
+      // Domain-based matching: if api.mason.id.vn is allowed, also allow *.mason.id.vn
+      try {
+        const patternUrl = new URL(pattern)
+        const originUrl = new URL(origin)
+        
+        // Check if same domain (e.g., both are *.mason.id.vn)
+        const patternDomain = patternUrl.hostname.split('.').slice(-3).join('.') // Get last 3 parts (mason.id.vn)
+        const originDomain = originUrl.hostname.split('.').slice(-3).join('.')
+        
+        if (patternDomain === originDomain && patternUrl.protocol === originUrl.protocol) {
+          // Same domain and protocol, allow it
+          return true
+        }
+      } catch (e) {
+        // Invalid URL, skip
       }
     }
   }
