@@ -1,9 +1,101 @@
+import { useState, useEffect } from 'react'
 import { FiCalendar, FiMapPin } from 'react-icons/fi'
 import { useTranslations } from '../../hooks/useTranslations'
+import { experienceService } from '../../services/experienceService'
 import './Experience.css'
 
 const Experience = () => {
   const t = useTranslations()
+  const [experiences, setExperiences] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    const fetchExperiences = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const data = await experienceService.getAll()
+        
+        // Format data for UI
+        const formatted = data.map(exp => experienceService.formatExperience(exp))
+        
+        // Sort by order_index and start_date
+        formatted.sort((a, b) => {
+          if (a.orderIndex !== b.orderIndex) {
+            return a.orderIndex - b.orderIndex
+          }
+          // If same order, sort by date (newest first)
+          return new Date(b.dates) - new Date(a.dates)
+        })
+        
+        setExperiences(formatted)
+      } catch (err) {
+        console.error('Failed to load experiences:', err)
+        setError(err.message || 'Không thể tải dữ liệu kinh nghiệm')
+        // Fallback to translations if API fails
+        if (t.experience?.items) {
+          setExperiences(
+            t.experience.items.map((item, index) => ({
+              id: `fallback-${index}`,
+              role: item.role,
+              company: item.company,
+              location: item.location,
+              dates: item.dates,
+              description: item.description,
+              achievements: item.achievements || [],
+              skills: item.skills || [],
+              isCurrent: false,
+              orderIndex: index,
+            }))
+          )
+        }
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchExperiences()
+  }, [t.experience])
+
+  if (loading) {
+    return (
+      <section id="experience" className="experience-section">
+        <div className="experience-container">
+          <h2 className="experience-title">{t.experience.title}</h2>
+          <p className="experience-subtitle">{t.experience.subtitle}</p>
+          <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-light)' }}>
+            Đang tải dữ liệu...
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  if (error && experiences.length === 0) {
+    return (
+      <section id="experience" className="experience-section">
+        <div className="experience-container">
+          <h2 className="experience-title">{t.experience.title}</h2>
+          <p className="experience-subtitle">{t.experience.subtitle}</p>
+          <div style={{ 
+            textAlign: 'center', 
+            padding: '3rem', 
+            color: '#DC2626',
+            background: '#FEE2E2',
+            borderRadius: '12px',
+            margin: '2rem auto',
+            maxWidth: '600px'
+          }}>
+            <p>{error}</p>
+            <p style={{ fontSize: '14px', marginTop: '0.5rem', color: 'var(--text-light)' }}>
+              Đang sử dụng dữ liệu mặc định
+            </p>
+          </div>
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section id="experience" className="experience-section">
@@ -11,9 +103,24 @@ const Experience = () => {
         <h2 className="experience-title">{t.experience.title}</h2>
         <p className="experience-subtitle">{t.experience.subtitle}</p>
         
+        {error && (
+          <div style={{ 
+            textAlign: 'center', 
+            padding: '1rem', 
+            color: '#92400E',
+            background: '#FEF3C7',
+            borderRadius: '8px',
+            margin: '1rem auto 2rem',
+            maxWidth: '600px',
+            fontSize: '14px'
+          }}>
+            ⚠️ {error} - Đang hiển thị dữ liệu từ API
+          </div>
+        )}
+        
         <div className="experience-timeline">
-          {t.experience.items.map((item, index) => (
-            <div key={index} className="experience-item">
+          {experiences.map((item, index) => (
+            <div key={item.id || index} className="experience-item">
               <div className="experience-number">{index + 1}</div>
               <div className="experience-content">
                 <h3 className="experience-role">{item.role}</h3>
@@ -24,13 +131,17 @@ const Experience = () => {
                     <FiCalendar className="meta-icon" />
                     <span>{item.dates}</span>
                   </div>
-                  <div className="experience-meta-item">
-                    <FiMapPin className="meta-icon" />
-                    <span>{item.location}</span>
-                  </div>
+                  {item.location && (
+                    <div className="experience-meta-item">
+                      <FiMapPin className="meta-icon" />
+                      <span>{item.location}</span>
+                    </div>
+                  )}
                 </div>
                 
-                <p className="experience-description">{item.description}</p>
+                {item.description && (
+                  <p className="experience-description">{item.description}</p>
+                )}
                 
                 {item.achievements && item.achievements.length > 0 && (
                   <div className="experience-achievements">
@@ -60,4 +171,3 @@ const Experience = () => {
 }
 
 export default Experience
-
