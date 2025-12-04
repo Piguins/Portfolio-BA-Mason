@@ -57,14 +57,49 @@ const isOriginAllowed = (origin) => {
 }
 
 /**
+ * Get API base URL for self-referencing origin check
+ */
+const getApiBaseUrl = () => {
+  // Check Vercel URL first (production)
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`
+  }
+  // Check custom API URL
+  if (process.env.API_URL) {
+    return process.env.API_URL
+  }
+  // Development fallback
+  return 'http://localhost:4000'
+}
+
+const apiBaseUrl = getApiBaseUrl()
+
+/**
  * CORS configuration
  * Only allows requests from origins specified in CORS_ORIGINS env variable
+ * Allows direct API access (no origin) and self-referencing requests
  */
 export const corsMiddleware = cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, Postman, etc.) in development only
-    if (!origin && process.env.NODE_ENV === 'development') {
+    // Allow requests with no origin (direct API access, Postman, curl, mobile apps, etc.)
+    // This is safe because CORS only applies to browser cross-origin requests
+    if (!origin) {
       return callback(null, true)
+    }
+    
+    // Allow self-referencing requests (API calling itself)
+    // Extract base URL from origin (remove path if any)
+    try {
+      const originUrl = new URL(origin)
+      const originBase = `${originUrl.protocol}//${originUrl.host}`
+      const apiBase = new URL(apiBaseUrl)
+      const apiBaseHost = `${apiBase.protocol}//${apiBase.host}`
+      
+      if (originBase === apiBaseHost) {
+        return callback(null, true)
+      }
+    } catch (e) {
+      // Invalid URL, continue with normal check
     }
     
     // Check if origin is allowed
@@ -72,7 +107,7 @@ export const corsMiddleware = cors({
       callback(null, true)
     } else {
       // Origin not allowed - always log for debugging
-      console.warn(`⚠️  CORS blocked origin: ${origin || '(no origin)'}`)
+      console.warn(`⚠️  CORS blocked origin: ${origin}`)
       
       if (allowedOrigins.length === 0) {
         console.error('❌ CORS_ORIGINS environment variable is not set!')
