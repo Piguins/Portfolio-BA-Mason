@@ -1,0 +1,294 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useRouter, useParams } from 'next/navigation'
+import Link from 'next/link'
+import { motion } from 'framer-motion'
+import '../../experience.css'
+
+interface Experience {
+  id: string
+  company: string
+  role: string
+  location?: string
+  start_date: string
+  end_date?: string
+  is_current: boolean
+  description?: string
+  order_index: number
+  bullets?: Array<{ id: number; text: string; order_index: number }>
+  skills_used?: Array<{ id: number; name: string; slug: string }>
+}
+
+export default function EditExperiencePage() {
+  const router = useRouter()
+  const params = useParams()
+  const id = params.id as string
+  
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [formData, setFormData] = useState({
+    company: '',
+    role: '',
+    location: '',
+    start_date: '',
+    end_date: '',
+    is_current: false,
+    description: '',
+    order_index: 0,
+    bullets: [] as Array<{ text: string; order_index: number }>,
+    skill_ids: [] as number[],
+  })
+  const [newBullet, setNewBullet] = useState('')
+
+  useEffect(() => {
+    if (id) {
+      fetchExperience()
+    }
+  }, [id])
+
+  const fetchExperience = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/experience/${id}`)
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch experience')
+      }
+      
+      const data: Experience = await response.json()
+      
+      // Format dates for input fields (YYYY-MM-DD)
+      const formatDateForInput = (dateString: string | null | undefined) => {
+        if (!dateString) return ''
+        const date = new Date(dateString)
+        return date.toISOString().split('T')[0]
+      }
+      
+      setFormData({
+        company: data.company,
+        role: data.role,
+        location: data.location || '',
+        start_date: formatDateForInput(data.start_date),
+        end_date: formatDateForInput(data.end_date),
+        is_current: data.is_current || false,
+        description: data.description || '',
+        order_index: data.order_index || 0,
+        bullets: data.bullets?.map(b => ({ text: b.text, order_index: b.order_index })) || [],
+        skill_ids: data.skills_used?.map(s => s.id) || [],
+      })
+    } catch (err: any) {
+      setError(err.message || 'Failed to load experience')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setSaving(true)
+    setError(null)
+
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/experience/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to update experience')
+      }
+
+      router.push('/dashboard/experience')
+    } catch (err: any) {
+      setError(err.message || 'Failed to update experience')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const addBullet = () => {
+    if (!newBullet.trim()) return
+    setFormData({
+      ...formData,
+      bullets: [...formData.bullets, { text: newBullet, order_index: formData.bullets.length }],
+    })
+    setNewBullet('')
+  }
+
+  const removeBullet = (index: number) => {
+    setFormData({
+      ...formData,
+      bullets: formData.bullets
+        .filter((_, i) => i !== index)
+        .map((bullet, i) => ({ ...bullet, order_index: i })),
+    })
+  }
+
+  const updateBullet = (index: number, text: string) => {
+    const updated = [...formData.bullets]
+    updated[index] = { ...updated[index], text }
+    setFormData({ ...formData, bullets: updated })
+  }
+
+  if (loading) {
+    return (
+      <div className="experience-page">
+        <div className="loading">Đang tải...</div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="experience-page">
+      <div className="page-header">
+        <div>
+          <Link href="/dashboard/experience" className="back-link">
+            ← Quay lại Experience
+          </Link>
+          <h1>Sửa Experience</h1>
+        </div>
+      </div>
+
+      {error && (
+        <div className="error-message">
+          {error}
+        </div>
+      )}
+
+      <motion.form
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        onSubmit={handleSubmit}
+        className="experience-form"
+      >
+        <div className="form-group">
+          <label>Company *</label>
+          <input
+            type="text"
+            required
+            value={formData.company}
+            onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Role *</label>
+          <input
+            type="text"
+            required
+            value={formData.role}
+            onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+          />
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label>Location</label>
+            <input
+              type="text"
+              value={formData.location}
+              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Order Index</label>
+            <input
+              type="number"
+              value={formData.order_index}
+              onChange={(e) => setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })}
+            />
+          </div>
+        </div>
+
+        <div className="form-row">
+          <div className="form-group">
+            <label>Start Date *</label>
+            <input
+              type="date"
+              required
+              value={formData.start_date}
+              onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+            />
+          </div>
+
+          <div className="form-group">
+            <label>End Date</label>
+            <input
+              type="date"
+              value={formData.end_date}
+              onChange={(e) => setFormData({ ...formData, end_date: e.target.value })}
+              disabled={formData.is_current}
+            />
+          </div>
+        </div>
+
+        <div className="form-group">
+          <label>
+            <input
+              type="checkbox"
+              checked={formData.is_current}
+              onChange={(e) => setFormData({ ...formData, is_current: e.target.checked, end_date: '' })}
+            />
+            Current Position
+          </label>
+        </div>
+
+        <div className="form-group">
+          <label>Description</label>
+          <textarea
+            rows={4}
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          />
+        </div>
+
+        <div className="form-group">
+          <label>Bullets</label>
+          <div className="bullets-input">
+            <input
+              type="text"
+              value={newBullet}
+              onChange={(e) => setNewBullet(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addBullet())}
+              placeholder="Nhập bullet point và nhấn Enter"
+            />
+            <button type="button" onClick={addBullet} className="btn-add">
+              Thêm
+            </button>
+          </div>
+          <ul className="bullets-list">
+            {formData.bullets.map((bullet, index) => (
+              <li key={index} className="bullet-edit-item">
+                <input
+                  type="text"
+                  value={bullet.text}
+                  onChange={(e) => updateBullet(index, e.target.value)}
+                  className="bullet-input"
+                />
+                <button type="button" onClick={() => removeBullet(index)} className="btn-remove">
+                  ×
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="form-actions">
+          <Link href="/dashboard/experience" className="btn-cancel">
+            Hủy
+          </Link>
+          <button type="submit" disabled={saving} className="btn-primary">
+            {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
+          </button>
+        </div>
+      </motion.form>
+    </div>
+  )
+}
+
