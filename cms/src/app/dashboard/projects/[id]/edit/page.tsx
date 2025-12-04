@@ -21,6 +21,12 @@ interface Project {
   tags?: Array<{ id: number; name: string; color: string }>
 }
 
+interface ProjectTag {
+  id: number
+  name: string
+  color: string
+}
+
 export default function EditProjectPage() {
   const router = useRouter()
   const params = useParams()
@@ -29,6 +35,8 @@ export default function EditProjectPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [tags, setTags] = useState<ProjectTag[]>([])
+  const [loadingTags, setLoadingTags] = useState(true)
   const [formData, setFormData] = useState({
     title: '',
     slug: '',
@@ -41,6 +49,36 @@ export default function EditProjectPage() {
     order_index: 0,
     tag_ids: [] as number[],
   })
+
+  // Fetch all project tags for selection
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+        const response = await fetch(`${API_URL}/api/projects?published=true`)
+        if (response.ok) {
+          const projects = await response.json()
+          const allTags = new Map<number, ProjectTag>()
+          projects.forEach((project: any) => {
+            if (project.tags && Array.isArray(project.tags)) {
+              project.tags.forEach((tag: ProjectTag) => {
+                if (!allTags.has(tag.id)) {
+                  allTags.set(tag.id, tag)
+                }
+              })
+            }
+          })
+          setTags(Array.from(allTags.values()))
+        }
+      } catch (err) {
+        console.error('Failed to fetch tags:', err)
+        setTags([])
+      } finally {
+        setLoadingTags(false)
+      }
+    }
+    fetchTags()
+  }, [])
 
   const fetchProject = useCallback(async () => {
     try {
@@ -262,6 +300,61 @@ export default function EditProjectPage() {
                 onChange={(e) => setFormData({ ...formData, github_url: e.target.value })}
                 placeholder="https://github.com/username/repo"
               />
+            </div>
+          </div>
+
+          <div className="form-section">
+            <h3 className="section-title">Tags (Project Tags)</h3>
+            <div className="form-group">
+              <label htmlFor="tags">Chọn các tags cho project này</label>
+              {loadingTags ? (
+                <p className="text-muted">Đang tải danh sách tags...</p>
+              ) : tags.length === 0 ? (
+                <p className="text-muted">Chưa có tag nào. Tags sẽ được tạo tự động khi bạn tạo project với tags mới.</p>
+              ) : (
+                <div className="tags-select-container">
+                  <div className="tags-checkbox-list">
+                    {tags.map((tag) => (
+                      <label key={tag.id} className="tag-checkbox-item" style={{ borderLeftColor: tag.color || '#6366f1' }}>
+                        <input
+                          type="checkbox"
+                          checked={formData.tag_ids.includes(tag.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setFormData({
+                                ...formData,
+                                tag_ids: [...formData.tag_ids, tag.id],
+                              })
+                            } else {
+                              setFormData({
+                                ...formData,
+                                tag_ids: formData.tag_ids.filter(id => id !== tag.id),
+                              })
+                            }
+                          }}
+                        />
+                        <span>{tag.name}</span>
+                        <span className="tag-color-badge" style={{ backgroundColor: tag.color || '#6366f1' }}></span>
+                      </label>
+                    ))}
+                  </div>
+                  {formData.tag_ids.length > 0 && (
+                    <div className="selected-tags-preview">
+                      <p className="selected-tags-label">Đã chọn ({formData.tag_ids.length}):</p>
+                      <div className="selected-tags-tags">
+                        {formData.tag_ids.map(tagId => {
+                          const tag = tags.find(t => t.id === tagId)
+                          return tag ? (
+                            <span key={tagId} className="selected-tag-tag" style={{ backgroundColor: tag.color || '#6366f1' }}>
+                              {tag.name}
+                            </span>
+                          ) : null
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 

@@ -21,6 +21,13 @@ interface Experience {
   skills_used?: Array<{ id: number; name: string; slug: string }>
 }
 
+interface Skill {
+  id: number
+  name: string
+  slug: string
+  category: string
+}
+
 export default function EditExperiencePage() {
   const router = useRouter()
   const params = useParams()
@@ -29,6 +36,8 @@ export default function EditExperiencePage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [skills, setSkills] = useState<Skill[]>([])
+  const [loadingSkills, setLoadingSkills] = useState(true)
   const [formData, setFormData] = useState({
     company: '',
     role: '',
@@ -42,6 +51,25 @@ export default function EditExperiencePage() {
     skill_ids: [] as number[],
   })
   const [newBullet, setNewBullet] = useState('')
+
+  // Fetch all skills for selection
+  useEffect(() => {
+    const fetchSkills = async () => {
+      try {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+        const response = await fetch(`${API_URL}/api/skills`)
+        if (response.ok) {
+          const data = await response.json()
+          setSkills(data)
+        }
+      } catch (err) {
+        console.error('Failed to fetch skills:', err)
+      } finally {
+        setLoadingSkills(false)
+      }
+    }
+    fetchSkills()
+  }, [])
 
   useEffect(() => {
     if (id) {
@@ -304,7 +332,7 @@ export default function EditExperiencePage() {
           </div>
 
           <div className="form-section">
-            <h3 className="section-title">Thành tựu (Bullets)</h3>
+            <h3 className="section-title">Thành tựu (Bullets) - Key Achievements</h3>
             <div className="form-group">
               <div className="bullets-input">
                 <input
@@ -339,6 +367,61 @@ export default function EditExperiencePage() {
                     </li>
                   ))}
                 </ul>
+              )}
+            </div>
+          </div>
+
+          <div className="form-section">
+            <h3 className="section-title">Kỹ năng sử dụng (Skills Used)</h3>
+            <div className="form-group">
+              <label htmlFor="skills">Chọn các kỹ năng đã sử dụng trong công việc này</label>
+              {loadingSkills ? (
+                <p className="text-muted">Đang tải danh sách skills...</p>
+              ) : skills.length === 0 ? (
+                <p className="text-muted">Chưa có skill nào. Hãy tạo skills trước.</p>
+              ) : (
+                <div className="skills-select-container">
+                  <div className="skills-checkbox-list">
+                    {skills.map((skill) => (
+                      <label key={skill.id} className="skill-checkbox-item">
+                        <input
+                          type="checkbox"
+                          checked={formData.skill_ids.includes(skill.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setFormData({
+                                ...formData,
+                                skill_ids: [...formData.skill_ids, skill.id],
+                              })
+                            } else {
+                              setFormData({
+                                ...formData,
+                                skill_ids: formData.skill_ids.filter(id => id !== skill.id),
+                              })
+                            }
+                          }}
+                        />
+                        <span>{skill.name}</span>
+                        <span className="skill-category-badge">{skill.category}</span>
+                      </label>
+                    ))}
+                  </div>
+                  {formData.skill_ids.length > 0 && (
+                    <div className="selected-skills-preview">
+                      <p className="selected-skills-label">Đã chọn ({formData.skill_ids.length}):</p>
+                      <div className="selected-skills-tags">
+                        {formData.skill_ids.map(skillId => {
+                          const skill = skills.find(s => s.id === skillId)
+                          return skill ? (
+                            <span key={skillId} className="selected-skill-tag">
+                              {skill.name}
+                            </span>
+                          ) : null
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           </div>
