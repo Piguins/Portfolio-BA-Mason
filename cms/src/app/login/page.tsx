@@ -72,7 +72,9 @@ export default function LoginPage() {
       setErrorType(errorInfo.type)
       setLoading(false)
     }
-  }, [email, password, router])
+    // router is not used directly in the callback, removed from deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [email, password])
 
   return (
     <main className="login-page">

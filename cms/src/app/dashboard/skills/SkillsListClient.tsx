@@ -160,6 +160,7 @@ export default function SkillsListClient({
                     </div>
                     {skill.icon_url && (
                       <div className="icon-preview">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={skill.icon_url} alt={skill.name} />
                       </div>
                     )}

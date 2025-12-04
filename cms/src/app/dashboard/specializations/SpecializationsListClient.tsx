@@ -61,7 +61,7 @@ export default function SpecializationsListClient({ initialSpecializations, init
             </a>
             <div className="header-text">
               <h1>Quản lý Specializations</h1>
-              <p>Quản lý các cards trong phần "I specialize in"</p>
+              <p>Quản lý các cards trong phần &quot;I specialize in&quot;</p>
             </div>
           </div>
           <LoadingButton

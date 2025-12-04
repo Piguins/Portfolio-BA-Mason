@@ -266,6 +266,7 @@ export default function HeroPage() {
               />
               {formData.profile_image_url && (
                 <div className="image-preview">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={formData.profile_image_url} alt="Profile preview" onError={(e) => e.currentTarget.style.display = 'none'} />
                 </div>
               )}
