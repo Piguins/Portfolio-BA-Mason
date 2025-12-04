@@ -5,6 +5,7 @@ import express from 'express'
 import cors from 'cors'
 import { getConfig } from './config/index.js'
 import { errorHandler } from './middleware/errorHandler.js'
+import { securityHeaders } from './middleware/securityHeaders.js'
 
 const config = getConfig()
 
@@ -19,8 +20,6 @@ import swaggerRoutes from './routes/swaggerRoutes.js'
 const app = express()
 
 // Middleware
-import { securityHeaders } from './middleware/securityHeaders.js'
-
 app.use(securityHeaders)
 app.use(cors())
 app.use(express.json())
