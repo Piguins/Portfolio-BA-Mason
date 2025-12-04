@@ -108,7 +108,7 @@ export const projectsService = {
       const project = projectResult.rows[0]
 
       // Insert tags
-      if (tag_ids.length > 0) {
+      if (tag_ids && tag_ids.length > 0) {
         for (const tagId of tag_ids) {
           await client.query(
             `INSERT INTO public.project_tags_map (project_id, tag_id)
@@ -123,6 +123,14 @@ export const projectsService = {
       return await this.getById(project.id)
     } catch (error) {
       await client.query('ROLLBACK')
+      console.error('ProjectsService.create error:', error)
+      // Re-throw with more context
+      if (error.code === '23505') { // Unique violation
+        throw new Error(`Project with slug "${slug}" already exists`)
+      }
+      if (error.code === '23503') { // Foreign key violation
+        throw new Error(`Invalid tag_id in tag_ids array`)
+      }
       throw error
     }
   },
@@ -161,7 +169,7 @@ export const projectsService = {
       await client.query('DELETE FROM public.project_tags_map WHERE project_id = $1', [id])
 
       // Insert new tags
-      if (tag_ids.length > 0) {
+      if (tag_ids && tag_ids.length > 0) {
         for (const tagId of tag_ids) {
           await client.query(
             `INSERT INTO public.project_tags_map (project_id, tag_id)
@@ -176,6 +184,14 @@ export const projectsService = {
       return await this.getById(id)
     } catch (error) {
       await client.query('ROLLBACK')
+      console.error('ProjectsService.update error:', error)
+      // Re-throw with more context
+      if (error.code === '23505') { // Unique violation
+        throw new Error(`Project with slug "${slug}" already exists`)
+      }
+      if (error.code === '23503') { // Foreign key violation
+        throw new Error(`Invalid tag_id in tag_ids array`)
+      }
       throw error
     }
   },

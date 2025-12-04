@@ -63,6 +63,14 @@ export const projectsController = {
    * Create new project
    */
   create: asyncHandler(async (req, res) => {
+    // Basic validation
+    if (!req.body.title || !req.body.slug) {
+      return res.status(400).json({
+        success: false,
+        error: 'Title and slug are required',
+      })
+    }
+
     const project = await projectsService.create(req.body)
     res.status(201).json({
       success: true,

@@ -51,14 +51,23 @@ export const skillsService = {
       order_index = 0,
     } = data
 
-    const result = await client.query(
-      `INSERT INTO public.skills 
-       (name, slug, category, level, icon_url, is_highlight, order_index)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
-       RETURNING *`,
-      [name, slug, category, level, icon_url || null, is_highlight, order_index]
-    )
-    return result.rows[0]
+    try {
+      const result = await client.query(
+        `INSERT INTO public.skills 
+         (name, slug, category, level, icon_url, is_highlight, order_index)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
+         RETURNING *`,
+        [name, slug, category, level, icon_url || null, is_highlight, order_index]
+      )
+      return result.rows[0]
+    } catch (error) {
+      console.error('SkillsService.create error:', error)
+      // Re-throw with more context
+      if (error.code === '23505') { // Unique violation
+        throw new Error(`Skill with slug "${slug}" already exists`)
+      }
+      throw error
+    }
   },
 
   /**
@@ -75,15 +84,24 @@ export const skillsService = {
       order_index,
     } = data
 
-    const result = await client.query(
-      `UPDATE public.skills 
-       SET name = $1, slug = $2, category = $3, level = $4, 
-           icon_url = $5, is_highlight = $6, order_index = $7, updated_at = NOW()
-       WHERE id = $8
-       RETURNING *`,
-      [name, slug, category, level, icon_url || null, is_highlight, order_index, id]
-    )
-    return result.rows[0] || null
+    try {
+      const result = await client.query(
+        `UPDATE public.skills 
+         SET name = $1, slug = $2, category = $3, level = $4, 
+             icon_url = $5, is_highlight = $6, order_index = $7, updated_at = NOW()
+         WHERE id = $8
+         RETURNING *`,
+        [name, slug, category, level, icon_url || null, is_highlight, order_index, id]
+      )
+      return result.rows[0] || null
+    } catch (error) {
+      console.error('SkillsService.update error:', error)
+      // Re-throw with more context
+      if (error.code === '23505') { // Unique violation
+        throw new Error(`Skill with slug "${slug}" already exists`)
+      }
+      throw error
+    }
   },
 
   /**

@@ -41,6 +41,14 @@ export const skillsController = {
    * Create new skill
    */
   create: asyncHandler(async (req, res) => {
+    // Basic validation
+    if (!req.body.name || !req.body.slug) {
+      return res.status(400).json({
+        success: false,
+        error: 'Name and slug are required',
+      })
+    }
+
     const skill = await skillsService.create(req.body)
     res.status(201).json({
       success: true,
