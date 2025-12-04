@@ -14,6 +14,9 @@ interface Experience {
   description?: string
   order_index: number
   bullets?: Array<{ id: number; text: string; order_index: number }>
+  // New free-text skills
+  skills_text?: string[]
+  // Old relation-based skills (still supported for backward compatibility)
   skills_used?: Array<{ id: number; name: string; slug: string }>
 }
 

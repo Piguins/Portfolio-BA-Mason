@@ -20,6 +20,8 @@ interface Experience {
   bullets?: Array<{ id: number; text: string; order_index: number }>
   // New free-text skills stored directly on experience
   skills_text?: string[]
+  // Legacy: old skills relation (for backward compatibility)
+  skills_used?: Array<{ id: number; name: string; slug: string }>
 }
 
 export default function EditExperiencePage() {
