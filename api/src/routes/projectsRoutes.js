@@ -50,12 +50,13 @@ const router = express.Router()
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
+// IMPORTANT: Route order matters! More specific routes first
 router.get('/api/projects', projectsController.getAll)
-router.get('/api/projects/:slug', projectsController.getBySlug)
-router.get('/api/projects/id/:id', projectsController.getById)
+router.get('/api/projects/id/:id', projectsController.getById) // Must come before :slug
 router.post('/api/projects', projectsController.create)
 router.put('/api/projects/:id', projectsController.update)
 router.delete('/api/projects/:id', projectsController.delete)
+router.get('/api/projects/:slug', projectsController.getBySlug) // Must be last (catch-all for slugs)
 
 export default router
 
