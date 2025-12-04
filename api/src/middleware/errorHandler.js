@@ -35,6 +35,9 @@ export const errorHandler = (err, req, res, next) => {
     return res.status(403).json({
       error: 'Forbidden',
       message: 'Origin not allowed',
+      ...(isDevelopment && {
+        hint: 'Check CORS_ORIGINS environment variable. See api/README.md for setup instructions.',
+      }),
     })
   }
   

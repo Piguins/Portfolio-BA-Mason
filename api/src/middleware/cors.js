@@ -40,9 +40,16 @@ export const corsMiddleware = cors({
       callback(null, true)
     } else {
       // Origin not allowed
+      // Always log in production for debugging (but don't expose allowed origins)
       if (process.env.NODE_ENV === 'development') {
         console.warn(`⚠️  CORS blocked origin: ${origin}`)
         console.warn(`   Allowed origins: ${allowedOrigins.join(', ')}`)
+      } else {
+        // Production: Log blocked origin but not allowed list (security)
+        console.warn(`⚠️  CORS blocked origin: ${origin}`)
+        if (allowedOrigins.length === 0) {
+          console.error('❌ CORS_ORIGINS environment variable is not set!')
+        }
       }
       callback(new Error('Not allowed by CORS'))
     }

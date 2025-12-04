@@ -96,7 +96,31 @@ Create `.env` file:
 PORT=4000
 DATABASE_URL=postgresql://user:password@host:port/database
 NODE_ENV=development
+
+# CORS Configuration (REQUIRED for production)
+# Comma-separated list of allowed origins (no spaces)
+# Example: https://your-cms.vercel.app,https://your-portfolio.vercel.app
+CORS_ORIGINS=https://your-cms.vercel.app,https://your-portfolio.vercel.app
+
+# Supabase Configuration
+SUPABASE_URL=your_supabase_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 ```
+
+**⚠️ IMPORTANT: CORS Configuration**
+
+The API uses strict CORS policy. You **must** set `CORS_ORIGINS` environment variable in production:
+
+- **Format**: Comma-separated URLs (no spaces): `https://domain1.com,https://domain2.com`
+- **Development**: Defaults to `http://localhost:3000,http://localhost:3001` if not set
+- **Production**: If not set, **all origins will be blocked** (fail-secure)
+
+**Vercel Deployment:**
+Add `CORS_ORIGINS` to your Vercel project environment variables:
+1. Go to Vercel Dashboard → Your Project → Settings → Environment Variables
+2. Add `CORS_ORIGINS` with your CMS and Portfolio URLs
+3. Example: `https://your-cms.vercel.app,https://your-portfolio.vercel.app`
 
 ### Development
 
