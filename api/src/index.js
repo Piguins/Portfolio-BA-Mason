@@ -19,6 +19,9 @@ import swaggerRoutes from './routes/swaggerRoutes.js'
 const app = express()
 
 // Middleware
+import { securityHeaders } from './middleware/securityHeaders.js'
+
+app.use(securityHeaders)
 app.use(cors())
 app.use(express.json())
 

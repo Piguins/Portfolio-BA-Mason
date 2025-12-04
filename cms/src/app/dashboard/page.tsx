@@ -42,7 +42,7 @@ export default async function DashboardPage() {
               Mason Portfolio CMS
             </h1>
             <p style={{ color: '#6B7280', fontSize: 14 }}>
-              Xin chào, <strong>{user.name || user.email}</strong>
+              Xin chào, <strong>{user.name || user.email?.split('@')[0] || 'User'}</strong>
             </p>
           </div>
           <LogoutButton />

@@ -68,13 +68,15 @@ router.post('/api/auth/login', async (req, res, next) => {
       return res.status(400).json({
         success: false,
         error: 'Email and password are required',
+        // Don't expose which field is missing
       })
     }
 
     if (!supabase) {
+      // Security: Don't expose internal configuration errors
       return res.status(500).json({
         success: false,
-        error: 'Authentication service not configured',
+        error: 'Service temporarily unavailable',
       })
     }
 
@@ -84,24 +86,26 @@ router.post('/api/auth/login', async (req, res, next) => {
     })
 
     if (error) {
+      // Security: Don't expose specific error details that could help attackers
+      // Use generic error message to prevent user enumeration
       return res.status(401).json({
         success: false,
-        error: error.message || 'Invalid credentials',
+        error: 'Invalid email or password',
       })
     }
 
+    // Security: Never return tokens or sensitive data in response
+    // Supabase handles tokens via secure HTTP-only cookies automatically
+    // Only return minimal, safe user information
     res.json({
       success: true,
       data: {
         user: {
-          id: data.user.id,
+          // Only return safe, non-sensitive user info
           email: data.user.email,
           name: data.user.user_metadata?.name || data.user.email?.split('@')[0],
         },
-        session: {
-          access_token: data.session.access_token,
-          expires_at: data.session.expires_at,
-        },
+        // Do not expose: id, tokens, session details, timestamps, etc.
       },
     })
   } catch (error) {
@@ -186,12 +190,13 @@ router.get('/api/auth/session', async (req, res, next) => {
       })
     }
 
+    // Security: Only return minimal, safe user information
     res.json({
       success: true,
       data: {
         authenticated: true,
         user: {
-          id: user.id,
+          // Do not expose: id, tokens, metadata, timestamps
           email: user.email,
           name: user.user_metadata?.name || user.email?.split('@')[0],
         },

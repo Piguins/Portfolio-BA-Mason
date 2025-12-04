@@ -19,8 +19,9 @@ export async function getCurrentUser(): Promise<User | null> {
       return null
     }
 
+    // Security: Only return safe, non-sensitive user information
     return {
-      id: user.id,
+      // Do not expose: id (UUID), tokens, timestamps, metadata
       email: user.email || '',
       name: user.user_metadata?.name || user.email?.split('@')[0],
     }

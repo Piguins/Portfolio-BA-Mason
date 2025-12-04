@@ -76,9 +76,9 @@ export function getAuthErrorMessage(error: any): AuthError {
     }
   }
 
-  // Default
+  // Default - generic error message to prevent information disclosure
   return {
-    message: error.message || 'Đăng nhập thất bại. Vui lòng thử lại',
+    message: 'Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu',
     type: 'unknown',
   }
 }
