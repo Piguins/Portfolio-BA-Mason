@@ -152,24 +152,31 @@ export default function LoginPage() {
               type="email"
               required
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value)
+                if (errorType === 'email') {
+                  setError('')
+                  setErrorType(null)
+                }
+              }}
               placeholder="you@example.com"
               disabled={loading}
               style={{
                 padding: '0.75rem 0.9rem',
                 borderRadius: 10,
-                border: '1px solid #E5E7EB',
+                border: `1px solid ${errorType === 'email' ? '#FCA5A5' : '#E5E7EB'}`,
                 fontSize: 14,
                 outline: 'none',
                 opacity: loading ? 0.6 : 1,
                 cursor: loading ? 'not-allowed' : 'text',
+                transition: 'border-color 0.2s',
               }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = '#583FBC'
-                e.currentTarget.style.boxShadow = '0 0 0 1px rgba(88,63,188,0.25)'
+                e.currentTarget.style.borderColor = errorType === 'email' ? '#F59E0B' : '#583FBC'
+                e.currentTarget.style.boxShadow = `0 0 0 1px ${errorType === 'email' ? 'rgba(245,158,11,0.25)' : 'rgba(88,63,188,0.25)'}`
               }}
               onBlur={(e) => {
-                e.currentTarget.style.borderColor = '#E5E7EB'
+                e.currentTarget.style.borderColor = errorType === 'email' ? '#FCA5A5' : '#E5E7EB'
                 e.currentTarget.style.boxShadow = 'none'
               }}
             />
@@ -189,24 +196,31 @@ export default function LoginPage() {
               type="password"
               required
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value)
+                if (errorType === 'password') {
+                  setError('')
+                  setErrorType(null)
+                }
+              }}
               placeholder="••••••••"
               disabled={loading}
               style={{
                 padding: '0.75rem 0.9rem',
                 borderRadius: 10,
-                border: '1px solid #E5E7EB',
+                border: `1px solid ${errorType === 'password' ? '#FCA5A5' : '#E5E7EB'}`,
                 fontSize: 14,
                 outline: 'none',
                 opacity: loading ? 0.6 : 1,
                 cursor: loading ? 'not-allowed' : 'text',
+                transition: 'border-color 0.2s',
               }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = '#583FBC'
-                e.currentTarget.style.boxShadow = '0 0 0 1px rgba(88,63,188,0.25)'
+                e.currentTarget.style.borderColor = errorType === 'password' ? '#F59E0B' : '#583FBC'
+                e.currentTarget.style.boxShadow = `0 0 0 1px ${errorType === 'password' ? 'rgba(245,158,11,0.25)' : 'rgba(88,63,188,0.25)'}`
               }}
               onBlur={(e) => {
-                e.currentTarget.style.borderColor = '#E5E7EB'
+                e.currentTarget.style.borderColor = errorType === 'password' ? '#FCA5A5' : '#E5E7EB'
                 e.currentTarget.style.boxShadow = 'none'
               }}
             />
