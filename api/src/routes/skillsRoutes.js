@@ -50,6 +50,10 @@ const router = express.Router()
  *               $ref: '#/components/schemas/Error'
  */
 router.get('/api/skills', skillsController.getAll)
+router.get('/api/skills/:id', skillsController.getById)
+router.post('/api/skills', skillsController.create)
+router.put('/api/skills/:id', skillsController.update)
+router.delete('/api/skills/:id', skillsController.delete)
 
 export default router
 

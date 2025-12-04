@@ -51,36 +51,11 @@ const router = express.Router()
  *               $ref: '#/components/schemas/Error'
  */
 router.get('/api/projects', projectsController.getAll)
-
-/**
- * @swagger
- * /api/projects/{slug}:
- *   get:
- *     summary: Get project by slug
- *     tags: [Projects]
- *     description: Retrieve a specific project by its slug
- *     parameters:
- *       - in: path
- *         name: slug
- *         required: true
- *         schema:
- *           type: string
- *         description: Project slug
- *     responses:
- *       200:
- *         description: Project details
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Project'
- *       404:
- *         description: Project not found
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
- */
 router.get('/api/projects/:slug', projectsController.getBySlug)
+router.get('/api/projects/id/:id', projectsController.getById)
+router.post('/api/projects', projectsController.create)
+router.put('/api/projects/:id', projectsController.update)
+router.delete('/api/projects/:id', projectsController.delete)
 
 export default router
 

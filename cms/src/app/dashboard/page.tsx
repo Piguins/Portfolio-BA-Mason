@@ -26,12 +26,12 @@ export default async function DashboardPage() {
           <DashboardCard
             title="Projects"
             description="Quản lý Projects / Case Studies"
-            status="Sắp có..."
+            link="/dashboard/projects"
           />
           <DashboardCard
             title="Skills"
             description="Quản lý Skills, Tools, Certifications"
-            status="Sắp có..."
+            link="/dashboard/skills"
           />
           <DashboardCard
             title="Experience"
