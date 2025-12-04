@@ -26,13 +26,7 @@ const Experience = () => {
             return a.orderIndex - b.orderIndex
           }
           // If same order, sort by start_date (newest first)
-          // Get original data to access start_date
-          const expA = data.find(e => e.id === a.id)
-          const expB = data.find(e => e.id === b.id)
-          if (expA && expB) {
-            return new Date(expB.start_date) - new Date(expA.start_date)
-          }
-          return 0
+          return new Date(b.startDate) - new Date(a.startDate)
         })
         
         setExperiences(formatted)

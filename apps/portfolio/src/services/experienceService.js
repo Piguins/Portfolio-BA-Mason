@@ -49,6 +49,7 @@ export const experienceService = {
       company: exp.company,
       location: exp.location || '',
       dates,
+      startDate: exp.start_date, // Keep for sorting
       description: exp.description || '',
       achievements: exp.bullets?.map(bullet => bullet.text) || [],
       skills: exp.skills_used?.map(skill => skill.name) || [],
