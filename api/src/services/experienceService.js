@@ -11,18 +11,16 @@ export const experienceService = {
       SELECT
         e.*,
         COALESCE(
-          (SELECT json_agg(json_build_object('id', eb.id, 'text', eb.text, 'order_index', eb.order_index))
+          (SELECT json_agg(json_build_object('id', eb.id, 'text', eb.text, 'order_index', eb.order_index) ORDER BY eb.order_index ASC)
            FROM public.experience_bullets eb
-           WHERE eb.experience_id = e.id
-           ORDER BY eb.order_index ASC),
+           WHERE eb.experience_id = e.id),
           '[]'
         ) AS bullets,
         COALESCE(
-          (SELECT json_agg(json_build_object('id', s.id, 'name', s.name, 'slug', s.slug, 'icon_url', s.icon_url))
+          (SELECT json_agg(json_build_object('id', s.id, 'name', s.name, 'slug', s.slug, 'icon_url', s.icon_url) ORDER BY s.order_index ASC)
            FROM public.experience_skills es
            JOIN public.skills s ON es.skill_id = s.id
-           WHERE es.experience_id = e.id
-           ORDER BY s.order_index ASC),
+           WHERE es.experience_id = e.id),
           '[]'
         ) AS skills_used
       FROM public.experience e
@@ -57,18 +55,16 @@ export const experienceService = {
       SELECT
         e.*,
         COALESCE(
-          (SELECT json_agg(json_build_object('id', eb.id, 'text', eb.text, 'order_index', eb.order_index))
+          (SELECT json_agg(json_build_object('id', eb.id, 'text', eb.text, 'order_index', eb.order_index) ORDER BY eb.order_index ASC)
            FROM public.experience_bullets eb
-           WHERE eb.experience_id = e.id
-           ORDER BY eb.order_index ASC),
+           WHERE eb.experience_id = e.id),
           '[]'
         ) AS bullets,
         COALESCE(
-          (SELECT json_agg(json_build_object('id', s.id, 'name', s.name, 'slug', s.slug))
+          (SELECT json_agg(json_build_object('id', s.id, 'name', s.name, 'slug', s.slug) ORDER BY s.order_index ASC)
            FROM public.experience_skills es
            JOIN public.skills s ON es.skill_id = s.id
-           WHERE es.experience_id = e.id
-           ORDER BY s.order_index ASC),
+           WHERE es.experience_id = e.id),
           '[]'
         ) AS skills_used
       FROM public.experience e
