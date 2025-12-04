@@ -40,7 +40,9 @@ export default async function ProjectsPage() {
       throw new Error('Failed to fetch projects')
     }
 
-    projects = await response.json()
+    const responseData = await response.json()
+    // Handle both old format (array) and new format ({ data, pagination })
+    projects = Array.isArray(responseData) ? responseData : (responseData.data || [])
   } catch (err: any) {
     console.error('Failed to fetch projects:', err)
     error = err.message || 'Failed to load projects'

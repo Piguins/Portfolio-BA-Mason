@@ -42,7 +42,9 @@ export default async function ExperiencePage() {
       throw new Error('Failed to fetch experiences')
     }
 
-    experiences = await response.json()
+    const responseData = await response.json()
+    // Handle both old format (array) and new format ({ data, pagination })
+    experiences = Array.isArray(responseData) ? responseData : (responseData.data || [])
   } catch (err: any) {
     console.error('Failed to fetch experiences:', err)
     error = err.message || 'Failed to load experiences'

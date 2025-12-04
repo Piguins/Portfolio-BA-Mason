@@ -17,7 +17,6 @@ import heroRoutes from './routes/heroRoutes.js'
 import specializationsRoutes from './routes/specializationsRoutes.js'
 import projectsRoutes from './routes/projectsRoutes.js'
 import skillsRoutes from './routes/skillsRoutes.js'
-import workSkillsRoutes from './routes/workSkillsRoutes.js'
 import experienceRoutes from './routes/experienceRoutes.js'
 import swaggerRoutes from './routes/swaggerRoutes.js'
 
@@ -52,7 +51,6 @@ app.use('/', heroRoutes)
 app.use('/', specializationsRoutes)
 app.use('/', projectsRoutes)
 app.use('/', skillsRoutes)
-app.use('/', workSkillsRoutes)
 app.use('/', experienceRoutes)
 app.use('/', swaggerRoutes)
 

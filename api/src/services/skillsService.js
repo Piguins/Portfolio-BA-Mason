@@ -1,39 +1,116 @@
-// Skills service - Database operations for skills
+// Skills service - OPTIMIZED VERSION
+// Performance improvements:
+// 1. Replaced SELECT * with explicit column names
+// 2. Added pagination support
+
 import client from '../db.js'
 
 export const skillsService = {
   /**
    * Get all skills
-   * @param {Object} filters - Optional filters (category, highlight)
+   * OPTIMIZED: Explicit column selection instead of SELECT *
+   * @param {Object} filters - Optional filters (category, highlight, limit, offset)
    */
   async getAll(filters = {}) {
-    let query = 'SELECT * FROM public.skills WHERE 1=1'
+    const {
+      category,
+      highlight,
+      limit = 1000, // Skills are usually small dataset
+      offset = 0,
+    } = filters
+
+    // OPTIMIZED: Explicit column selection (faster, more secure)
+    let query = `
+      SELECT
+        id,
+        name,
+        slug,
+        category,
+        level,
+        icon_url,
+        description,
+        order_index,
+        is_highlight,
+        created_at,
+        updated_at
+      FROM public.skills
+      WHERE 1=1
+    `
     const params = []
     let paramIndex = 1
     
-    if (filters.category) {
+    if (category) {
       query += ` AND category = $${paramIndex}`
-      params.push(filters.category)
+      params.push(category)
       paramIndex++
     }
     
-    if (filters.highlight !== undefined) {
+    if (highlight !== undefined) {
       query += ` AND is_highlight = $${paramIndex}`
-      params.push(filters.highlight)
+      params.push(highlight)
       paramIndex++
     }
     
-    query += ' ORDER BY category ASC, order_index ASC, id ASC'
+    query += ` ORDER BY category ASC, order_index ASC, id ASC`
+    
+    // Only add LIMIT/OFFSET if reasonable limit
+    if (limit < 10000) {
+      query += ` LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`
+      params.push(limit, offset)
+    }
     
     const result = await client.query(query, params)
-    return result.rows
+    
+    // Get total count for pagination (only if limit used)
+    let totalCount = null
+    if (limit < 10000) {
+      let countQuery = 'SELECT COUNT(*) as total FROM public.skills WHERE 1=1'
+      const countParams = []
+      if (category) {
+        countQuery += ` AND category = $1`
+        countParams.push(category)
+      }
+      if (highlight !== undefined) {
+        countQuery += ` AND is_highlight = $${category ? '2' : '1'}`
+        countParams.push(highlight)
+      }
+      
+      const countResult = await client.query(countQuery, countParams)
+      totalCount = parseInt(countResult.rows[0].total)
+    }
+    
+    return {
+      data: result.rows,
+      pagination: totalCount !== null ? {
+        total: totalCount,
+        limit,
+        offset,
+        hasMore: offset + limit < totalCount,
+      } : null,
+    }
   },
 
   /**
    * Get skill by ID
+   * OPTIMIZED: Explicit column selection
    */
   async getById(id) {
-    const result = await client.query('SELECT * FROM public.skills WHERE id = $1', [id])
+    const result = await client.query(`
+      SELECT
+        id,
+        name,
+        slug,
+        category,
+        level,
+        icon_url,
+        description,
+        order_index,
+        is_highlight,
+        created_at,
+        updated_at
+      FROM public.skills
+      WHERE id = $1
+    `, [id])
     return result.rows[0] || null
   },
 
@@ -47,6 +124,7 @@ export const skillsService = {
       category = 'technical',
       level = 1,
       icon_url,
+      description,
       is_highlight = false,
       order_index = 0,
     } = data
@@ -54,16 +132,15 @@ export const skillsService = {
     try {
       const result = await client.query(
         `INSERT INTO public.skills 
-         (name, slug, category, level, icon_url, is_highlight, order_index)
-         VALUES ($1, $2, $3, $4, $5, $6, $7)
+         (name, slug, category, level, icon_url, description, is_highlight, order_index)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
          RETURNING *`,
-        [name, slug, category, level, icon_url || null, is_highlight, order_index]
+        [name, slug, category, level, icon_url || null, description || null, is_highlight, order_index]
       )
       return result.rows[0]
     } catch (error) {
       console.error('SkillsService.create error:', error)
-      // Re-throw with more context
-      if (error.code === '23505') { // Unique violation
+      if (error.code === '23505') {
         throw new Error(`Skill with slug "${slug}" already exists`)
       }
       throw error
@@ -80,6 +157,7 @@ export const skillsService = {
       category,
       level,
       icon_url,
+      description,
       is_highlight,
       order_index,
     } = data
@@ -88,16 +166,15 @@ export const skillsService = {
       const result = await client.query(
         `UPDATE public.skills 
          SET name = $1, slug = $2, category = $3, level = $4, 
-             icon_url = $5, is_highlight = $6, order_index = $7, updated_at = NOW()
-         WHERE id = $8
+             icon_url = $5, description = $6, is_highlight = $7, order_index = $8, updated_at = NOW()
+         WHERE id = $9
          RETURNING *`,
-        [name, slug, category, level, icon_url || null, is_highlight, order_index, id]
+        [name, slug, category, level, icon_url || null, description || null, is_highlight, order_index, id]
       )
       return result.rows[0] || null
     } catch (error) {
       console.error('SkillsService.update error:', error)
-      // Re-throw with more context
-      if (error.code === '23505') { // Unique violation
+      if (error.code === '23505') {
         throw new Error(`Skill with slug "${slug}" already exists`)
       }
       throw error
@@ -122,4 +199,3 @@ export const skillsService = {
     return result.rows[0] || null
   },
 }
-

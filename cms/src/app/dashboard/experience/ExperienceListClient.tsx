@@ -18,6 +18,9 @@ interface Experience {
   description?: string
   order_index: number
   bullets?: Array<{ id: number; text: string; order_index: number }>
+  // New free-text skills
+  skills_text?: string[]
+  // Old relation-based skills (still supported for backward compatibility)
   skills_used?: Array<{ id: number; name: string; slug: string }>
 }
 
@@ -44,7 +47,9 @@ export default function ExperienceListClient({
       })
       
       if (!response.ok) throw new Error('Failed to fetch experiences')
-      const data = await response.json()
+      const responseData = await response.json()
+      // Handle both old format (array) and new format ({ data, pagination })
+      const data = Array.isArray(responseData) ? responseData : (responseData.data || [])
       setExperiences(data)
     } catch (err: any) {
       setError(err.message || 'Failed to load experiences')
@@ -186,18 +191,25 @@ export default function ExperienceListClient({
                   </div>
                 )}
 
-                {exp.skills_used && exp.skills_used.length > 0 && (
+                {(exp.skills_text && exp.skills_text.length > 0) ||
+                  (exp.skills_used && exp.skills_used.length > 0) ? (
                   <div className="card-skills">
                     <h4>Kỹ năng sử dụng</h4>
                     <div className="skills-tags">
-                      {exp.skills_used.map((skill) => (
-                        <span key={skill.id} className="skill-tag">
-                          {skill.name}
-                        </span>
-                      ))}
+                      {exp.skills_text && exp.skills_text.length > 0
+                        ? exp.skills_text.map((skill, index) => (
+                            <span key={index} className="skill-tag">
+                              {skill}
+                            </span>
+                          ))
+                        : exp.skills_used?.map((skill) => (
+                            <span key={skill.id} className="skill-tag">
+                              {skill.name}
+                            </span>
+                          ))}
                     </div>
                   </div>
-                )}
+                ) : null}
               </motion.div>
             ))}
           </div>

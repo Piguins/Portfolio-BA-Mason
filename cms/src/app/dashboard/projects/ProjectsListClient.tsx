@@ -44,7 +44,9 @@ export default function ProjectsListClient({
       })
       
       if (!response.ok) throw new Error('Failed to fetch projects')
-      const data = await response.json()
+      const responseData = await response.json()
+      // Handle both old format (array) and new format ({ data, pagination })
+      const data = Array.isArray(responseData) ? responseData : (responseData.data || [])
       setProjects(data)
     } catch (err: any) {
       setError(err.message || 'Failed to load projects')

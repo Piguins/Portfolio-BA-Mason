@@ -5,19 +5,31 @@ import { asyncHandler } from '../middleware/errorHandler.js'
 export const skillsController = {
   /**
    * Get all skills
+   * OPTIMIZED: Supports pagination, backward compatible
    */
   getAll: asyncHandler(async (req, res) => {
     const filters = {
       category: req.query.category,
       highlight: req.query.highlight === 'true' ? true : req.query.highlight === 'false' ? false : undefined,
+      limit: req.query.limit ? parseInt(req.query.limit) : undefined,
+      offset: req.query.offset ? parseInt(req.query.offset) : undefined,
     }
     
-    const skills = await skillsService.getAll(filters)
+    const result = await skillsService.getAll(filters)
     
     // Add cache headers
     res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=60')
     
-    res.json(skills)
+    // Backward compatible: return array if no pagination requested, otherwise return object
+    if (result.pagination) {
+      res.json({
+        success: true,
+        data: result.data,
+        pagination: result.pagination,
+      })
+    } else {
+      res.json(result.data)
+    }
   }),
 
   /**

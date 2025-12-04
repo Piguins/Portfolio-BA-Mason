@@ -62,6 +62,6 @@ MIT License - Free to use for personal and commercial purposes.
 ---
 
 <div align="center">
-  <p>For detailed documentation, please select your preferred language above.</p>
-  <p>Project built with React and Vite.</p>
+  <p>For detailed documentation of the CMS ↔ API connection and login flow, see the <code>cms/README.md</code> and <code>api/README.md</code>.</p>
+  <p>Project built with React, Vite, Next.js, Express and Supabase.</p>
 </div>

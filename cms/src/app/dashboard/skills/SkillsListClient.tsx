@@ -42,7 +42,9 @@ export default function SkillsListClient({
       })
       
       if (!response.ok) throw new Error('Failed to fetch skills')
-      const data = await response.json()
+      const responseData = await response.json()
+      // Handle both old format (array) and new format ({ data, pagination })
+      const data = Array.isArray(responseData) ? responseData : (responseData.data || [])
       setSkills(data)
     } catch (err: any) {
       setError(err.message || 'Failed to load skills')

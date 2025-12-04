@@ -5,10 +5,13 @@ import { asyncHandler } from '../middleware/errorHandler.js'
 export const projectsController = {
   /**
    * Get all projects (CMS: all, Public: published only)
+   * OPTIMIZED: Supports pagination, backward compatible
    */
   getAll: asyncHandler(async (req, res) => {
     const filters = {
       published: req.query.published === 'true' ? true : req.query.published === 'false' ? false : undefined,
+      limit: req.query.limit ? parseInt(req.query.limit) : undefined,
+      offset: req.query.offset ? parseInt(req.query.offset) : undefined,
     }
     
     // If no published filter, default to published=true for public API
@@ -16,12 +19,21 @@ export const projectsController = {
       filters.published = true
     }
     
-    const projects = await projectsService.getAll(filters)
+    const result = await projectsService.getAll(filters)
     
     // Add cache headers for GET requests
     res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=60')
     
-    res.json(projects)
+    // Backward compatible: return array if no pagination requested, otherwise return object
+    if (result.pagination) {
+      res.json({
+        success: true,
+        data: result.data,
+        pagination: result.pagination,
+      })
+    } else {
+      res.json(result.data)
+    }
   }),
   
   /**

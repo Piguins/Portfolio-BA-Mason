@@ -36,17 +36,21 @@ npm install
 
 ### 2. Environment Variables
 
-Copy `.env.local.example` to `.env.local` and fill in your values:
+Tạo file `.env.local` trong thư mục `cms/` (hoặc copy từ `.env.local.example`) với các biến sau:
 
-```bash
-cp .env.local.example .env.local
+```env
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# API Configuration
+NEXT_PUBLIC_API_URL=http://localhost:4000
+# For production: NEXT_PUBLIC_API_URL=https://api.mason.id.vn
+
+# App Configuration
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+# For production: NEXT_PUBLIC_APP_URL=https://admin.mason.id.vn
 ```
-
-Required variables:
-- `NEXT_PUBLIC_SUPABASE_URL` - Your Supabase project URL
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Your Supabase anon key
-- `NEXT_PUBLIC_API_URL` - Backend API URL (default: http://localhost:4000)
-- `NEXT_PUBLIC_APP_URL` - CMS app URL (default: http://localhost:3000)
 
 ### 3. Run Development Server
 

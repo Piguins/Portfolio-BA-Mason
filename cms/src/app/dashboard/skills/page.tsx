@@ -37,7 +37,9 @@ export default async function SkillsPage() {
       throw new Error('Failed to fetch skills')
     }
 
-    skills = await response.json()
+    const responseData = await response.json()
+    // Handle both old format (array) and new format ({ data, pagination })
+    skills = Array.isArray(responseData) ? responseData : (responseData.data || [])
   } catch (err: any) {
     console.error('Failed to fetch skills:', err)
     error = err.message || 'Failed to load skills'

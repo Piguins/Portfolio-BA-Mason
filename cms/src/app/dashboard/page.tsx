@@ -40,13 +40,8 @@ export default async function DashboardPage() {
           />
           <DashboardCard
             title="Skills"
-            description="Quản lý Skills Section (Logos - I specialize in)"
+            description="Quản lý Skills, Tools, Certifications"
             link="/dashboard/skills"
-          />
-          <DashboardCard
-            title="Work Skills"
-            description="Quản lý Work Skills (Skills used in Experience - độc lập)"
-            link="/dashboard/work-skills"
           />
           <DashboardCard
             title="Experience"

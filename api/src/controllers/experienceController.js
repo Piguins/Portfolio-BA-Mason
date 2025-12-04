@@ -5,16 +5,18 @@ import { asyncHandler } from '../middleware/errorHandler.js'
 export const experienceController = {
   /**
    * Get all work experience
-   * Performance: Added response caching headers
+   * OPTIMIZED: Supports pagination, backward compatible with old format
    */
   getAll: asyncHandler(async (req, res) => {
     const filters = {
       current: req.query.current === 'true' ? true : req.query.current === 'false' ? false : undefined,
       company: req.query.company,
+      limit: req.query.limit ? parseInt(req.query.limit) : undefined,
+      offset: req.query.offset ? parseInt(req.query.offset) : undefined,
     }
     
     const startTime = Date.now()
-    const experience = await experienceService.getAll(filters)
+    const result = await experienceService.getAll(filters)
     const queryTime = Date.now() - startTime
     
     // Add cache headers for GET requests (5 minutes cache)
@@ -23,7 +25,17 @@ export const experienceController = {
     // Add performance header
     res.setHeader('X-Query-Time', `${queryTime}ms`)
     
-    res.json(experience)
+    // Backward compatible: return array if no pagination requested, otherwise return object
+    if (result.pagination) {
+      res.json({
+        success: true,
+        data: result.data,
+        pagination: result.pagination,
+      })
+    } else {
+      // Old format: return array directly for backward compatibility
+      res.json(result.data)
+    }
   }),
 
   /**

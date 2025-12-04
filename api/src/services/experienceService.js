@@ -1,14 +1,27 @@
-// Experience service - Database operations for work experience
+// Experience service - OPTIMIZED VERSION
+// Performance improvements:
+// 1. Batch inserts for bullets (reduces queries from N to 1)
+// 2. Removed unnecessary JOINs for skills (using skills_text array)
+// 3. Added pagination support
+// 4. Optimized GROUP BY query
+
 import client from '../db.js'
 
 export const experienceService = {
   /**
    * Get all work experience with bullets and skills
-   * OPTIMIZED: Using JOINs instead of subqueries for better performance
-   * @param {Object} filters - Optional filters (current, company)
+   * OPTIMIZED: Using JOINs, removed unnecessary skills JOIN, added pagination
+   * @param {Object} filters - Optional filters (current, company, limit, offset)
    */
   async getAll(filters = {}) {
-    // Optimized query using JOINs and array_agg (faster than json_agg subqueries)
+    const {
+      current,
+      company,
+      limit = 100, // Default limit to prevent loading too much data
+      offset = 0,
+    } = filters
+
+    // Optimized query - removed skills JOIN since we use skills_text now
     let query = `
       SELECT
         e.id,
@@ -22,6 +35,7 @@ export const experienceService = {
         e.order_index,
         e.created_at,
         e.updated_at,
+        e.skills_text,
         COALESCE(
           json_agg(DISTINCT jsonb_build_object(
             'id', eb.id,
@@ -29,58 +43,79 @@ export const experienceService = {
             'order_index', eb.order_index
           )) FILTER (WHERE eb.id IS NOT NULL),
           '[]'
-        ) AS bullets,
-        COALESCE(
-          json_agg(DISTINCT jsonb_build_object(
-            'id', ws.id,
-            'name', ws.name,
-            'slug', ws.slug,
-            'category', ws.category
-          )) FILTER (WHERE ws.id IS NOT NULL),
-          '[]'
-        ) AS skills_used
+        ) AS bullets
       FROM public.experience e
       LEFT JOIN public.experience_bullets eb ON eb.experience_id = e.id
-      LEFT JOIN public.experience_work_skills_map ewsm ON ewsm.experience_id = e.id
-      LEFT JOIN public.work_skills ws ON ws.id = ewsm.work_skill_id
       WHERE 1=1
     `
     const params = []
     let paramIndex = 1
     
-    if (filters.current !== undefined) {
+    if (current !== undefined) {
       query += ` AND e.is_current = $${paramIndex}`
-      params.push(filters.current)
+      params.push(current)
       paramIndex++
     }
     
-    if (filters.company) {
+    if (company) {
       query += ` AND e.company ILIKE $${paramIndex}`
-      params.push(`%${filters.company}%`)
+      params.push(`%${company}%`)
       paramIndex++
     }
     
     query += `
       GROUP BY e.id, e.company, e.role, e.location, e.start_date, e.end_date, 
-               e.is_current, e.description, e.order_index, e.created_at, e.updated_at
+               e.is_current, e.description, e.order_index, e.created_at, e.updated_at, e.skills_text
       ORDER BY e.order_index ASC, e.start_date DESC
+      LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
     `
+    params.push(limit, offset)
     
     const startTime = Date.now()
     const result = await client.query(query, params)
     const queryTime = Date.now() - startTime
     
-    // Log slow queries (for monitoring) - lowered threshold
+    // Log slow queries
     if (queryTime > 200) {
       console.warn(`⚠️ Slow query detected: ${queryTime}ms for getAll experiences`)
     }
     
-    return result.rows
+    // Get total count for pagination (only if limit/offset used)
+    let totalCount = null
+    if (limit < 1000) { // Only count if reasonable limit
+      const countQuery = `
+        SELECT COUNT(DISTINCT e.id) as total
+        FROM public.experience e
+        WHERE 1=1
+          ${current !== undefined ? `AND e.is_current = $1` : ''}
+          ${company ? `AND e.company ILIKE $${current !== undefined ? '2' : '1'}` : ''}
+      `
+      const countParams = []
+      if (current !== undefined) countParams.push(current)
+      if (company) countParams.push(`%${company}%`)
+      
+      const countResult = await client.query(countQuery, countParams)
+      totalCount = parseInt(countResult.rows[0].total)
+    }
+    
+    return {
+      data: result.rows,
+      pagination: totalCount !== null ? {
+        total: totalCount,
+        limit,
+        offset,
+        hasMore: offset + limit < totalCount,
+      } : null,
+    }
   },
 
   /**
    * Get experience by ID
    * OPTIMIZED: Using JOINs instead of subqueries
+   */
+  /**
+   * Get experience by ID
+   * OPTIMIZED: Removed unnecessary skills JOIN
    */
   async getById(id) {
     const result = await client.query(`
@@ -96,6 +131,7 @@ export const experienceService = {
         e.order_index,
         e.created_at,
         e.updated_at,
+        e.skills_text,
         COALESCE(
           json_agg(DISTINCT jsonb_build_object(
             'id', eb.id,
@@ -103,23 +139,12 @@ export const experienceService = {
             'order_index', eb.order_index
           )) FILTER (WHERE eb.id IS NOT NULL),
           '[]'
-        ) AS bullets,
-        COALESCE(
-          json_agg(DISTINCT jsonb_build_object(
-            'id', ws.id,
-            'name', ws.name,
-            'slug', ws.slug,
-            'category', ws.category
-          )) FILTER (WHERE ws.id IS NOT NULL),
-          '[]'
-        ) AS skills_used
+        ) AS bullets
       FROM public.experience e
       LEFT JOIN public.experience_bullets eb ON eb.experience_id = e.id
-      LEFT JOIN public.experience_work_skills_map ewsm ON ewsm.experience_id = e.id
-      LEFT JOIN public.work_skills ws ON ws.id = ewsm.work_skill_id
       WHERE e.id = $1
       GROUP BY e.id, e.company, e.role, e.location, e.start_date, e.end_date, 
-               e.is_current, e.description, e.order_index, e.created_at, e.updated_at
+               e.is_current, e.description, e.order_index, e.created_at, e.updated_at, e.skills_text
     `, [id])
     return result.rows[0] || null
   },
@@ -138,7 +163,8 @@ export const experienceService = {
       description,
       order_index,
       bullets = [],
-      skill_ids = [],
+      // New free-text skills stored directly on experience as text[]
+      skills_text = [],
     } = data
 
     try {
@@ -148,35 +174,42 @@ export const experienceService = {
       // Insert experience
       const expResult = await client.query(
         `INSERT INTO public.experience 
-         (company, role, location, start_date, end_date, is_current, description, order_index)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+         (company, role, location, start_date, end_date, is_current, description, order_index, skills_text)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
          RETURNING *`,
-        [company, role, location, start_date, end_date || null, is_current || false, description || null, order_index || 0]
+        [
+          company,
+          role,
+          location,
+          start_date,
+          end_date || null,
+          is_current || false,
+          description || null,
+          order_index || 0,
+          Array.isArray(skills_text) ? skills_text : [],
+        ]
       )
       const experience = expResult.rows[0]
 
-      // Insert bullets
+      // OPTIMIZED: Batch insert bullets in a single query
       if (bullets.length > 0) {
-        for (let i = 0; i < bullets.length; i++) {
-          await client.query(
-            `INSERT INTO public.experience_bullets (experience_id, text, order_index)
-             VALUES ($1, $2, $3)`,
-            [experience.id, bullets[i].text, bullets[i].order_index || i]
-          )
-        }
+        const values = bullets.map((bullet, i) => 
+          `($1, $${i * 3 + 2}, $${i * 3 + 3})`
+        ).join(', ')
+        
+        const params = [experience.id]
+        bullets.forEach((bullet, i) => {
+          params.push(bullet.text, bullet.order_index || i)
+        })
+        
+        await client.query(
+          `INSERT INTO public.experience_bullets (experience_id, text, order_index)
+           VALUES ${values}`,
+          params
+        )
       }
 
-      // Insert work skills (separate from Skills section)
-      if (skill_ids && skill_ids.length > 0) {
-        for (const workSkillId of skill_ids) {
-          await client.query(
-            `INSERT INTO public.experience_work_skills_map (experience_id, work_skill_id)
-             VALUES ($1, $2)
-             ON CONFLICT DO NOTHING`,
-            [experience.id, workSkillId]
-          )
-        }
-      }
+      // NOTE: Old relation table experience_skills is no longer used for new data.
 
       await client.query('COMMIT')
       return await this.getById(experience.id)
@@ -200,7 +233,8 @@ export const experienceService = {
       description,
       order_index,
       bullets = [],
-      skill_ids = [],
+      // New free-text skills stored directly on experience as text[]
+      skills_text = [],
     } = data
 
     try {
@@ -211,39 +245,45 @@ export const experienceService = {
         `UPDATE public.experience 
          SET company = $1, role = $2, location = $3, start_date = $4, 
              end_date = $5, is_current = $6, description = $7, order_index = $8,
+             skills_text = $9,
              updated_at = NOW()
-         WHERE id = $9`,
-        [company, role, location, start_date, end_date || null, is_current || false, description || null, order_index || 0, id]
+         WHERE id = $10`,
+        [
+          company,
+          role,
+          location,
+          start_date,
+          end_date || null,
+          is_current || false,
+          description || null,
+          order_index || 0,
+          Array.isArray(skills_text) ? skills_text : [],
+          id,
+        ]
       )
 
       // Delete existing bullets
       await client.query('DELETE FROM public.experience_bullets WHERE experience_id = $1', [id])
 
-      // Insert new bullets
+      // OPTIMIZED: Batch insert new bullets
       if (bullets.length > 0) {
-        for (let i = 0; i < bullets.length; i++) {
-          await client.query(
-            `INSERT INTO public.experience_bullets (experience_id, text, order_index)
-             VALUES ($1, $2, $3)`,
-            [id, bullets[i].text, bullets[i].order_index || i]
-          )
-        }
+        const values = bullets.map((bullet, i) => 
+          `($1, $${i * 3 + 2}, $${i * 3 + 3})`
+        ).join(', ')
+        
+        const params = [id]
+        bullets.forEach((bullet, i) => {
+          params.push(bullet.text, bullet.order_index || i)
+        })
+        
+        await client.query(
+          `INSERT INTO public.experience_bullets (experience_id, text, order_index)
+           VALUES ${values}`,
+          params
+        )
       }
 
-      // Delete existing work skills (separate from Skills section)
-      await client.query('DELETE FROM public.experience_work_skills_map WHERE experience_id = $1', [id])
-
-      // Insert new work skills
-      if (skill_ids && skill_ids.length > 0) {
-        for (const workSkillId of skill_ids) {
-          await client.query(
-            `INSERT INTO public.experience_work_skills_map (experience_id, work_skill_id)
-             VALUES ($1, $2)
-             ON CONFLICT DO NOTHING`,
-            [id, workSkillId]
-          )
-        }
-      }
+      // NOTE: Old relation table experience_skills is no longer used for new data.
 
       await client.query('COMMIT')
       return await this.getById(id)
@@ -262,7 +302,7 @@ export const experienceService = {
       
       // Delete related records first
       await client.query('DELETE FROM public.experience_bullets WHERE experience_id = $1', [id])
-      await client.query('DELETE FROM public.experience_work_skills_map WHERE experience_id = $1', [id])
+      await client.query('DELETE FROM public.experience_skills WHERE experience_id = $1', [id])
       
       // Delete experience
       const result = await client.query('DELETE FROM public.experience WHERE id = $1 RETURNING *', [id])

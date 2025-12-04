@@ -18,14 +18,8 @@ interface Experience {
   description?: string
   order_index: number
   bullets?: Array<{ id: number; text: string; order_index: number }>
-  skills_used?: Array<{ id: number; name: string; slug: string }>
-}
-
-interface Skill {
-  id: number
-  name: string
-  slug: string
-  category: string
+  // New free-text skills stored directly on experience
+  skills_text?: string[]
 }
 
 export default function EditExperiencePage() {
@@ -36,8 +30,6 @@ export default function EditExperiencePage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [skills, setSkills] = useState<Skill[]>([])
-  const [loadingSkills, setLoadingSkills] = useState(true)
   const [formData, setFormData] = useState({
     company: '',
     role: '',
@@ -48,28 +40,11 @@ export default function EditExperiencePage() {
     description: '',
     order_index: 0,
     bullets: [] as Array<{ text: string; order_index: number }>,
-    skill_ids: [] as number[],
+    // Free-text skills, e.g. ["UX/UI", "SQL"]
+    skills_text: [] as string[],
   })
   const [newBullet, setNewBullet] = useState('')
-
-  // Fetch all work skills for selection (separate from Skills section)
-  useEffect(() => {
-    const fetchWorkSkills = async () => {
-      try {
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-        const response = await fetch(`${API_URL}/api/work-skills`)
-        if (response.ok) {
-          const data = await response.json()
-          setSkills(data)
-        }
-      } catch (err) {
-        console.error('Failed to fetch work skills:', err)
-      } finally {
-        setLoadingSkills(false)
-      }
-    }
-    fetchWorkSkills()
-  }, [])
+  const [newSkill, setNewSkill] = useState('')
 
   useEffect(() => {
     if (id) {
@@ -115,7 +90,10 @@ export default function EditExperiencePage() {
         description: data.description || '',
         order_index: data.order_index || 0,
         bullets: data.bullets?.map(b => ({ text: b.text, order_index: b.order_index })) || [],
-        skill_ids: data.skills_used?.map(s => s.id) || [],
+        // Prefer new skills_text if present; fallback to names from old skills_used
+        skills_text: Array.isArray(data.skills_text) && data.skills_text.length > 0
+          ? data.skills_text
+          : (data.skills_used?.map((s) => s.name) || []),
       })
     } catch (err: any) {
       if (err.name === 'AbortError') {
@@ -185,6 +163,32 @@ export default function EditExperiencePage() {
     const updated = [...formData.bullets]
     updated[index] = { ...updated[index], text }
     setFormData({ ...formData, bullets: updated })
+  }
+
+  const addSkill = () => {
+    const value = newSkill.trim()
+    if (!value) return
+    // Avoid duplicates (case-insensitive)
+    if (
+      formData.skills_text.some(
+        (s) => s.toLowerCase() === value.toLowerCase()
+      )
+    ) {
+      setNewSkill('')
+      return
+    }
+    setFormData({
+      ...formData,
+      skills_text: [...formData.skills_text, value],
+    })
+    setNewSkill('')
+  }
+
+  const removeSkill = (index: number) => {
+    setFormData({
+      ...formData,
+      skills_text: formData.skills_text.filter((_, i) => i !== index),
+    })
   }
 
   if (loading) {
@@ -373,59 +377,48 @@ export default function EditExperiencePage() {
           </div>
 
           <div className="form-section">
-            <h3 className="section-title">Kỹ năng sử dụng (Skills Used)</h3>
-            <div className="form-group">
-              <label htmlFor="skills">Chọn các kỹ năng đã sử dụng trong công việc này</label>
-              {loadingSkills ? (
-                <p className="text-muted">Đang tải danh sách work skills...</p>
-              ) : skills.length === 0 ? (
-                <p className="text-muted">Chưa có work skill nào. Hãy tạo work skills trước.</p>
-              ) : (
-                <div className="skills-select-container">
-                  <div className="skills-checkbox-list">
-                    {skills.map((skill) => (
-                      <label key={skill.id} className="skill-checkbox-item">
-                        <input
-                          type="checkbox"
-                          checked={formData.skill_ids.includes(skill.id)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setFormData({
-                                ...formData,
-                                skill_ids: [...formData.skill_ids, skill.id],
-                              })
-                            } else {
-                              setFormData({
-                                ...formData,
-                                skill_ids: formData.skill_ids.filter(id => id !== skill.id),
-                              })
-                            }
-                          }}
-                        />
-                        <span>{skill.name}</span>
-                        <span className="skill-category-badge">{skill.category}</span>
-                      </label>
-                    ))}
-                  </div>
-                  {formData.skill_ids.length > 0 && (
-                    <div className="selected-skills-preview">
-                      <p className="selected-skills-label">Đã chọn ({formData.skill_ids.length}):</p>
-                      <div className="selected-skills-tags">
-                        {formData.skill_ids.map(skillId => {
-                          const skill = skills.find(s => s.id === skillId)
-                          return skill ? (
-                            <span key={skillId} className="selected-skill-tag">
-                              {skill.name}
-                            </span>
-                          ) : null
-                        })}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+        <h3 className="section-title">Kỹ năng sử dụng (Skills Used)</h3>
+        <div className="form-group">
+          <label htmlFor="skills_input">
+            Nhập kỹ năng đã sử dụng trong công việc này (ví dụ: UX/UI, SQL)
+          </label>
+          <div className="bullets-input">
+            <input
+              id="skills_input"
+              type="text"
+              value={newSkill}
+              onChange={(e) => setNewSkill(e.target.value)}
+              onKeyPress={(e) =>
+                e.key === 'Enter' && (e.preventDefault(), addSkill())
+              }
+              placeholder="Nhập skill và nhấn Enter hoặc nút Thêm"
+            />
+            <LoadingButton
+              type="button"
+              onClick={addSkill}
+              variant="primary"
+            >
+              Thêm
+            </LoadingButton>
           </div>
+          {formData.skills_text.length > 0 && (
+            <div className="selected-skills-tags">
+              {formData.skills_text.map((skill, index) => (
+                <span key={index} className="selected-skill-tag">
+                  {skill}
+                  <button
+                    type="button"
+                    className="btn-remove"
+                    onClick={() => removeSkill(index)}
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
 
           <div className="form-actions">
             <LoadingButton
