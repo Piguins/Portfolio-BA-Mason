@@ -112,14 +112,12 @@ export default function SpecializationsListClient({ initialSpecializations, init
                     <LoadingButton
                       onClick={() => router.push(`/dashboard/specializations/${specialization.id}/edit`)}
                       variant="primary"
-                      size="sm"
                     >
                       Sửa
                     </LoadingButton>
                     <LoadingButton
                       onClick={() => handleDelete(specialization.id)}
                       variant="danger"
-                      size="sm"
                       loading={deletingId === specialization.id}
                     >
                       Xóa
