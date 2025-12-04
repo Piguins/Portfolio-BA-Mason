@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { getAuthErrorMessage } from '@/lib/auth-errors'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -10,21 +11,49 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [errorType, setErrorType] = useState<'email' | 'password' | 'network' | 'unknown' | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setErrorType(null)
     setLoading(true)
+
+    // Basic validation
+    if (!email.trim()) {
+      setError('Vui lòng nhập email')
+      setErrorType('email')
+      setLoading(false)
+      return
+    }
+
+    if (!password.trim()) {
+      setError('Vui lòng nhập mật khẩu')
+      setErrorType('password')
+      setLoading(false)
+      return
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      setError('Email không đúng định dạng')
+      setErrorType('email')
+      setLoading(false)
+      return
+    }
 
     try {
       const supabase = createClient()
       const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email,
+        email: email.trim(),
         password,
       })
 
       if (authError) {
-        setError(authError.message || 'Đăng nhập thất bại')
+        const errorInfo = getAuthErrorMessage(authError)
+        setError(errorInfo.message)
+        setErrorType(errorInfo.type)
         setLoading(false)
         return
       }
@@ -33,8 +62,10 @@ export default function LoginPage() {
         router.push('/dashboard')
         router.refresh()
       }
-    } catch (err) {
-      setError('Đã xảy ra lỗi. Vui lòng thử lại.')
+    } catch (err: any) {
+      const errorInfo = getAuthErrorMessage(err)
+      setError(errorInfo.message)
+      setErrorType(errorInfo.type)
       setLoading(false)
     }
   }
@@ -87,16 +118,22 @@ export default function LoginPage() {
         {error && (
           <div
             style={{
-              padding: '0.75rem',
+              padding: '0.75rem 1rem',
               marginBottom: '1rem',
-              background: '#FEE2E2',
-              border: '1px solid #FCA5A5',
+              background: errorType === 'email' ? '#FEF3C7' : errorType === 'password' ? '#FEE2E2' : '#E0E7FF',
+              border: `1px solid ${errorType === 'email' ? '#FCD34D' : errorType === 'password' ? '#FCA5A5' : '#A5B4FC'}`,
               borderRadius: 8,
-              color: '#DC2626',
+              color: errorType === 'email' ? '#92400E' : errorType === 'password' ? '#DC2626' : '#4338CA',
               fontSize: 14,
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.5rem',
             }}
           >
-            {error}
+            <span style={{ fontSize: 16 }}>
+              {errorType === 'email' ? '📧' : errorType === 'password' ? '🔒' : '⚠️'}
+            </span>
+            <span>{error}</span>
           </div>
         )}
 
