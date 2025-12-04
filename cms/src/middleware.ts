@@ -16,20 +16,45 @@ export const config = {
 
 export async function middleware(request: NextRequest) {
   try {
+    // PERFORMANCE: Skip auth check for static assets and API routes
+    const pathname = request.nextUrl.pathname
+    if (
+      pathname.startsWith('/_next') ||
+      pathname.startsWith('/api') ||
+      pathname.match(/\.(ico|png|jpg|jpeg|svg|css|js|woff|woff2|ttf|eot)$/i)
+    ) {
+      return NextResponse.next()
+    }
+
     // Check if Supabase env vars are set
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
     if (!supabaseUrl || !supabaseKey) {
-      // If env vars not set, just allow access (for development)
-      // In production, these should always be set
       console.warn('Supabase env vars not set, skipping auth check')
-      
-      // Still handle redirects
-      if (request.nextUrl.pathname === '/') {
+      if (pathname === '/') {
         return NextResponse.redirect(new URL('/login', request.url))
       }
       return NextResponse.next()
+    }
+
+    // PERFORMANCE: Fast path - check for auth cookie first before Supabase call
+    const authToken = request.cookies.get('sb-access-token') || 
+                     request.cookies.get('sb-auth-token')
+    
+    // If no auth token and accessing protected route, redirect immediately
+    if (!authToken && pathname.startsWith('/dashboard')) {
+      return NextResponse.redirect(new URL('/login', request.url))
+    }
+
+    // If no auth token and on login page, allow access
+    if (!authToken && pathname === '/login') {
+      return NextResponse.next()
+    }
+
+    // If no auth token and on root, redirect to login
+    if (!authToken && pathname === '/') {
+      return NextResponse.redirect(new URL('/login', request.url))
     }
 
     let response = NextResponse.next({
@@ -55,27 +80,28 @@ export async function middleware(request: NextRequest) {
               response.cookies.set(name, value, options)
             )
           } catch (error) {
-            // Ignore cookie setting errors in middleware
             console.error('Cookie setting error:', error)
           }
         },
       },
     })
 
+    // PERFORMANCE: Only check auth if we have a token (avoid unnecessary Supabase calls)
     let user = null
-    try {
-      const {
-        data: { user: authUser },
-        error,
-      } = await supabase.auth.getUser()
+    if (authToken) {
+      try {
+        const {
+          data: { user: authUser },
+          error,
+        } = await supabase.auth.getUser()
 
-      if (!error && authUser) {
-        user = authUser
+        if (!error && authUser) {
+          user = authUser
+        }
+      } catch (error) {
+        console.error('Auth check error:', error)
+        user = null
       }
-    } catch (error) {
-      // If auth check fails, treat as not authenticated
-      console.error('Auth check error:', error)
-      user = null
     }
 
     // Protect /dashboard routes

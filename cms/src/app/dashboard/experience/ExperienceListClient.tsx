@@ -1,7 +1,11 @@
-import { redirect } from 'next/navigation'
-import { getCurrentUser } from '@/lib/auth'
-import ExperienceListClient from './ExperienceListClient'
-import './experience.css'
+'use client'
+
+import { useState, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
+import { motion } from 'framer-motion'
+import BackButton from '@/components/BackButton'
+import LoadingButton from '@/components/LoadingButton'
+import '../experience.css'
 
 interface Experience {
   id: string
@@ -17,47 +21,43 @@ interface Experience {
   skills_used?: Array<{ id: number; name: string; slug: string }>
 }
 
-// PERFORMANCE: Server Component - fetch data before render
-export default async function ExperiencePage() {
-  // Check auth
-  const user = await getCurrentUser()
-  if (!user) {
-    redirect('/login')
-  }
-
-  // PERFORMANCE: Fetch data on server-side (before render)
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-  let experiences: Experience[] = []
-  let error: string | null = null
-
-  try {
-    const response = await fetch(`${API_URL}/api/experience`, {
-      next: { revalidate: 60 }, // Cache 60 seconds
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch experiences')
-    }
-
-    experiences = await response.json()
-  } catch (err: any) {
-    console.error('Failed to fetch experiences:', err)
-    error = err.message || 'Failed to load experiences'
-  }
-
-  // Pass data to client component for interactivity
-  return <ExperienceListClient initialExperiences={experiences} initialError={error} />
+interface ExperienceListClientProps {
+  initialExperiences: Experience[]
+  initialError: string | null
 }
+
+export default function ExperienceListClient({ 
+  initialExperiences, 
+  initialError 
+}: ExperienceListClientProps) {
+  const router = useRouter()
+  const [experiences, setExperiences] = useState<Experience[]>(initialExperiences)
+  const [error, setError] = useState<string | null>(initialError)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+
+  const fetchExperiences = useCallback(async () => {
+    try {
+      setError(null)
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+      const response = await fetch(`${API_URL}/api/experience`, {
+        cache: 'no-store',
+      })
+      
+      if (!response.ok) throw new Error('Failed to fetch experiences')
+      const data = await response.json()
+      setExperiences(data)
+    } catch (err: any) {
+      setError(err.message || 'Failed to load experiences')
+    }
+  }, [])
 
   const handleDelete = async (id: string) => {
     if (!confirm('Bạn có chắc chắn muốn xóa experience này?')) return
 
     try {
       setDeletingId(id)
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/experience/${id}`, {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+      const response = await fetch(`${API_URL}/api/experience/${id}`, {
         method: 'DELETE',
       })
       if (!response.ok) throw new Error('Failed to delete experience')
@@ -74,19 +74,6 @@ export default async function ExperiencePage() {
       year: 'numeric',
       month: 'long',
     })
-  }
-
-  if (loading) {
-    return (
-      <div className="experience-page">
-        <div className="page-container">
-          <div className="loading-state">
-            <div className="loading-spinner"></div>
-            <p>Đang tải dữ liệu...</p>
-          </div>
-        </div>
-      </div>
-    )
   }
 
   return (
@@ -219,3 +206,4 @@ export default async function ExperiencePage() {
     </div>
   )
 }
+
