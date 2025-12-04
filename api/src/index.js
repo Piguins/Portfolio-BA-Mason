@@ -13,6 +13,8 @@ const config = getConfig()
 // Routes
 import healthRoutes from './routes/healthRoutes.js'
 import authRoutes from './routes/authRoutes.js'
+import heroRoutes from './routes/heroRoutes.js'
+import specializationsRoutes from './routes/specializationsRoutes.js'
 import projectsRoutes from './routes/projectsRoutes.js'
 import skillsRoutes from './routes/skillsRoutes.js'
 import experienceRoutes from './routes/experienceRoutes.js'
@@ -45,6 +47,8 @@ app.use(express.json())
 // Routes
 app.use('/', healthRoutes)
 app.use('/', authRoutes)
+app.use('/', heroRoutes)
+app.use('/', specializationsRoutes)
 app.use('/', projectsRoutes)
 app.use('/', skillsRoutes)
 app.use('/', experienceRoutes)
