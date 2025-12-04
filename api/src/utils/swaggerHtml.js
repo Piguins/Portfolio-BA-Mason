@@ -1,46 +1,66 @@
 // Swagger UI HTML template
 export const generateSwaggerHtml = (baseUrl) => {
+  const specUrl = `${baseUrl}/api-docs.json`
+  
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mason Portfolio API Documentation</title>
+  <title>API Documentation - Mason Portfolio</title>
   <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui.css" />
   <style>
+    html { box-sizing: border-box; overflow: -moz-scrollbars-vertical; overflow-y: scroll; }
+    *, *:before, *:after { box-sizing: inherit; }
+    body { margin: 0; padding: 0; background: #fafafa; }
     .swagger-ui .topbar { display: none; }
-    body { margin: 0; }
-    * { box-sizing: border-box; }
+    .swagger-ui .info { margin: 50px 0; }
+    .swagger-ui .info .title { color: #3b4151; }
     .swagger-ui * { 
-      pointer-events: auto !important; 
-      user-select: auto !important;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
     .swagger-ui .opblock {
-      position: relative !important;
-      z-index: auto !important;
+      border: 1px solid #000;
+      border-radius: 4px;
+      margin: 0 0 15px;
     }
     .swagger-ui .try-out__btn,
     .swagger-ui .btn.try-out__btn {
-      cursor: pointer !important;
-      pointer-events: auto !important;
-      opacity: 1 !important;
-      display: inline-block !important;
-      visibility: visible !important;
+      background: #4990e2;
+      border-color: #4990e2;
+      color: #fff;
     }
     .swagger-ui .opblock-summary {
-      cursor: pointer !important;
-      pointer-events: auto !important;
+      cursor: pointer;
+      padding: 5px;
     }
     .swagger-ui .opblock-summary:hover {
-      background-color: rgba(0,0,0,0.05);
+      background: rgba(0,0,0,.02);
     }
     .swagger-ui button,
     .swagger-ui .btn {
-      cursor: pointer !important;
-      pointer-events: auto !important;
+      font-family: inherit;
+      cursor: pointer;
     }
     .swagger-ui .opblock-tag {
-      cursor: pointer !important;
+      font-size: 24px;
+      margin: 0 0 5px;
+      padding: 5px 0 5px 5px;
+    }
+    .loading-message {
+      text-align: center;
+      padding: 50px;
+      font-size: 18px;
+      color: #3b4151;
+    }
+    .error-message {
+      text-align: center;
+      padding: 50px;
+      font-size: 18px;
+      color: #d32f2f;
+      background: #ffebee;
+      border-radius: 4px;
+      margin: 20px;
     }
   </style>
 </head>
@@ -50,17 +70,20 @@ export const generateSwaggerHtml = (baseUrl) => {
   <script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-standalone-preset.js"></script>
   <script>
     (function() {
-      'use strict';
-      
       function initSwagger() {
+        // Check if SwaggerUIBundle is loaded
         if (typeof SwaggerUIBundle === 'undefined') {
+          console.log('Waiting for SwaggerUIBundle to load...');
           setTimeout(initSwagger, 100);
           return;
         }
-        
-        const specUrl = '${baseUrl}/api-docs.json';
-        console.log('Loading Swagger spec from:', specUrl);
-        
+
+        const specUrl = '${specUrl}';
+        console.log('Initializing Swagger UI with spec URL:', specUrl);
+
+        // Show loading message
+        document.getElementById('swagger-ui').innerHTML = '<div class="loading-message">Loading API documentation...</div>';
+
         try {
           window.ui = SwaggerUIBundle({
             url: specUrl,
@@ -74,54 +97,42 @@ export const generateSwaggerHtml = (baseUrl) => {
               SwaggerUIBundle.plugins.DownloadUrl
             ],
             layout: "StandaloneLayout",
-            persistAuthorization: true,
-            displayRequestDuration: true,
-            filter: true,
-            tryItOutEnabled: true,
-            showExtensions: true,
-            showCommonExtensions: true,
-            withCredentials: false,
-            docExpansion: 'list',
-            defaultModelsExpandDepth: 2,
-            defaultModelExpandDepth: 2,
-            supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch', 'head', 'options'],
             validatorUrl: null,
+            tryItOutEnabled: true,
+            requestInterceptor: function(request) {
+              console.log('Swagger request:', request);
+              return request;
+            },
+            responseInterceptor: function(response) {
+              console.log('Swagger response:', response);
+              return response;
+            },
             onComplete: function() {
               console.log('✅ Swagger UI loaded successfully');
-              setTimeout(function() {
-                const allClickables = document.querySelectorAll(
-                  '.opblock-summary, .opblock-tag, .try-out__btn, .btn.try-out__btn, .execute, .btn.execute, .authorize'
-                );
-                allClickables.forEach(function(el) {
-                  el.style.pointerEvents = 'auto';
-                  el.style.cursor = 'pointer';
-                  if (el.tagName === 'BUTTON' || el.classList.contains('btn')) {
-                    el.disabled = false;
-                    el.removeAttribute('disabled');
-                  }
-                });
-                console.log('✅ Interactions verified');
-              }, 1000);
             },
             onFailure: function(data) {
               console.error('❌ Swagger UI failed to load:', data);
               document.getElementById('swagger-ui').innerHTML = 
-                '<div style="padding: 20px; color: red;">' +
-                '<h2>Failed to load API definition</h2>' +
-                '<pre>' + JSON.stringify(data, null, 2) + '</pre>' +
+                '<div class="error-message">' +
+                '<h2>Failed to load API documentation</h2>' +
+                '<p>Error: ' + (data.message || 'Unknown error') + '</p>' +
+                '<p>Please check the console for more details.</p>' +
+                '<p><a href="' + specUrl + '" target="_blank">Try opening the JSON spec directly</a></p>' +
                 '</div>';
             }
           });
         } catch (error) {
           console.error('❌ Error initializing Swagger UI:', error);
           document.getElementById('swagger-ui').innerHTML = 
-            '<div style="padding: 20px; color: red;">' +
+            '<div class="error-message">' +
             '<h2>Error initializing Swagger UI</h2>' +
-            '<pre>' + error.toString() + '</pre>' +
+            '<p>' + error.message + '</p>' +
+            '<p>Please check the console for more details.</p>' +
             '</div>';
         }
       }
-      
+
+      // Initialize when DOM is ready
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initSwagger);
       } else {
@@ -132,4 +143,3 @@ export const generateSwaggerHtml = (baseUrl) => {
 </body>
 </html>`
 }
-
