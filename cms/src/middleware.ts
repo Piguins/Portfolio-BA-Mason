@@ -38,22 +38,26 @@ export async function middleware(request: NextRequest) {
       return NextResponse.next()
     }
 
-    // PERFORMANCE: Fast path - check for auth cookie first before Supabase call
-    const authToken = request.cookies.get('sb-access-token') || 
-                     request.cookies.get('sb-auth-token')
+    // PERFORMANCE: Fast path - check for Supabase auth cookies
+    // Supabase SSR uses cookies like: sb-<project-ref>-auth-token
+    // Check for any Supabase auth-related cookies
+    const allCookies = request.cookies.getAll()
+    const hasAuthCookie = allCookies.some(cookie => 
+      cookie.name.includes('sb-') && cookie.name.includes('auth-token')
+    )
     
-    // If no auth token and accessing protected route, redirect immediately
-    if (!authToken && pathname.startsWith('/dashboard')) {
+    // If no auth cookie and accessing protected route, redirect immediately
+    if (!hasAuthCookie && pathname.startsWith('/dashboard')) {
       return NextResponse.redirect(new URL('/login', request.url))
     }
 
-    // If no auth token and on login page, allow access
-    if (!authToken && pathname === '/login') {
+    // If no auth cookie and on login page, allow access
+    if (!hasAuthCookie && pathname === '/login') {
       return NextResponse.next()
     }
 
-    // If no auth token and on root, redirect to login
-    if (!authToken && pathname === '/') {
+    // If no auth cookie and on root, redirect to login
+    if (!hasAuthCookie && pathname === '/') {
       return NextResponse.redirect(new URL('/login', request.url))
     }
 
@@ -86,9 +90,9 @@ export async function middleware(request: NextRequest) {
       },
     })
 
-    // PERFORMANCE: Only check auth if we have a token (avoid unnecessary Supabase calls)
+    // PERFORMANCE: Only check auth if we have a cookie (avoid unnecessary Supabase calls)
     let user = null
-    if (authToken) {
+    if (hasAuthCookie) {
       try {
         const {
           data: { user: authUser },

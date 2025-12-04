@@ -61,8 +61,10 @@ export default function LoginPage() {
       }
 
       if (data?.user) {
-        // Use replace instead of push for faster navigation
-        router.replace('/dashboard')
+        // Wait a bit for cookies to be set by Supabase SSR
+        // Then use window.location for full page reload to ensure middleware sees the cookies
+        await new Promise(resolve => setTimeout(resolve, 100))
+        window.location.href = '/dashboard'
       }
     } catch (err: any) {
       const errorInfo = getAuthErrorMessage(err)
