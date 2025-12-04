@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import BackButton from '@/components/BackButton'
 import LoadingButton from '@/components/LoadingButton'
-import '../experience.css'
+import './experience.css'
 
 interface Experience {
   id: string
