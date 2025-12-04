@@ -59,11 +59,12 @@ export const skillsService = {
       params.push(limit, offset)
     }
     
-    const result = await client.query(query, params)
+    // OPTIMIZED: Parallelize main query and count query (if needed)
+    const queries = [client.query(query, params)]
     
-    // Get total count for pagination (only if limit used)
+    // Get total count for pagination (only if limit used and first page)
     let totalCount = null
-    if (limit < 10000) {
+    if (limit < 10000 && offset === 0) {
       let countQuery = 'SELECT COUNT(*) as total FROM public.skills WHERE 1=1'
       const countParams = []
       if (category) {
@@ -75,8 +76,15 @@ export const skillsService = {
         countParams.push(highlight)
       }
       
-      const countResult = await client.query(countQuery, countParams)
-      totalCount = parseInt(countResult.rows[0].total)
+      queries.push(client.query(countQuery, countParams))
+    }
+    
+    // Execute queries in parallel
+    const results = await Promise.all(queries)
+    const result = results[0]
+    
+    if (results.length > 1) {
+      totalCount = parseInt(results[1].rows[0].total)
     }
     
     return {

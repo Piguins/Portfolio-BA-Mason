@@ -15,23 +15,35 @@ interface Skill {
 }
 
 // PERFORMANCE: Server Component - fetch data before render
+// OPTIMIZED: Parallelize auth check and data fetching
 export default async function SkillsPage() {
-  const user = await getCurrentUser()
-  if (!user) {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+  
+  // OPTIMIZED: Start auth check and data fetch in parallel
+  const [user, dataResponse] = await Promise.allSettled([
+    getCurrentUser(),
+    fetch(`${API_URL}/api/skills`, {
+      next: { revalidate: 300 }, // Cache 5 minutes
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }),
+  ])
+
+  // Check auth first
+  if (user.status === 'rejected' || !user.value) {
     redirect('/login')
   }
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
   let skills: Skill[] = []
   let error: string | null = null
 
   try {
-    const response = await fetch(`${API_URL}/api/skills`, {
-      next: { revalidate: 60 },
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
+    if (dataResponse.status === 'rejected') {
+      throw new Error('Failed to fetch skills')
+    }
+
+    const response = dataResponse.value
 
     if (!response.ok) {
       throw new Error('Failed to fetch skills')

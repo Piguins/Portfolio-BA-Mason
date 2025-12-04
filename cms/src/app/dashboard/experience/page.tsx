@@ -21,25 +21,35 @@ interface Experience {
 }
 
 // PERFORMANCE: Server Component - fetch data before render
+// OPTIMIZED: Parallelize auth check and data fetching
 export default async function ExperiencePage() {
-  // Check auth
-  const user = await getCurrentUser()
-  if (!user) {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+  
+  // OPTIMIZED: Start auth check and data fetch in parallel
+  const [user, dataResponse] = await Promise.allSettled([
+    getCurrentUser(),
+    fetch(`${API_URL}/api/experience`, {
+      next: { revalidate: 300 }, // Cache 5 minutes (increased from 60s)
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }),
+  ])
+
+  // Check auth first
+  if (user.status === 'rejected' || !user.value) {
     redirect('/login')
   }
 
-  // PERFORMANCE: Fetch data on server-side (before render)
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
   let experiences: Experience[] = []
   let error: string | null = null
 
   try {
-    const response = await fetch(`${API_URL}/api/experience`, {
-      next: { revalidate: 60 }, // Cache 60 seconds
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
+    if (dataResponse.status === 'rejected') {
+      throw new Error('Failed to fetch experiences')
+    }
+
+    const response = dataResponse.value
 
     if (!response.ok) {
       throw new Error('Failed to fetch experiences')

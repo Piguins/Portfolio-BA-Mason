@@ -72,17 +72,13 @@ export const experienceService = {
     params.push(limit, offset)
     
     const startTime = Date.now()
-    const result = await client.query(query, params)
-    const queryTime = Date.now() - startTime
     
-    // Log slow queries
-    if (queryTime > 200) {
-      console.warn(`⚠️ Slow query detected: ${queryTime}ms for getAll experiences`)
-    }
+    // OPTIMIZED: Parallelize main query and count query (if needed)
+    const queries = [client.query(query, params)]
     
-    // Get total count for pagination (only if limit/offset used)
+    // Get total count for pagination (only if limit/offset used and reasonable limit)
     let totalCount = null
-    if (limit < 1000) { // Only count if reasonable limit
+    if (limit < 1000 && offset === 0) { // Only count on first page
       const countQuery = `
         SELECT COUNT(DISTINCT e.id) as total
         FROM public.experience e
@@ -94,8 +90,22 @@ export const experienceService = {
       if (current !== undefined) countParams.push(current)
       if (company) countParams.push(`%${company}%`)
       
-      const countResult = await client.query(countQuery, countParams)
-      totalCount = parseInt(countResult.rows[0].total)
+      queries.push(client.query(countQuery, countParams))
+    }
+    
+    // Execute queries in parallel
+    const results = await Promise.all(queries)
+    const result = results[0]
+    
+    if (results.length > 1) {
+      totalCount = parseInt(results[1].rows[0].total)
+    }
+    
+    const queryTime = Date.now() - startTime
+    
+    // Log slow queries
+    if (queryTime > 200) {
+      console.warn(`⚠️ Slow query detected: ${queryTime}ms for getAll experiences`)
     }
     
     return {
