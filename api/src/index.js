@@ -20,6 +20,20 @@ import swaggerRoutes from './routes/swaggerRoutes.js'
 const app = express()
 
 // Middleware
+// Performance: Add response time header for monitoring
+app.use((req, res, next) => {
+  const startTime = Date.now()
+  res.on('finish', () => {
+    const duration = Date.now() - startTime
+    res.setHeader('X-Response-Time', `${duration}ms`)
+    // Log slow requests
+    if (duration > 500) {
+      console.warn(`⚠️ Slow request: ${req.method} ${req.path} - ${duration}ms`)
+    }
+  })
+  next()
+})
+
 app.use(securityHeaders)
 app.use(cors())
 app.use(express.json())
