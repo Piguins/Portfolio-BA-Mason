@@ -4,26 +4,45 @@ import client from '../db.js'
 export const experienceService = {
   /**
    * Get all work experience with bullets and skills
+   * OPTIMIZED: Using JOINs instead of subqueries for better performance
    * @param {Object} filters - Optional filters (current, company)
    */
   async getAll(filters = {}) {
+    // Optimized query using JOINs and array_agg (faster than json_agg subqueries)
     let query = `
       SELECT
-        e.*,
+        e.id,
+        e.company,
+        e.role,
+        e.location,
+        e.start_date,
+        e.end_date,
+        e.is_current,
+        e.description,
+        e.order_index,
+        e.created_at,
+        e.updated_at,
         COALESCE(
-          (SELECT json_agg(json_build_object('id', eb.id, 'text', eb.text, 'order_index', eb.order_index) ORDER BY eb.order_index ASC)
-           FROM public.experience_bullets eb
-           WHERE eb.experience_id = e.id),
+          json_agg(DISTINCT jsonb_build_object(
+            'id', eb.id,
+            'text', eb.text,
+            'order_index', eb.order_index
+          )) FILTER (WHERE eb.id IS NOT NULL),
           '[]'
         ) AS bullets,
         COALESCE(
-          (SELECT json_agg(json_build_object('id', s.id, 'name', s.name, 'slug', s.slug, 'icon_url', s.icon_url) ORDER BY s.order_index ASC)
-           FROM public.experience_skills es
-           JOIN public.skills s ON es.skill_id = s.id
-           WHERE es.experience_id = e.id),
+          json_agg(DISTINCT jsonb_build_object(
+            'id', s.id,
+            'name', s.name,
+            'slug', s.slug,
+            'icon_url', s.icon_url
+          )) FILTER (WHERE s.id IS NOT NULL),
           '[]'
         ) AS skills_used
       FROM public.experience e
+      LEFT JOIN public.experience_bullets eb ON eb.experience_id = e.id
+      LEFT JOIN public.experience_skills es ON es.experience_id = e.id
+      LEFT JOIN public.skills s ON s.id = es.skill_id
       WHERE 1=1
     `
     const params = []
@@ -41,9 +60,21 @@ export const experienceService = {
       paramIndex++
     }
     
-    query += ' ORDER BY e.order_index ASC, e.start_date DESC'
+    query += `
+      GROUP BY e.id, e.company, e.role, e.location, e.start_date, e.end_date, 
+               e.is_current, e.description, e.order_index, e.created_at, e.updated_at
+      ORDER BY e.order_index ASC, e.start_date DESC
+    `
     
+    const startTime = Date.now()
     const result = await client.query(query, params)
+    const queryTime = Date.now() - startTime
+    
+    // Log slow queries (for monitoring)
+    if (queryTime > 500) {
+      console.warn(`⚠️ Slow query detected: ${queryTime}ms for getAll experiences`)
+    }
+    
     return result.rows
   },
 

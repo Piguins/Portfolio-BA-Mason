@@ -5,6 +5,7 @@ import { asyncHandler } from '../middleware/errorHandler.js'
 export const experienceController = {
   /**
    * Get all work experience
+   * Performance: Added response caching headers
    */
   getAll: asyncHandler(async (req, res) => {
     const filters = {
@@ -12,7 +13,16 @@ export const experienceController = {
       company: req.query.company,
     }
     
+    const startTime = Date.now()
     const experience = await experienceService.getAll(filters)
+    const queryTime = Date.now() - startTime
+    
+    // Add cache headers for GET requests (5 minutes cache)
+    res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=60')
+    
+    // Add performance header
+    res.setHeader('X-Query-Time', `${queryTime}ms`)
+    
     res.json(experience)
   }),
 
