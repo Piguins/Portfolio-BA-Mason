@@ -1,6 +1,6 @@
 'use client'
 
-import { createBrowserClient } from '@/lib/supabase/client'
+import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import './LogoutButton.css'
@@ -8,7 +8,7 @@ import './LogoutButton.css'
 export default function LogoutButton() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
-  const supabase = createBrowserClient()
+  const supabase = createClient()
 
   const handleLogout = async () => {
     setLoading(true)
