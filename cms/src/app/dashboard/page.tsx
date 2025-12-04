@@ -24,6 +24,16 @@ export default async function DashboardPage() {
 
         <div className="dashboard-grid">
           <DashboardCard
+            title="Hero"
+            description="Quản lý Hero Section (Name, Title, Description, Social Links)"
+            link="/dashboard/hero"
+          />
+          <DashboardCard
+            title="Specializations"
+            description="Quản lý Specializations (I specialize in - 3 cards)"
+            link="/dashboard/specializations"
+          />
+          <DashboardCard
             title="Projects"
             description="Quản lý Projects / Case Studies"
             link="/dashboard/projects"
