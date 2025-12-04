@@ -215,6 +215,101 @@
   font-weight: 500;
 }
 
+/* Form Styles */
+.experience-form {
+  background: var(--bg-white);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: var(--shadow-lg);
+  max-width: 800px;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  font-family: var(--font-primary);
+  font-weight: 600;
+  color: var(--dark-blue);
+  margin-bottom: 0.5rem;
+  font-size: 14px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="date"],
+.form-group input[type="number"],
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid var(--bg-grey);
+  border-radius: 8px;
+  font-family: var(--font-secondary);
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.bullets-input {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.bullets-input input {
+  flex: 1;
+}
+
+.btn-add {
+  padding: 0.75rem 1rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.btn-remove {
+  background: #FEE2E2;
+  color: #DC2626;
+  border: none;
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  margin-left: 0.5rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 2rem;
+}
+
+.btn-cancel {
+  padding: 0.75rem 1.5rem;
+  background: var(--bg-grey);
+  color: var(--text-dark);
+  border: none;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: 500;
+  display: inline-block;
+}
+
 @media (max-width: 768px) {
   .experience-page {
     padding: 1rem;
@@ -235,6 +330,10 @@
   .btn-edit,
   .btn-delete {
     flex: 1;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
   }
 }
 
