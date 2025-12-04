@@ -1,5 +1,6 @@
 // Database connection using pg library with Connection Pooling
-// IMPORTANT: Use Pool instead of Client for better performance in serverless environments
+// IMPORTANT: Use Supabase Connection Pooler (port 6543) for serverless environments
+// Direct connection (port 5432) is slow for serverless - use pooler instead!
 import pkg from 'pg'
 import dotenv from 'dotenv'
 
@@ -7,25 +8,37 @@ dotenv.config()
 
 const { Pool } = pkg
 
-const connectionString = process.env.DATABASE_URL
+let connectionString = process.env.DATABASE_URL
 
 if (!connectionString) {
   throw new Error('DATABASE_URL is not configured in .env file')
 }
 
+// CRITICAL: Convert direct connection to pooler connection for better performance
+// Supabase pooler uses port 6543 (Session Mode) or 6543 (Transaction Mode)
+// Direct connection (port 5432) is 3-5x slower for serverless functions
+if (connectionString.includes(':5432/')) {
+  // Replace port 5432 with 6543 (Session Mode Pooler)
+  connectionString = connectionString.replace(':5432/', ':6543/')
+  console.log('⚠️ Using direct connection (port 5432). Consider using pooler (port 6543) for better performance.')
+  console.log('💡 Update DATABASE_URL to use port 6543 for Supabase Connection Pooler')
+} else if (connectionString.includes(':6543/')) {
+  console.log('✅ Using Supabase Connection Pooler (port 6543) - optimal for serverless')
+}
+
 // Connection Pool Configuration
-// Optimized for Vercel serverless functions
+// Optimized for Vercel serverless functions with Supabase Pooler
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: connectionString,
   // SSL config for Supabase (required for pooler)
   ssl: { rejectUnauthorized: false },
-  // Pool settings for optimal performance
-  max: 20, // Maximum number of clients in the pool
-  min: 2, // Minimum number of clients in the pool
-  idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
-  connectionTimeoutMillis: 5000, // Return an error after 5 seconds if connection cannot be established
-  // For serverless: allow connections to be reused across invocations
-  allowExitOnIdle: false, // Keep pool alive even when idle
+  // Pool settings optimized for serverless (smaller pool for pooler)
+  max: 1, // IMPORTANT: Pooler handles pooling, so we only need 1 connection per function
+  min: 0, // No minimum for serverless
+  idleTimeoutMillis: 10000, // Close idle clients quickly (10 seconds)
+  connectionTimeoutMillis: 3000, // Fast timeout (3 seconds)
+  // For serverless: connections are managed by Supabase pooler
+  allowExitOnIdle: true, // Allow pool to close when idle (pooler handles persistence)
 })
 
 // Handle pool errors

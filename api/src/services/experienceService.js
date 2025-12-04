@@ -70,8 +70,8 @@ export const experienceService = {
     const result = await client.query(query, params)
     const queryTime = Date.now() - startTime
     
-    // Log slow queries (for monitoring)
-    if (queryTime > 500) {
+    // Log slow queries (for monitoring) - lowered threshold
+    if (queryTime > 200) {
       console.warn(`⚠️ Slow query detected: ${queryTime}ms for getAll experiences`)
     }
     

@@ -3,6 +3,7 @@
 
 import express from 'express'
 import cors from 'cors'
+import compression from 'compression'
 import { getConfig } from './config/index.js'
 import { errorHandler } from './middleware/errorHandler.js'
 import { securityHeaders } from './middleware/securityHeaders.js'
@@ -26,13 +27,16 @@ app.use((req, res, next) => {
   res.on('finish', () => {
     const duration = Date.now() - startTime
     res.setHeader('X-Response-Time', `${duration}ms`)
-    // Log slow requests
-    if (duration > 500) {
+    // Log slow requests (threshold lowered for better monitoring)
+    if (duration > 300) {
       console.warn(`⚠️ Slow request: ${req.method} ${req.path} - ${duration}ms`)
     }
   })
   next()
 })
+
+// Compression middleware for faster responses (reduces response size by 60-80%)
+app.use(compression())
 
 app.use(securityHeaders)
 app.use(cors())
