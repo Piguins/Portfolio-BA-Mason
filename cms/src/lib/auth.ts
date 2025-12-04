@@ -2,7 +2,7 @@ import { createClient } from './supabase/server'
 import { cookies } from 'next/headers'
 
 export interface User {
-  id: string
+  // Security: id removed to prevent UUID exposure
   email: string
   name?: string
 }
