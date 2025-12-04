@@ -34,23 +34,23 @@ export default function NewExperiencePage() {
   })
   const [newBullet, setNewBullet] = useState('')
 
-  // Fetch all skills for selection
+  // Fetch all work skills for selection (separate from Skills section)
   useEffect(() => {
-    const fetchSkills = async () => {
+    const fetchWorkSkills = async () => {
       try {
         const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-        const response = await fetch(`${API_URL}/api/skills`)
+        const response = await fetch(`${API_URL}/api/work-skills`)
         if (response.ok) {
           const data = await response.json()
           setSkills(data)
         }
       } catch (err) {
-        console.error('Failed to fetch skills:', err)
+        console.error('Failed to fetch work skills:', err)
       } finally {
         setLoadingSkills(false)
       }
     }
-    fetchSkills()
+    fetchWorkSkills()
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -277,9 +277,9 @@ export default function NewExperiencePage() {
             <div className="form-group">
               <label htmlFor="skills">Chọn các kỹ năng đã sử dụng trong công việc này</label>
               {loadingSkills ? (
-                <p className="text-muted">Đang tải danh sách skills...</p>
+                <p className="text-muted">Đang tải danh sách work skills...</p>
               ) : skills.length === 0 ? (
-                <p className="text-muted">Chưa có skill nào. Hãy tạo skills trước.</p>
+                <p className="text-muted">Chưa có work skill nào. Hãy tạo work skills trước.</p>
               ) : (
                 <div className="skills-select-container">
                   <div className="skills-checkbox-list">
