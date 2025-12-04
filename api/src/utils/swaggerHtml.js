@@ -29,9 +29,12 @@ export const generateSwaggerHtml = (baseUrl) => {
       background: #4990e2;
       border-color: #4990e2;
       color: #fff;
+      cursor: pointer !important;
+      pointer-events: auto !important;
     }
     .swagger-ui .opblock-summary {
-      cursor: pointer;
+      cursor: pointer !important;
+      pointer-events: auto !important;
       padding: 5px;
     }
     .swagger-ui .opblock-summary:hover {
@@ -40,9 +43,11 @@ export const generateSwaggerHtml = (baseUrl) => {
     .swagger-ui button,
     .swagger-ui .btn {
       font-family: inherit;
-      cursor: pointer;
+      cursor: pointer !important;
+      pointer-events: auto !important;
     }
     .swagger-ui .opblock-tag {
+      cursor: pointer !important;
       font-size: 24px;
       margin: 0 0 5px;
       padding: 5px 0 5px 5px;
@@ -70,6 +75,8 @@ export const generateSwaggerHtml = (baseUrl) => {
   <script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-standalone-preset.js"></script>
   <script>
     (function() {
+      'use strict';
+      
       function initSwagger() {
         // Check if SwaggerUIBundle is loaded
         if (typeof SwaggerUIBundle === 'undefined') {
@@ -82,7 +89,8 @@ export const generateSwaggerHtml = (baseUrl) => {
         console.log('Initializing Swagger UI with spec URL:', specUrl);
 
         // Show loading message
-        document.getElementById('swagger-ui').innerHTML = '<div class="loading-message">Loading API documentation...</div>';
+        const swaggerContainer = document.getElementById('swagger-ui');
+        swaggerContainer.innerHTML = '<div class="loading-message">Loading API documentation...</div>';
 
         try {
           window.ui = SwaggerUIBundle({
@@ -109,10 +117,27 @@ export const generateSwaggerHtml = (baseUrl) => {
             },
             onComplete: function() {
               console.log('✅ Swagger UI loaded successfully');
+              // Force enable interactions after load
+              setTimeout(function() {
+                const allClickables = document.querySelectorAll(
+                  '.opblock-summary, .opblock-tag, .try-out__btn, .btn.try-out__btn, .execute, .btn.execute, .authorize, .opblock-tag-section'
+                );
+                allClickables.forEach(function(el) {
+                  if (el) {
+                    el.style.pointerEvents = 'auto';
+                    el.style.cursor = 'pointer';
+                    if (el.tagName === 'BUTTON' || el.classList.contains('btn')) {
+                      el.disabled = false;
+                      el.removeAttribute('disabled');
+                    }
+                  }
+                });
+                console.log('✅ Interactions enabled');
+              }, 500);
             },
             onFailure: function(data) {
               console.error('❌ Swagger UI failed to load:', data);
-              document.getElementById('swagger-ui').innerHTML = 
+              swaggerContainer.innerHTML = 
                 '<div class="error-message">' +
                 '<h2>Failed to load API documentation</h2>' +
                 '<p>Error: ' + (data.message || 'Unknown error') + '</p>' +
@@ -123,7 +148,7 @@ export const generateSwaggerHtml = (baseUrl) => {
           });
         } catch (error) {
           console.error('❌ Error initializing Swagger UI:', error);
-          document.getElementById('swagger-ui').innerHTML = 
+          swaggerContainer.innerHTML = 
             '<div class="error-message">' +
             '<h2>Error initializing Swagger UI</h2>' +
             '<p>' + error.message + '</p>' +
