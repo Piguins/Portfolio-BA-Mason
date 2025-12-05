@@ -1,6 +1,8 @@
 // Global Database Connection Pool - Singleton Pattern
-// OPTIMIZED: Pool creation is non-blocking - created synchronously but connection is lazy
-// This prevents blocking serverless function cold starts
+// OPTIMIZED for Vercel Serverless Functions:
+// - Uses global variable to cache pool across invocations
+// - Prevents creating new pool on every request
+// - Connection is lazy (non-blocking cold start)
 import pkg from 'pg'
 import dotenv from 'dotenv'
 
@@ -8,10 +10,16 @@ dotenv.config()
 
 const { Pool } = pkg
 
-// Singleton instance - created immediately but connection is lazy
-let poolInstance = null
+// CRITICAL: Use global variable to cache pool across Vercel function invocations
+// In Vercel serverless, the container can be reused, so we cache the pool here
+// This prevents creating a new connection pool on every request
+const globalForDb = globalThis
+
+// Singleton instance - cached in global scope for Vercel serverless reuse
+let poolInstance = globalForDb.poolInstance || null
 
 function createPool() {
+  // Return cached instance if exists (reused across invocations in Vercel)
   if (poolInstance) {
     return poolInstance
   }
@@ -53,16 +61,20 @@ function createPool() {
   // Session mode (port 5432) - no pgbouncer=true needed, supports prepared statements
 
   // Optimized pool configuration for serverless (Vercel)
-  // max: 1 is correct for serverless - each function instance uses 1 connection to pooler
+  // CRITICAL: max: 1 because Transaction Mode on Supabase handles pooling
+  // Vercel serverless functions should NOT open multiple connections per instance
   poolInstance = new Pool({
     connectionString: connectionString,
     ssl: { rejectUnauthorized: false },
-    max: 1, // Serverless: 1 connection per function instance
-    min: 0, // Don't pre-create connections
-    idleTimeoutMillis: 30000, // 30s for better reuse
-    connectionTimeoutMillis: 5000, // 5s timeout for connection attempts
-    allowExitOnIdle: true,
+    max: 1, // CRITICAL: 1 connection per function instance (Supavisor handles pooling)
+    min: 0, // Don't pre-create connections (lazy connection)
+    idleTimeoutMillis: 30000, // 30s for better reuse across invocations
+    connectionTimeoutMillis: 3000, // 3s timeout - fail fast if connection hangs
+    allowExitOnIdle: true, // Allow process to exit when idle (serverless-friendly)
   })
+  
+  // Cache pool instance in global scope for Vercel serverless reuse
+  globalForDb.poolInstance = poolInstance
   
   // Log connection info (only in development)
   if (process.env.NODE_ENV !== 'production') {

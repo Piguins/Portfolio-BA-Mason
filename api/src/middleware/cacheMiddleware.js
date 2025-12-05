@@ -14,8 +14,11 @@ export const cacheMiddleware = (req, res, next) => {
     const shouldCache = !noCachePaths.some(path => req.path.startsWith(path))
     
     if (shouldCache) {
-      // Default strategy: 1 min browser cache, 10 min CDN cache
-      res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=600')
+      // Public GET requests: Cache at Vercel Edge Network CDN
+      // s-maxage=60: Cache for 60s at CDN (Vercel Edge)
+      // stale-while-revalidate=300: Serve stale content for 300s while revalidating
+      // This reduces load on serverless functions for frequently accessed data
+      res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=60, stale-while-revalidate=300')
     } else {
       // No cache for auth and dynamic endpoints
       res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private')

@@ -30,10 +30,9 @@ import projectsRoutes from './routes/projectsRoutes.js'
 import skillsRoutes from './routes/skillsRoutes.js'
 import experienceRoutes from './routes/experienceRoutes.js'
 
-// Swagger imports for fast endpoints
-import { swaggerSpec } from './swagger.js'
-import { generateSwaggerHtml } from './utils/swaggerHtml.js'
-import { getBaseUrl } from './utils/urlHelper.js'
+// Swagger imports - lazy loaded to reduce initial bundle size
+// Only imported when /api-docs endpoint is accessed
+// This improves cold start time for serverless functions
 
 const app = express()
 
@@ -58,10 +57,12 @@ import { healthController } from './controllers/healthController.js'
 app.get('/health', healthController.check)
 app.get('/health/db', healthController.dbCheck)
 
-// Swagger endpoints - must be fast for documentation
+// Swagger endpoints - lazy loaded to reduce cold start time
 // Swagger JSON spec
-app.get('/api-docs.json', (req, res) => {
+app.get('/api-docs.json', async (req, res) => {
   try {
+    // Lazy load Swagger spec only when needed
+    const { swaggerSpec } = await import('./swagger.js')
     res.setHeader('Content-Type', 'application/json')
     res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=600') // Cache for 5min
     res.json(swaggerSpec)
@@ -72,8 +73,11 @@ app.get('/api-docs.json', (req, res) => {
 })
 
 // Swagger UI
-app.get('/api-docs', (req, res) => {
+app.get('/api-docs', async (req, res) => {
   try {
+    // Lazy load Swagger utilities only when needed
+    const { generateSwaggerHtml } = await import('./utils/swaggerHtml.js')
+    const { getBaseUrl } = await import('./utils/urlHelper.js')
     const baseUrl = getBaseUrl(req)
     const html = generateSwaggerHtml(baseUrl)
     res.setHeader('Content-Type', 'text/html')
@@ -138,9 +142,9 @@ export default app
 // Start server only if not in Vercel environment
 if (!config.isVercel) {
   app.listen(config.port, () => {
-  if (config.nodeEnv !== 'production') {
-    console.log(`🚀 API server running on http://localhost:${config.port}`)
-    console.log(`📚 Swagger docs available at http://localhost:${config.port}/api-docs`)
-  }
+    if (config.nodeEnv !== 'production') {
+      console.log(`🚀 API server running on http://localhost:${config.port}`)
+      console.log(`📚 Swagger docs available at http://localhost:${config.port}/api-docs`)
+    }
   })
 }
