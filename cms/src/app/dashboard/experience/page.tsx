@@ -68,5 +68,6 @@ export default async function ExperiencePage() {
   }
 
   // Pass data to client component for interactivity
+  // Always render client component even if there's an error - let it handle display
   return <ExperienceListClient initialExperiences={experiences} initialError={error} />
 }

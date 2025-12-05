@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import BackButton from '@/components/BackButton'
@@ -37,6 +37,14 @@ export default function ExperienceListClient({
   const [experiences, setExperiences] = useState<Experience[]>(initialExperiences)
   const [error, setError] = useState<string | null>(initialError)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+
+  // Debug: Log when component receives props
+  useEffect(() => {
+    console.log('[ExperienceListClient] Received props:', {
+      experiencesCount: initialExperiences?.length || 0,
+      error: initialError,
+    })
+  }, [initialExperiences, initialError])
 
   const fetchExperiences = useCallback(async () => {
     try {
