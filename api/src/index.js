@@ -138,7 +138,9 @@ export default app
 // Start server only if not in Vercel environment
 if (!config.isVercel) {
   app.listen(config.port, () => {
+  if (config.nodeEnv !== 'production') {
     console.log(`🚀 API server running on http://localhost:${config.port}`)
     console.log(`📚 Swagger docs available at http://localhost:${config.port}/api-docs`)
+  }
   })
 }

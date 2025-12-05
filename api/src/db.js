@@ -64,13 +64,15 @@ function createPool() {
     allowExitOnIdle: true,
   })
   
-  // Log connection info (without sensitive data)
-  const connectionInfo = connectionString.replace(/:[^:@]+@/, ':****@') // Hide password
-  console.log(`📊 Database pool created: ${isServerless ? 'Serverless' : 'Standard'} mode`)
-  if (isTransactionMode) {
-    console.log(`   Using Supavisor pooler (transaction mode - port 6543)`)
-  } else if (isSessionMode) {
-    console.log(`   Using Supavisor pooler (session mode - port 5432)`)
+  // Log connection info (only in development)
+  if (process.env.NODE_ENV !== 'production') {
+    const connectionInfo = connectionString.replace(/:[^:@]+@/, ':****@') // Hide password
+    console.log(`📊 Database pool created: ${isServerless ? 'Serverless' : 'Standard'} mode`)
+    if (isTransactionMode) {
+      console.log(`   Using Supavisor pooler (transaction mode - port 6543)`)
+    } else if (isSessionMode) {
+      console.log(`   Using Supavisor pooler (session mode - port 5432)`)
+    }
   }
 
   // Error handling
@@ -87,18 +89,20 @@ function createPool() {
     }
   })
   
-  // Connection event handlers for debugging
-  poolInstance.on('connect', (client) => {
-    console.log('✅ Database client connected')
-  })
-  
-  poolInstance.on('acquire', (client) => {
-    console.log('📥 Database client acquired from pool')
-  })
-  
-  poolInstance.on('remove', (client) => {
-    console.log('📤 Database client removed from pool')
-  })
+  // Connection event handlers for debugging (only in development)
+  if (process.env.NODE_ENV !== 'production') {
+    poolInstance.on('connect', () => {
+      console.log('✅ Database client connected')
+    })
+
+    poolInstance.on('acquire', () => {
+      console.log('📥 Database client acquired from pool')
+    })
+
+    poolInstance.on('remove', () => {
+      console.log('📤 Database client removed from pool')
+    })
+  }
 
   return poolInstance
 }

@@ -55,7 +55,7 @@ export default function NewProjectPage() {
           setTags(Array.from(allTags.values()))
         }
       } catch (err) {
-        console.error('Failed to fetch tags:', err)
+        // Failed to fetch tags - error already handled by catch block
         // If that fails, try to get tags from a single project or create empty array
         setTags([])
       } finally {

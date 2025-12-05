@@ -44,7 +44,7 @@ export async function middleware(request: NextRequest) {
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
     if (!supabaseUrl || !supabaseKey) {
-      console.warn('Supabase env vars not set, skipping auth check')
+      // Supabase env vars not set, skipping auth check
       if (pathname === '/') {
         return NextResponse.redirect(new URL('/login', request.url))
       }
@@ -97,7 +97,10 @@ export async function middleware(request: NextRequest) {
               response.cookies.set(cookie.name, cookie.value, cookie.options)
             })
           } catch (error) {
-            console.error('Cookie setting error:', error)
+            // Cookie setting error - silent in production
+            if (process.env.NODE_ENV !== 'production') {
+              console.error('Cookie setting error:', error)
+            }
           }
         },
       },
@@ -116,6 +119,7 @@ export async function middleware(request: NextRequest) {
           user = authUser
         }
       } catch (error) {
+        // Auth check error - always log for debugging
         console.error('Auth check error:', error)
         user = null
       }
@@ -143,6 +147,7 @@ export async function middleware(request: NextRequest) {
     return response
   } catch (error) {
     // If middleware fails completely, log and allow request through
+    // Middleware error - always log
     console.error('Middleware error:', error)
 
     // Fallback: redirect root to login

@@ -71,7 +71,7 @@ export default function EditProjectPage() {
           setTags(Array.from(allTags.values()))
         }
       } catch (err) {
-        console.error('Failed to fetch tags:', err)
+        // Failed to fetch tags - error already handled by catch block
         setTags([])
       } finally {
         setLoadingTags(false)

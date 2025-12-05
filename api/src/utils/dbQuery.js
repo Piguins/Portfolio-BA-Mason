@@ -27,8 +27,8 @@ export async function queryWithTimeout(text, params = [], timeoutMs = 10000) {
     const result = await Promise.race([queryPromise, timeoutPromise])
     const duration = Date.now() - startTime
     
-    // Log slow queries (>1s)
-    if (duration > 1000) {
+    // Log slow queries (>1s) - only in development
+    if (process.env.NODE_ENV !== 'production' && duration > 1000) {
       console.log(`⚠️  Slow query (${duration}ms): ${text.substring(0, 100)}...`)
     }
     
