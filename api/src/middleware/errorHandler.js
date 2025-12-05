@@ -18,7 +18,26 @@ export const errorHandler = (err, req, res, next) => {
   if (err.code && err.code.startsWith('P')) {
     return res.status(500).json({
       error: 'Database error',
-      ...(isDevelopment && { message: err.message }),
+      message: err.message || 'Database operation failed',
+      ...(isDevelopment && { code: err.code }),
+    })
+  }
+  
+  // Database timeout errors
+  if (err.message && err.message.includes('timeout')) {
+    return res.status(504).json({
+      error: 'Database timeout',
+      message: 'Database query took too long. Please try again.',
+      ...(isDevelopment && { details: err.message }),
+    })
+  }
+  
+  // Database connection errors
+  if (err.message && (err.message.includes('connection') || err.message.includes('ECONNREFUSED'))) {
+    return res.status(503).json({
+      error: 'Database unavailable',
+      message: 'Cannot connect to database. Please try again later.',
+      ...(isDevelopment && { details: err.message }),
     })
   }
   

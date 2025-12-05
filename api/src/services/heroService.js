@@ -1,12 +1,12 @@
 // Hero service - Database operations for hero content (singleton)
-import client from '../db.js'
+import { queryWithTimeout } from '../utils/dbQuery.js'
 
 export const heroService = {
   /**
    * Get hero content (singleton - only 1 record)
    */
   async get() {
-    const result = await client.query(`
+    const result = await queryWithTimeout(`
       SELECT * FROM public.hero_content
       WHERE id = 1
       LIMIT 1
@@ -49,7 +49,7 @@ export const heroService = {
       profile_image_url,
     } = data
 
-    const result = await client.query(`
+    const result = await queryWithTimeout(`
       INSERT INTO public.hero_content (
         id, greeting, greeting_part2, name, title, description,
         linkedin_url, github_url, email_url, profile_image_url, updated_at

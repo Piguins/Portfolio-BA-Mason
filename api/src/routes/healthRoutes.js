@@ -50,6 +50,7 @@ const router = express.Router()
  *                   example: "Database connection failed"
  */
 router.get('/health', healthController.check)
+router.get('/health/db', healthController.dbCheck)
 
 /**
  * @swagger
