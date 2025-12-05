@@ -23,9 +23,9 @@ export const apiLimiter = rateLimit({
   keyGenerator: (req) => {
     return req.headers['x-forwarded-for']?.split(',')[0] || req.ip || req.connection.remoteAddress
   },
-  // Skip rate limiting for health checks
+  // Skip rate limiting for health checks and Swagger docs
   skip: (req) => {
-    return req.path === '/api/health'
+    return req.path === '/health' || req.path === '/api/health' || req.path === '/api-docs' || req.path === '/api-docs.json'
   },
 })
 

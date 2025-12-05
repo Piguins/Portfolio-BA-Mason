@@ -77,6 +77,11 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 // Health check (no rate limiting, no auth)
 app.use('/', healthRoutes)
 
+// Swagger documentation (protected with Basic Auth)
+// Must be before other routes to avoid conflicts
+// Note: swaggerAuth middleware is applied to routes in swaggerRoutes.js
+app.use('/', swaggerRoutes)
+
 // Authentication routes (stricter rate limiting)
 app.use('/api/auth', authLimiter)
 app.use('/', authRoutes)
@@ -88,10 +93,6 @@ app.use('/', specializationsRoutes)
 app.use('/', projectsRoutes)
 app.use('/', skillsRoutes)
 app.use('/', experienceRoutes)
-
-// Swagger documentation (protected with Basic Auth)
-// Note: swaggerAuth middleware is applied to routes in swaggerRoutes.js
-app.use('/', swaggerRoutes)
 
 // Error handling (must be last)
 app.use(errorHandler)
