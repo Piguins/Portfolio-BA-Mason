@@ -34,8 +34,7 @@ export default function SpecializationsListClient({ initialSpecializations, init
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s timeout
 
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-      const response = await fetch(`${API_URL}/api/specializations`, {
+      const response = await fetch(`/api/specializations`, {
         cache: 'no-store',
         signal: controller.signal,
       })
@@ -72,8 +71,7 @@ export default function SpecializationsListClient({ initialSpecializations, init
 
     setDeletingId(id)
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-      const response = await fetch(`${API_URL}/api/specializations/${id}`, {
+      const response = await fetch(`/api/specializations/${id}`, {
         method: 'DELETE',
       })
 

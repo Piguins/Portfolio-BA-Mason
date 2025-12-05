@@ -64,8 +64,7 @@ export default function EditExperiencePage() {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s timeout
 
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-      const response = await fetch(`${API_URL}/api/experience/${id}`, {
+      const response = await fetch(`/api/experience/${id}`, {
         signal: controller.signal,
         cache: 'no-store',
       })
@@ -123,8 +122,7 @@ export default function EditExperiencePage() {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 15000) // 15s timeout
 
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-      const response = await fetchWithAuth(`${API_URL}/api/experience/${id}`, {
+      const response = await fetchWithAuth(`/api/experience/${id}`, {
         method: 'PUT',
         body: JSON.stringify(formData),
         signal: controller.signal,

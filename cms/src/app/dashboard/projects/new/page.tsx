@@ -59,8 +59,7 @@ export default function NewProjectPage() {
       const timeoutId = setTimeout(() => controller.abort(), 15000)
 
       try {
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-        const response = await fetchWithAuth(`${API_URL}/api/projects`, {
+        const response = await fetchWithAuth(`/api/projects`, {
           method: 'POST',
           body: JSON.stringify(formData),
           signal: controller.signal,

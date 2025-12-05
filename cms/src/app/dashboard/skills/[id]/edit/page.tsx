@@ -40,8 +40,8 @@ export default function EditSkillPage() {
     try {
       setLoading(true)
       setError(null)
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-      const response = await fetch(`${API_URL}/api/skills/${id}`, {
+
+      const response = await fetch(`/api/skills/${id}`, {
         cache: 'no-store',
       })
 
@@ -94,8 +94,7 @@ export default function EditSkillPage() {
       const timeoutId = setTimeout(() => controller.abort(), 15000)
 
       try {
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-        const response = await fetch(`${API_URL}/api/skills/${id}`, {
+        const response = await fetch(`/api/skills/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),

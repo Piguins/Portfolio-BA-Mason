@@ -39,8 +39,7 @@ export default function EditProjectPage() {
   useEffect(() => {
     const fetchProject = async () => {
       try {
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-        const response = await fetchWithTimeout(`${API_URL}/api/projects/${id}`, {
+        const response = await fetchWithTimeout(`/api/projects/${id}`, {
           timeout: 10000,
         })
 
@@ -106,8 +105,7 @@ export default function EditProjectPage() {
       const timeoutId = setTimeout(() => controller.abort(), 15000)
 
       try {
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-        const response = await fetchWithAuth(`${API_URL}/api/projects/${id}`, {
+        const response = await fetchWithAuth(`/api/projects/${id}`, {
           method: 'PUT',
           body: JSON.stringify(formData),
           signal: controller.signal,

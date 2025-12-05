@@ -39,8 +39,7 @@ export default function ProjectsListClient({
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s timeout
 
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-      const response = await fetch(`${API_URL}/api/projects?published=`, {
+      const response = await fetch(`/api/projects?published=`, {
         cache: 'no-store',
         signal: controller.signal,
       })
@@ -75,8 +74,8 @@ export default function ProjectsListClient({
 
     try {
       setDeletingId(id)
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-      const response = await fetch(`${API_URL}/api/projects/${id}`, {
+
+      const response = await fetch(`/api/projects/${id}`, {
         method: 'DELETE',
       })
       if (!response.ok) throw new Error('Failed to delete project')

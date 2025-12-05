@@ -47,8 +47,7 @@ export default function HeroPage() {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s timeout
 
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-      const response = await fetch(`${API_URL}/api/hero`, {
+      const response = await fetch('/api/hero', {
         cache: 'no-store',
         signal: controller.signal,
       })
@@ -98,8 +97,7 @@ export default function HeroPage() {
       const timeoutId = setTimeout(() => controller.abort(), 15000)
 
       try {
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-        const response = await fetchWithAuth(`${API_URL}/api/hero`, {
+        const response = await fetchWithAuth('/api/hero', {
           method: 'PUT',
           body: JSON.stringify(payload),
           signal: controller.signal,

@@ -11,9 +11,13 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ error: 'Invalid ID format' }, { status: 400 })
     }
 
-    const specialization = await prisma.specialization.findUnique({
-      where: { id: idNum },
-    })
+    const result = await prisma.$queryRawUnsafe(
+      `SELECT id, number, title, description, icon_url, created_at, updated_at
+       FROM public.specializations WHERE id = $1`,
+      idNum
+    )
+
+    const specialization = Array.isArray(result) ? result[0] : result
 
     if (!specialization) {
       return NextResponse.json({ error: 'Specialization not found' }, { status: 404 })
@@ -37,20 +41,30 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     }
 
     const body = await request.json()
-    const { iconUrl, title, description } = body
+    const { number, title, description, icon_url } = body
 
     if (!title) {
       return NextResponse.json({ error: 'Title is required' }, { status: 400 })
     }
 
-    const specialization = await prisma.specialization.update({
-      where: { id: idNum },
-      data: {
-        iconUrl: iconUrl || null,
-        title,
-        description: description || null,
-      },
-    })
+    await prisma.$executeRawUnsafe(
+      `UPDATE public.specializations
+       SET number = $1, title = $2, description = $3, icon_url = $4, updated_at = NOW()
+       WHERE id = $5`,
+      number || null,
+      title,
+      description || null,
+      icon_url || null,
+      idNum
+    )
+
+    const result = await prisma.$queryRawUnsafe(
+      `SELECT id, number, title, description, icon_url, created_at, updated_at
+       FROM public.specializations WHERE id = $1`,
+      idNum
+    )
+
+    const specialization = Array.isArray(result) ? result[0] : result
 
     return NextResponse.json(specialization)
   } catch (error) {
@@ -69,9 +83,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       return NextResponse.json({ error: 'Invalid ID format' }, { status: 400 })
     }
 
-    await prisma.specialization.delete({
-      where: { id: idNum },
-    })
+    await prisma.$executeRawUnsafe(`DELETE FROM public.specializations WHERE id = $1`, idNum)
 
     return NextResponse.json({ message: 'Specialization deleted successfully' })
   } catch (error) {

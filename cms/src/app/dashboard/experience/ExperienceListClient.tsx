@@ -47,8 +47,7 @@ export default function ExperienceListClient({
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s timeout
 
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-      const response = await fetch(`${API_URL}/api/experience`, {
+      const response = await fetch('/api/experience', {
         cache: 'no-store',
         signal: controller.signal,
       })
@@ -83,8 +82,8 @@ export default function ExperienceListClient({
 
     try {
       setDeletingId(id)
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-      const response = await fetch(`${API_URL}/api/experience/${id}`, {
+
+      const response = await fetch(`/api/experience/${id}`, {
         method: 'DELETE',
       })
       if (!response.ok) throw new Error('Failed to delete experience')

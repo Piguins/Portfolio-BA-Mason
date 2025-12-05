@@ -39,8 +39,7 @@ export default function SkillsListClient({ initialSkills, initialError }: Skills
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s timeout
 
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-      const response = await fetch(`${API_URL}/api/skills`, {
+      const response = await fetch(`/api/skills`, {
         cache: 'no-store',
         signal: controller.signal,
       })
@@ -75,8 +74,8 @@ export default function SkillsListClient({ initialSkills, initialError }: Skills
 
     try {
       setDeletingId(id)
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-      const response = await fetch(`${API_URL}/api/skills/${id}`, {
+
+      const response = await fetch(`/api/skills/${id}`, {
         method: 'DELETE',
       })
       if (!response.ok) {

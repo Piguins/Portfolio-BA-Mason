@@ -39,8 +39,7 @@ export default function NewSpecializationPage() {
       const timeoutId = setTimeout(() => controller.abort(), 15000)
 
       try {
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-        const response = await fetchWithAuth(`${API_URL}/api/specializations`, {
+        const response = await fetchWithAuth(`/api/specializations`, {
           method: 'POST',
           body: JSON.stringify(payload),
           signal: controller.signal,

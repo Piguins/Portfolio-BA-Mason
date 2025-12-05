@@ -37,8 +37,7 @@ export default function NewExperiencePage() {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 15000) // 15s timeout
 
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-      const response = await fetchWithAuth(`${API_URL}/api/experience`, {
+      const response = await fetchWithAuth(`/api/experience`, {
         method: 'POST',
         body: JSON.stringify(formData),
         signal: controller.signal,

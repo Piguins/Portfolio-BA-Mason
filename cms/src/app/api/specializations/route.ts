@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-// GET - Get all specializations
+// GET - Get all specializations (uses specializations table)
 export async function GET() {
   try {
-    const specializations = await prisma.specialization.findMany({
-      orderBy: { createdAt: 'asc' },
-    })
+    const result = await prisma.$queryRawUnsafe(`
+      SELECT id, number, title, description, icon_url, created_at, updated_at
+      FROM public.specializations
+      ORDER BY id ASC
+    `)
 
+    const specializations = Array.isArray(result) ? result : [result]
     return NextResponse.json(specializations)
   } catch (error) {
     console.error('Error fetching specializations:', error)
@@ -19,20 +22,23 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { iconUrl, title, description } = body
+    const { number, title, description, icon_url } = body
 
     if (!title) {
       return NextResponse.json({ error: 'Title is required' }, { status: 400 })
     }
 
-    const specialization = await prisma.specialization.create({
-      data: {
-        iconUrl: iconUrl || null,
-        title,
-        description: description || null,
-      },
-    })
+    const result = await prisma.$executeRawUnsafe(
+      `INSERT INTO public.specializations (number, title, description, icon_url)
+       VALUES ($1, $2, $3, $4)
+       RETURNING *`,
+      number || null,
+      title,
+      description || null,
+      icon_url || null
+    )
 
+    const specialization = Array.isArray(result) ? result[0] : result
     return NextResponse.json(specialization, { status: 201 })
   } catch (error) {
     console.error('Error creating specialization:', error)

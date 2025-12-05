@@ -34,8 +34,8 @@ export default function EditSpecializationPage() {
     try {
       setLoading(true)
       setError(null)
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-      const response = await fetch(`${API_URL}/api/specializations/${id}`, {
+
+      const response = await fetch(`/api/specializations/${id}`, {
         cache: 'no-store',
       })
 
@@ -84,8 +84,7 @@ export default function EditSpecializationPage() {
       const timeoutId = setTimeout(() => controller.abort(), 15000)
 
       try {
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-        const response = await fetchWithAuth(`${API_URL}/api/specializations/${id}`, {
+        const response = await fetchWithAuth(`/api/specializations/${id}`, {
           method: 'PUT',
           body: JSON.stringify(payload),
           signal: controller.signal,
