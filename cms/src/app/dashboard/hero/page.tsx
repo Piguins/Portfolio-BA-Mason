@@ -90,9 +90,11 @@ export default function HeroPage() {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
       const API_KEY = process.env.NEXT_PUBLIC_API_KEY || ''
       const response = await fetch(`${API_URL}/api/hero`, {
-        headers: API_KEY ? { 'X-API-Key': API_KEY } : {},
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(API_KEY ? { 'X-API-Key': API_KEY } : {}),
+        },
         body: JSON.stringify(payload),
         signal: controller.signal,
       })
