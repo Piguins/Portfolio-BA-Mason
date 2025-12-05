@@ -38,7 +38,9 @@ export async function middleware(request: NextRequest) {
     }
 
     // Check if Supabase env vars are set
+    // @ts-ignore - process is available in Node.js runtime
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    // @ts-ignore - process is available in Node.js runtime
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
     if (!supabaseUrl || !supabaseKey) {
