@@ -1,2 +1,7 @@
-// Entry point for Vercel - re-export from src/index.js
-export { default } from './src/index.js'
+// Entry point for Vercel serverless function
+import app from './src/index.js'
+
+// Export handler for Vercel
+export default function handler(req, res) {
+  return app(req, res)
+}
