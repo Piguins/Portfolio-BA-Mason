@@ -3,8 +3,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 import BackButton from '@/components/BackButton'
 import LoadingButton from '@/components/LoadingButton'
+import { fetchWithAuth } from '@/lib/fetchWithAuth'
 import '../../skills.css'
 
 interface Skill {
@@ -14,6 +16,7 @@ interface Skill {
   category: string
   level: number
   icon_url?: string
+  description?: string
   is_highlight: boolean
   order_index: number
 }
@@ -32,6 +35,7 @@ export default function EditSkillPage() {
     category: 'technical',
     level: 1,
     icon_url: '',
+    description: '',
     is_highlight: false,
     order_index: 0,
   })
@@ -56,6 +60,7 @@ export default function EditSkillPage() {
         category: data.category,
         level: data.level,
         icon_url: data.icon_url || '',
+        description: data.description || '',
         is_highlight: data.is_highlight || false,
         order_index: data.order_index || 0,
       })
@@ -94,9 +99,8 @@ export default function EditSkillPage() {
       const timeoutId = setTimeout(() => controller.abort(), 15000)
 
       try {
-        const response = await fetch(`/api/skills/${id}`, {
+        const response = await fetchWithAuth(`/api/skills/${id}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
           signal: controller.signal,
         })
@@ -104,15 +108,20 @@ export default function EditSkillPage() {
 
         if (!response.ok) {
           const errorData = await response.json()
-          throw new Error(errorData.error || 'Failed to update skill')
+          throw new Error(errorData.error || errorData.message || 'Failed to update skill')
         }
 
+        toast.success('Skill đã được cập nhật thành công!')
         router.replace('/dashboard/skills')
       } catch (err: any) {
         if (err.name === 'AbortError') {
-          setError('Yêu cầu cập nhật skill đã hết thời gian. Vui lòng thử lại.')
+          const errorMsg = 'Yêu cầu cập nhật skill đã hết thời gian. Vui lòng thử lại.'
+          setError(errorMsg)
+          toast.error(errorMsg)
         } else {
-          setError(err.message || 'Failed to update skill')
+          const errorMsg = err.message || 'Failed to update skill'
+          setError(errorMsg)
+          toast.error(errorMsg)
         }
       } finally {
         setSaving(false)
@@ -230,7 +239,18 @@ export default function EditSkillPage() {
           </div>
 
           <div className="form-section">
-            <h3 className="section-title">Media & Settings</h3>
+            <h3 className="section-title">Mô tả & Media</h3>
+            <div className="form-group">
+              <label htmlFor="description">Description</label>
+              <textarea
+                id="description"
+                rows={3}
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Mô tả về skill này..."
+              />
+            </div>
+
             <div className="form-group">
               <label htmlFor="icon_url">Icon URL</label>
               <input

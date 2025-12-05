@@ -17,6 +17,7 @@ export default function NewSpecializationPage() {
     number: '',
     title: '',
     description: '',
+    icon_url: '',
   })
 
   const handleSubmit = useCallback(
@@ -136,7 +137,16 @@ export default function NewSpecializationPage() {
               />
             </div>
 
-            <div className="form-group"></div>
+            <div className="form-group">
+              <label htmlFor="icon_url">Icon URL</label>
+              <input
+                id="icon_url"
+                type="url"
+                value={formData.icon_url}
+                onChange={(e) => setFormData({ ...formData, icon_url: e.target.value })}
+                placeholder="https://example.com/icon.svg"
+              />
+            </div>
           </div>
 
           <div className="form-actions">

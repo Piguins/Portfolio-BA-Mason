@@ -119,9 +119,9 @@ export async function POST(request: NextRequest) {
       return Array.isArray(fullExp) ? fullExp[0] : fullExp
     })
 
-    return NextResponse.json(experience, { 
+    return NextResponse.json(experience, {
       status: 201,
-      headers: corsHeaders(request)
+      headers: corsHeaders(request),
     })
   } catch (error) {
     console.error('Error creating experience:', error)

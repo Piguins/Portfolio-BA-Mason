@@ -9,11 +9,13 @@ Với domain `admin.mason.id.vn`, bạn có thể truy cập Swagger UI tại:
 ## Các cách kiểm tra API
 
 ### 1. Swagger UI (Khuyến nghị)
+
 - Truy cập: `https://admin.mason.id.vn/api-docs`
 - Xem tất cả endpoints, schemas, và test trực tiếp trong browser
 - Có thể authenticate với JWT token từ Supabase
 
 ### 2. OpenAPI JSON Spec
+
 - URL: `https://admin.mason.id.vn/api/api-docs`
 - Trả về OpenAPI 3.0 specification dạng JSON
 - Có thể import vào Postman, Insomnia, hoặc tools khác
@@ -59,10 +61,12 @@ curl -X PUT https://admin.mason.id.vn/api/hero \
 ## Các Endpoints có sẵn
 
 ### Hero Section (Singleton)
+
 - `GET /api/hero` - Lấy hero content
 - `PUT /api/hero` - Update hero content (cần auth)
 
 ### Experience
+
 - `GET /api/experience` - Lấy tất cả experiences
 - `GET /api/experience/[id]` - Lấy experience theo ID
 - `POST /api/experience` - Tạo experience mới (cần auth)
@@ -70,6 +74,7 @@ curl -X PUT https://admin.mason.id.vn/api/hero \
 - `DELETE /api/experience/[id]` - Xóa experience (cần auth)
 
 ### Projects
+
 - `GET /api/projects` - Lấy tất cả projects
 - `GET /api/projects/[id]` - Lấy project theo ID
 - `POST /api/projects` - Tạo project mới (cần auth)
@@ -77,6 +82,7 @@ curl -X PUT https://admin.mason.id.vn/api/hero \
 - `DELETE /api/projects/[id]` - Xóa project (cần auth)
 
 ### Specializations
+
 - `GET /api/specializations` - Lấy tất cả specializations
 - `GET /api/specializations/[id]` - Lấy specialization theo ID
 - `POST /api/specializations` - Tạo specialization mới (cần auth)
@@ -84,6 +90,7 @@ curl -X PUT https://admin.mason.id.vn/api/hero \
 - `DELETE /api/specializations/[id]` - Xóa specialization (cần auth)
 
 ### Skills
+
 - `GET /api/skills` - Lấy tất cả skills
 - `GET /api/skills/[id]` - Lấy skill theo ID
 - `POST /api/skills` - Tạo skill mới (cần auth)
@@ -95,11 +102,13 @@ curl -X PUT https://admin.mason.id.vn/api/hero \
 Các endpoints POST, PUT, DELETE yêu cầu JWT token từ Supabase Auth.
 
 Header format:
+
 ```
 Authorization: Bearer <jwt-token>
 ```
 
 Để lấy token:
+
 1. Login vào CMS tại `https://admin.mason.id.vn/login`
 2. Token được lưu trong browser cookies (Supabase session)
 3. Hoặc lấy từ Supabase client: `supabase.auth.getSession()`
@@ -107,10 +116,10 @@ Authorization: Bearer <jwt-token>
 ## CORS
 
 API đã được cấu hình CORS để cho phép:
+
 - `https://mason.id.vn`
 - `https://www.mason.id.vn`
 - `http://localhost:5173` (dev)
 - `http://localhost:3000` (dev)
 
 Frontend portfolio có thể gọi API từ CMS mà không gặp CORS issues.
-

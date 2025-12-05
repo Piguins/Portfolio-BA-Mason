@@ -14,6 +14,7 @@ interface Specialization {
   number: string
   title: string
   description?: string
+  icon_url?: string
 }
 
 export default function EditSpecializationPage() {
@@ -28,6 +29,7 @@ export default function EditSpecializationPage() {
     number: '',
     title: '',
     description: '',
+    icon_url: '',
   })
 
   const fetchSpecialization = useCallback(async () => {
@@ -48,6 +50,7 @@ export default function EditSpecializationPage() {
         number: data.number,
         title: data.title,
         description: data.description || '',
+        icon_url: data.icon_url || '',
       })
     } catch (err: any) {
       const errorMsg = err.message || 'Failed to load specialization'
@@ -192,7 +195,16 @@ export default function EditSpecializationPage() {
               />
             </div>
 
-            <div className="form-group"></div>
+            <div className="form-group">
+              <label htmlFor="icon_url">Icon URL</label>
+              <input
+                id="icon_url"
+                type="url"
+                value={formData.icon_url}
+                onChange={(e) => setFormData({ ...formData, icon_url: e.target.value })}
+                placeholder="https://example.com/icon.svg"
+              />
+            </div>
           </div>
 
           <div className="form-actions">

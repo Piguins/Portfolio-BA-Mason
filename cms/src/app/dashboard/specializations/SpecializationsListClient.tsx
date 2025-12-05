@@ -11,7 +11,7 @@ interface Specialization {
   number: string
   title: string
   description?: string
-  order_index: number
+  icon_url?: string
 }
 
 interface Props {

@@ -13,9 +13,10 @@ export const openApiSpec = {
   },
   servers: [
     {
-      url: typeof window !== 'undefined' 
-        ? window.location.origin 
-        : process.env.NEXT_PUBLIC_APP_URL || 'https://admin.mason.id.vn',
+      url:
+        typeof window !== 'undefined'
+          ? window.location.origin
+          : process.env.NEXT_PUBLIC_APP_URL || 'https://admin.mason.id.vn',
       description: 'CMS API Server',
     },
   ],

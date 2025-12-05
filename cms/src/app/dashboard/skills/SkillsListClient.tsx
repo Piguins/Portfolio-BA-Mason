@@ -14,6 +14,7 @@ interface Skill {
   category: string
   level: number
   icon_url?: string
+  description?: string
   is_highlight: boolean
   order_index: number
 }

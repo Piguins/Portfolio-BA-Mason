@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 // CORS middleware for API routes
 export function corsHeaders(request: NextRequest) {
   const origin = request.headers.get('origin')
-  
+
   // Allow requests from portfolio frontend domains
   const allowedOrigins = [
     'https://mason.id.vn',
@@ -27,4 +27,3 @@ export function corsHeaders(request: NextRequest) {
 export function corsOptionsHandler(request: NextRequest) {
   return NextResponse.json({}, { headers: corsHeaders(request) })
 }
-

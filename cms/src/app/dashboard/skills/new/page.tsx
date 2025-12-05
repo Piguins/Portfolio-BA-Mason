@@ -3,8 +3,10 @@
 import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 import BackButton from '@/components/BackButton'
 import LoadingButton from '@/components/LoadingButton'
+import { fetchWithAuth } from '@/lib/fetchWithAuth'
 import '../skills.css'
 
 export default function NewSkillPage() {
@@ -17,6 +19,7 @@ export default function NewSkillPage() {
     category: 'technical',
     level: 1,
     icon_url: '',
+    description: '',
     is_highlight: false,
     order_index: 0,
   })
@@ -43,9 +46,8 @@ export default function NewSkillPage() {
       const timeoutId = setTimeout(() => controller.abort(), 15000)
 
       try {
-        const response = await fetch(`/api/skills`, {
+        const response = await fetchWithAuth(`/api/skills`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
           signal: controller.signal,
         })
@@ -53,15 +55,20 @@ export default function NewSkillPage() {
 
         if (!response.ok) {
           const errorData = await response.json()
-          throw new Error(errorData.error || 'Failed to create skill')
+          throw new Error(errorData.error || errorData.message || 'Failed to create skill')
         }
 
+        toast.success('Skill đã được tạo thành công!')
         router.replace('/dashboard/skills')
       } catch (err: any) {
         if (err.name === 'AbortError') {
-          setError('Yêu cầu tạo skill đã hết thời gian. Vui lòng thử lại.')
+          const errorMsg = 'Yêu cầu tạo skill đã hết thời gian. Vui lòng thử lại.'
+          setError(errorMsg)
+          toast.error(errorMsg)
         } else {
-          setError(err.message || 'Failed to create skill')
+          const errorMsg = err.message || 'Failed to create skill'
+          setError(errorMsg)
+          toast.error(errorMsg)
         }
       } finally {
         setLoading(false)
@@ -183,7 +190,18 @@ export default function NewSkillPage() {
           </div>
 
           <div className="form-section">
-            <h3 className="section-title">Media & Settings</h3>
+            <h3 className="section-title">Mô tả & Media</h3>
+            <div className="form-group">
+              <label htmlFor="description">Description</label>
+              <textarea
+                id="description"
+                rows={3}
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Mô tả về skill này..."
+              />
+            </div>
+
             <div className="form-group">
               <label htmlFor="icon_url">Icon URL</label>
               <input

@@ -16,8 +16,7 @@ interface Experience {
   end_date?: string
   is_current: boolean
   description?: string
-  order_index: number
-  bullets?: Array<{ id: number; text: string; order_index: number }>
+  bullets?: Array<{ id: number; text: string }>
   // New free-text skills
   skills_text?: string[]
   // Old relation-based skills (still supported for backward compatibility)
