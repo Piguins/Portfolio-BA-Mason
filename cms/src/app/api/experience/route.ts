@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { corsHeaders, corsOptionsHandler } from '@/middleware/cors'
+
+// Handle OPTIONS request for CORS
+export async function OPTIONS(request: NextRequest) {
+  return corsOptionsHandler(request)
+}
 
 // GET - Get all experiences (with bullets from experience_bullets)
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const result = await prisma.$queryRawUnsafe(`
       SELECT
@@ -32,7 +38,7 @@ export async function GET() {
     `)
 
     const experiences = Array.isArray(result) ? result : [result]
-    return NextResponse.json(experiences)
+    return NextResponse.json(experiences, { headers: corsHeaders(request) })
   } catch (error) {
     console.error('Error fetching experiences:', error)
     return NextResponse.json({ error: 'Failed to fetch experiences' }, { status: 500 })
@@ -113,7 +119,10 @@ export async function POST(request: NextRequest) {
       return Array.isArray(fullExp) ? fullExp[0] : fullExp
     })
 
-    return NextResponse.json(experience, { status: 201 })
+    return NextResponse.json(experience, { 
+      status: 201,
+      headers: corsHeaders(request)
+    })
   } catch (error) {
     console.error('Error creating experience:', error)
     return NextResponse.json({ error: 'Failed to create experience' }, { status: 500 })

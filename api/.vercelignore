@@ -1,8 +1,0 @@
-node_modules
-*.md
-test-*.js
-encode-*.js
-*.sh
-.env
-.env.local
-.env.*.local
