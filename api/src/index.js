@@ -13,6 +13,7 @@ import { apiLimiter, authLimiter } from './middleware/rateLimiter.js'
 // Performance middleware
 import { performanceLogger } from './middleware/performanceLogger.js'
 import { cacheMiddleware } from './middleware/cacheMiddleware.js'
+import { requestTimeout } from './middleware/requestTimeout.js'
 
 // Initialize database connection pool on startup (singleton)
 import './db.js'
@@ -41,10 +42,13 @@ app.use(corsMiddleware)
 app.use(hppMiddleware)
 app.use(apiLimiter)
 
-// 2. Performance logging (early to capture all timing)
+// 2. Request timeout (kill requests that take too long - 30s)
+app.use(requestTimeout(30000))
+
+// 3. Performance logging (early to capture all timing)
 app.use(performanceLogger)
 
-// 3. Compression (before routes to compress all responses)
+// 4. Compression (before routes to compress all responses)
 app.use(compression({
   level: 6, // Balance between compression and speed (1-9, default: 6)
   threshold: 1024, // Only compress responses > 1KB
@@ -58,14 +62,14 @@ app.use(compression({
   },
 }))
 
-// 4. Security headers
+// 5. Security headers
 app.use(securityHeaders)
 
-// 5. Body parsing
+// 6. Body parsing
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 
-// 6. Caching middleware (after parsing, before routes)
+// 7. Caching middleware (after parsing, before routes)
 app.use(cacheMiddleware)
 
 app.use('/', healthRoutes)

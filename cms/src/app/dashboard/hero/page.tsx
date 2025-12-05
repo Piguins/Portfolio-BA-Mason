@@ -43,10 +43,17 @@ export default function HeroPage() {
     try {
       setLoading(true)
       setError(null)
+
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s timeout
+
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
       const response = await fetch(`${API_URL}/api/hero`, {
         cache: 'no-store',
+        signal: controller.signal,
       })
+
+      clearTimeout(timeoutId)
 
       if (!response.ok) {
         throw new Error('Failed to fetch hero content')
@@ -55,7 +62,11 @@ export default function HeroPage() {
       const data: HeroData = await response.json()
       setFormData(data)
     } catch (err: any) {
-      setError(err.message || 'Failed to load hero content')
+      if (err.name === 'AbortError') {
+        setError('Request timeout. Vui lòng thử lại.')
+      } else {
+        setError(err.message || 'Failed to load hero content')
+      }
     } finally {
       setLoading(false)
     }
