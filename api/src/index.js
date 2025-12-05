@@ -1,7 +1,3 @@
-// Mason Portfolio API
-// Tech stack: Node.js + Express + PostgreSQL (Supabase)
-// SECURITY: Hardened with Helmet, Rate Limiting, CORS, HPP protection
-
 import express from 'express'
 import compression from 'compression'
 import { getConfig } from './config/index.js'
@@ -28,71 +24,34 @@ import swaggerRoutes from './routes/swaggerRoutes.js'
 
 const app = express()
 
-// ============================================
-// SECURITY MIDDLEWARE (Order matters!)
-// ============================================
-
-// 1. Helmet - Secure HTTP headers (must be first)
 app.use(helmetMiddleware)
-
-// 2. CORS - Allow all origins (security handled by API key)
 app.use(corsMiddleware)
-
-// 3. HPP - HTTP Parameter Pollution protection
 app.use(hppMiddleware)
-
-// 4. Rate Limiting - DDoS and brute-force protection
 app.use(apiLimiter)
 
-// 5. Performance: Add response time header for monitoring
 app.use((req, res, next) => {
   const startTime = Date.now()
   res.on('finish', () => {
     const duration = Date.now() - startTime
     res.setHeader('X-Response-Time', `${duration}ms`)
-    // Log slow requests (threshold lowered for better monitoring)
-    if (duration > 300) {
-      console.warn(`⚠️ Slow request: ${req.method} ${req.path} - ${duration}ms`)
-    }
   })
   next()
 })
 
-// 6. Compression middleware for faster responses (reduces response size by 60-80%)
 app.use(compression())
-
-// 7. Additional security headers (complement to Helmet)
 app.use(securityHeaders)
-
-// 8. Body parsing (after security middleware)
-app.use(express.json({ limit: '10mb' })) // Limit body size to prevent DoS
+app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 
-// ============================================
-// ROUTES
-// ============================================
-
-// Health check (no rate limiting, no auth)
 app.use('/', healthRoutes)
-
-// Swagger documentation (publicly accessible)
-// Must be before other routes to avoid conflicts
 app.use('/', swaggerRoutes)
-
-// Authentication routes (stricter rate limiting)
 app.use('/api/auth', authLimiter)
 app.use('/', authRoutes)
-
-// API routes
-// GET routes are public, POST/PUT/DELETE require Access Token (JWT)
-// Authentication is applied per-route in route files
 app.use('/', heroRoutes)
 app.use('/', specializationsRoutes)
 app.use('/', projectsRoutes)
 app.use('/', skillsRoutes)
 app.use('/', experienceRoutes)
-
-// Error handling (must be last)
 app.use(errorHandler)
 
 // Export for Vercel serverless

@@ -78,17 +78,12 @@ export const generateSwaggerHtml = (baseUrl) => {
       'use strict';
       
       function initSwagger() {
-        // Check if SwaggerUIBundle is loaded
         if (typeof SwaggerUIBundle === 'undefined') {
-          console.log('Waiting for SwaggerUIBundle to load...');
           setTimeout(initSwagger, 100);
           return;
         }
 
         const specUrl = '${specUrl}';
-        console.log('Initializing Swagger UI with spec URL:', specUrl);
-
-        // Show loading message
         const swaggerContainer = document.getElementById('swagger-ui');
         swaggerContainer.innerHTML = '<div class="loading-message">Loading API documentation...</div>';
 
@@ -108,16 +103,12 @@ export const generateSwaggerHtml = (baseUrl) => {
             validatorUrl: null,
             tryItOutEnabled: true,
             requestInterceptor: function(request) {
-              console.log('Swagger request:', request);
               return request;
             },
             responseInterceptor: function(response) {
-              console.log('Swagger response:', response);
               return response;
             },
             onComplete: function() {
-              console.log('✅ Swagger UI loaded successfully');
-              // Force enable interactions after load
               setTimeout(function() {
                 const allClickables = document.querySelectorAll(
                   '.opblock-summary, .opblock-tag, .try-out__btn, .btn.try-out__btn, .execute, .btn.execute, .authorize, .opblock-tag-section'
@@ -132,32 +123,27 @@ export const generateSwaggerHtml = (baseUrl) => {
                     }
                   }
                 });
-                console.log('✅ Interactions enabled');
               }, 500);
             },
             onFailure: function(data) {
-              console.error('❌ Swagger UI failed to load:', data);
+              console.error('Swagger UI failed to load:', data);
               swaggerContainer.innerHTML = 
                 '<div class="error-message">' +
                 '<h2>Failed to load API documentation</h2>' +
                 '<p>Error: ' + (data.message || 'Unknown error') + '</p>' +
-                '<p>Please check the console for more details.</p>' +
                 '<p><a href="' + specUrl + '" target="_blank">Try opening the JSON spec directly</a></p>' +
                 '</div>';
             }
           });
         } catch (error) {
-          console.error('❌ Error initializing Swagger UI:', error);
+          console.error('Error initializing Swagger UI:', error);
           swaggerContainer.innerHTML = 
             '<div class="error-message">' +
             '<h2>Error initializing Swagger UI</h2>' +
             '<p>' + error.message + '</p>' +
-            '<p>Please check the console for more details.</p>' +
             '</div>';
         }
       }
-
-      // Initialize when DOM is ready
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initSwagger);
       } else {
