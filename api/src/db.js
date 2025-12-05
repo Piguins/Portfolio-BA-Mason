@@ -22,9 +22,22 @@ function createPool() {
     throw new Error('DATABASE_URL is not configured in environment variables')
   }
 
-  // Use connection pooler for better performance (port 6543)
-  if (connectionString.includes(':5432/')) {
-    connectionString = connectionString.replace(':5432/', ':6543/')
+  // For serverless (Vercel), use transaction mode pooler (port 6543)
+  // Transaction mode requires pgbouncer=true to disable prepared statements
+  const isServerless = process.env.VERCEL === '1'
+  const isPooler = connectionString.includes('pooler.supabase.com') || connectionString.includes(':6543')
+  
+  if (isServerless || isPooler) {
+    // Ensure we're using port 6543 (transaction mode)
+    if (connectionString.includes(':5432/')) {
+      connectionString = connectionString.replace(':5432/', ':6543/')
+    }
+    
+    // Add pgbouncer=true for transaction mode (required to disable prepared statements)
+    if (!connectionString.includes('pgbouncer=true')) {
+      const separator = connectionString.includes('?') ? '&' : '?'
+      connectionString = `${connectionString}${separator}pgbouncer=true`
+    }
   }
 
   // Optimized pool configuration for serverless (Vercel)
@@ -35,17 +48,42 @@ function createPool() {
     max: 1, // Serverless: 1 connection per function instance
     min: 0, // Don't pre-create connections
     idleTimeoutMillis: 30000, // 30s for better reuse
-    connectionTimeoutMillis: 3000, // Reduced to 3s for faster failure
+    connectionTimeoutMillis: 5000, // 5s timeout for connection attempts
     allowExitOnIdle: true,
   })
+  
+  // Log connection info (without sensitive data)
+  const connectionInfo = connectionString.replace(/:[^:@]+@/, ':****@') // Hide password
+  console.log(`📊 Database pool created: ${isServerless ? 'Serverless' : 'Standard'} mode`)
+  if (isPooler) {
+    console.log(`   Using Supavisor pooler (transaction mode)`)
+  }
 
   // Error handling
   poolInstance.on('error', (err, client) => {
-    console.error('Database pool error:', err)
+    console.error('❌ Database pool error:', {
+      message: err.message,
+      code: err.code,
+      severity: err.severity,
+    })
     // Don't exit in serverless - let Vercel handle it
     if (process.env.VERCEL !== '1') {
+      console.error('⚠️  Exiting process due to database pool error')
       process.exit(-1)
     }
+  })
+  
+  // Connection event handlers for debugging
+  poolInstance.on('connect', (client) => {
+    console.log('✅ Database client connected')
+  })
+  
+  poolInstance.on('acquire', (client) => {
+    console.log('📥 Database client acquired from pool')
+  })
+  
+  poolInstance.on('remove', (client) => {
+    console.log('📤 Database client removed from pool')
   })
 
   return poolInstance

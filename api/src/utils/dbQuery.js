@@ -11,6 +11,8 @@ import client from '../db.js'
  * @returns {Promise} Query result
  */
 export async function queryWithTimeout(text, params = [], timeoutMs = 10000) {
+  const startTime = Date.now()
+  
   const queryPromise = client.query(text, params)
   
   // Create timeout promise
@@ -23,11 +25,28 @@ export async function queryWithTimeout(text, params = [], timeoutMs = 10000) {
   try {
     // Race between query and timeout
     const result = await Promise.race([queryPromise, timeoutPromise])
+    const duration = Date.now() - startTime
+    
+    // Log slow queries (>1s)
+    if (duration > 1000) {
+      console.log(`⚠️  Slow query (${duration}ms): ${text.substring(0, 100)}...`)
+    }
+    
     return result
   } catch (error) {
-    // Log timeout errors
+    const duration = Date.now() - startTime
+    
+    // Log timeout errors with more context
     if (error.message && error.message.includes('timeout')) {
-      console.error(`⚠️  Database query timeout: ${text.substring(0, 50)}...`)
+      console.error(`⚠️  Database query timeout after ${duration}ms: ${text.substring(0, 100)}...`)
+      console.error(`   Query params:`, params.length > 0 ? '[...]' : 'none')
+    } else {
+      // Log other database errors
+      console.error(`❌ Database query error (${duration}ms):`, {
+        message: error.message,
+        code: error.code,
+        query: text.substring(0, 100),
+      })
     }
     throw error
   }
