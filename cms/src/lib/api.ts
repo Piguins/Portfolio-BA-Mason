@@ -15,12 +15,8 @@ export async function apiRequest<T = any>(
   try {
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
+      ...(API_KEY ? { 'X-API-Key': API_KEY } : {}),
       ...options.headers,
-    }
-
-    // Add API key if available
-    if (API_KEY) {
-      headers['X-API-Key'] = API_KEY
     }
 
     const response = await fetch(`${API_URL}${endpoint}`, {
