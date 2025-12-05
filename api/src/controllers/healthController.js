@@ -4,21 +4,31 @@ import { asyncHandler } from '../middleware/errorHandler.js'
 
 export const healthController = {
   /**
-   * Health check endpoint
+   * Health check endpoint with timeout protection
    */
   check: asyncHandler(async (req, res) => {
+    // Check database connection with timeout (5 seconds)
+    const dbCheckPromise = client.query('SELECT 1')
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Database connection timeout')), 5000)
+    })
+    
     try {
-      await client.query('SELECT 1')
+      await Promise.race([dbCheckPromise, timeoutPromise])
       res.json({
         status: 'ok',
         service: 'portfolio-api',
         database: 'connected',
+        timestamp: new Date().toISOString(),
       })
     } catch (err) {
       console.error('Health check error:', err)
       res.status(500).json({
         status: 'error',
-        message: 'Database connection failed',
+        service: 'portfolio-api',
+        database: 'disconnected',
+        message: err.message || 'Database connection failed',
+        timestamp: new Date().toISOString(),
       })
     }
   }),
