@@ -1,7 +1,6 @@
 'use client'
 
 import SpecializationsListClient from './SpecializationsListClient'
-import './specializations.css'
 
 export default function SpecializationsPage() {
   // Client component - fetch happens in SpecializationsListClient
