@@ -1,5 +1,6 @@
 // Global Database Connection Pool - Singleton Pattern
-// CRITICAL: This pool is initialized ONCE at server startup and reused across all requests
+// OPTIMIZED: Pool creation is non-blocking - created synchronously but connection is lazy
+// This prevents blocking serverless function cold starts
 import pkg from 'pg'
 import dotenv from 'dotenv'
 
@@ -7,7 +8,7 @@ dotenv.config()
 
 const { Pool } = pkg
 
-// Singleton instance - initialized once, reused everywhere
+// Singleton instance - created immediately but connection is lazy
 let poolInstance = null
 
 function createPool() {
@@ -18,7 +19,7 @@ function createPool() {
   let connectionString = process.env.DATABASE_URL
 
   if (!connectionString) {
-    throw new Error('DATABASE_URL is not configured in .env file')
+    throw new Error('DATABASE_URL is not configured in environment variables')
   }
 
   // Use connection pooler for better performance (port 6543)
@@ -32,9 +33,9 @@ function createPool() {
     connectionString: connectionString,
     ssl: { rejectUnauthorized: false },
     max: 1, // Serverless: 1 connection per function instance
-    min: 0,
-    idleTimeoutMillis: 30000, // Increased to 30s for better reuse
-    connectionTimeoutMillis: 5000, // 5s timeout
+    min: 0, // Don't pre-create connections
+    idleTimeoutMillis: 30000, // 30s for better reuse
+    connectionTimeoutMillis: 3000, // Reduced to 3s for faster failure
     allowExitOnIdle: true,
   })
 
@@ -50,7 +51,7 @@ function createPool() {
   return poolInstance
 }
 
-// Export singleton pool instance
+// Create pool immediately but connection is lazy (non-blocking)
 const pool = createPool()
 
 // Export as both 'pool' and 'client' for compatibility
@@ -59,4 +60,3 @@ export { pool }
 export { pool as client }
 // Default export is the pool instance (services import as 'client')
 export default pool
-

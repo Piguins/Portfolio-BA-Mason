@@ -15,7 +15,8 @@ import { performanceLogger } from './middleware/performanceLogger.js'
 import { cacheMiddleware } from './middleware/cacheMiddleware.js'
 import { requestTimeout } from './middleware/requestTimeout.js'
 
-// Initialize database connection pool on startup (singleton)
+// Database connection pool - lazy loaded (non-blocking)
+// Import is side-effect only - pool creation doesn't block
 import './db.js'
 
 const config = getConfig()
@@ -33,31 +34,39 @@ import swaggerRoutes from './routes/swaggerRoutes.js'
 const app = express()
 
 // ============================================
-// MIDDLEWARE STACK (Order matters for performance!)
+// OPTIMIZED MIDDLEWARE STACK
 // ============================================
 
-// 1. Security middleware (must be first)
+// CRITICAL: Root endpoint FIRST - before all middleware
+// This ensures instant response without any middleware overhead
+app.get('/', (req, res) => {
+  res.json({
+    message: 'Mason Portfolio API',
+    docs: 'Available endpoints: /health, /api/projects, /api/skills, /api/experience',
+    swagger: '/api-docs',
+  })
+})
+
+// 1. Security middleware (after root endpoint)
 app.use(helmetMiddleware)
 app.use(corsMiddleware)
 app.use(hppMiddleware)
 app.use(apiLimiter)
 
-// 2. Request timeout (kill requests that take too long - 30s)
+// 2. Request timeout (skip for root - already handled above)
 app.use(requestTimeout(30000))
 
-// 3. Performance logging (early to capture all timing)
+// 3. Performance logging
 app.use(performanceLogger)
 
-// 4. Compression (before routes to compress all responses)
+// 4. Compression
 app.use(compression({
-  level: 6, // Balance between compression and speed (1-9, default: 6)
-  threshold: 1024, // Only compress responses > 1KB
+  level: 6,
+  threshold: 1024,
   filter: (req, res) => {
-    // Don't compress if explicitly disabled
     if (req.headers['x-no-compression']) {
       return false
     }
-    // Use default compression filter
     return compression.filter(req, res)
   },
 }))
@@ -69,10 +78,10 @@ app.use(securityHeaders)
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 
-// 7. Caching middleware (after parsing, before routes)
+// 7. Caching middleware
 app.use(cacheMiddleware)
 
-// Root endpoint must be first to avoid blocking
+// Routes
 app.use('/', healthRoutes)
 app.use('/', swaggerRoutes)
 app.use('/api/auth', authLimiter)

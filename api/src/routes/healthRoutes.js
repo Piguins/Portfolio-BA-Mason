@@ -76,7 +76,8 @@ router.get('/health', healthController.check)
  *                   type: string
  *                   example: /api-docs
  */
-router.get('/', healthController.root)
+// Root endpoint is handled directly in index.js for better performance
+// router.get('/', healthController.root)
 
 export default router
 
