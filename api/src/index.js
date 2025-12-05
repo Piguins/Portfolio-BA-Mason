@@ -72,6 +72,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 // 7. Caching middleware (after parsing, before routes)
 app.use(cacheMiddleware)
 
+// Root endpoint must be first to avoid blocking
 app.use('/', healthRoutes)
 app.use('/', swaggerRoutes)
 app.use('/api/auth', authLimiter)

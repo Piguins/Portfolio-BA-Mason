@@ -3,6 +3,11 @@
 
 export const requestTimeout = (timeoutMs = 30000) => {
   return (req, res, next) => {
+    // Skip timeout for health check endpoints (fast responses)
+    if (req.path === '/' || req.path === '/health') {
+      return next()
+    }
+
     // Set timeout for request
     const timeout = setTimeout(() => {
       if (!res.headersSent) {
