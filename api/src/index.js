@@ -10,6 +10,13 @@ import { corsMiddleware } from './middleware/cors.js'
 import { hppMiddleware } from './middleware/hpp.js'
 import { apiLimiter, authLimiter } from './middleware/rateLimiter.js'
 
+// Performance middleware
+import { performanceLogger } from './middleware/performanceLogger.js'
+import { cacheMiddleware } from './middleware/cacheMiddleware.js'
+
+// Initialize database connection pool on startup (singleton)
+import './db.js'
+
 const config = getConfig()
 
 // Routes
@@ -24,24 +31,42 @@ import swaggerRoutes from './routes/swaggerRoutes.js'
 
 const app = express()
 
+// ============================================
+// MIDDLEWARE STACK (Order matters for performance!)
+// ============================================
+
+// 1. Security middleware (must be first)
 app.use(helmetMiddleware)
 app.use(corsMiddleware)
 app.use(hppMiddleware)
 app.use(apiLimiter)
 
-app.use((req, res, next) => {
-  const startTime = Date.now()
-  res.on('finish', () => {
-    const duration = Date.now() - startTime
-    res.setHeader('X-Response-Time', `${duration}ms`)
-  })
-  next()
-})
+// 2. Performance logging (early to capture all timing)
+app.use(performanceLogger)
 
-app.use(compression())
+// 3. Compression (before routes to compress all responses)
+app.use(compression({
+  level: 6, // Balance between compression and speed (1-9, default: 6)
+  threshold: 1024, // Only compress responses > 1KB
+  filter: (req, res) => {
+    // Don't compress if explicitly disabled
+    if (req.headers['x-no-compression']) {
+      return false
+    }
+    // Use default compression filter
+    return compression.filter(req, res)
+  },
+}))
+
+// 4. Security headers
 app.use(securityHeaders)
+
+// 5. Body parsing
 app.use(express.json({ limit: '10mb' }))
 app.use(express.urlencoded({ extended: true, limit: '10mb' }))
+
+// 6. Caching middleware (after parsing, before routes)
+app.use(cacheMiddleware)
 
 app.use('/', healthRoutes)
 app.use('/', swaggerRoutes)
