@@ -111,7 +111,7 @@ export default function NewExperiencePage() {
       <div className="page-container">
         <div className="page-header">
           <div className="header-content">
-            <BackButton href="/dashboard/experience">Quay lại Experience</BackButton>
+            <BackButton href="/dashboard/experience" />
             <div className="header-text">
               <h1>Thêm Experience mới</h1>
               <p>Điền thông tin để tạo experience mới</p>

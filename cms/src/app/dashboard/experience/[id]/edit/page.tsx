@@ -211,7 +211,7 @@ export default function EditExperiencePage() {
       <div className="page-container">
         <div className="page-header">
           <div className="header-content">
-            <BackButton href="/dashboard/experience">Quay lại Experience</BackButton>
+            <BackButton href="/dashboard/experience" />
             <div className="header-text">
               <h1>Sửa Experience</h1>
               <p>Cập nhật thông tin experience</p>

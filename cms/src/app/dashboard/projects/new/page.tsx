@@ -126,7 +126,7 @@ export default function NewProjectPage() {
       <div className="page-container">
         <div className="page-header">
           <div className="header-content">
-            <BackButton href="/dashboard/projects">← Quay lại Projects</BackButton>
+            <BackButton href="/dashboard/projects" />
             <div className="header-text">
               <h1>Thêm Project mới</h1>
               <p>Điền thông tin để tạo project mới</p>

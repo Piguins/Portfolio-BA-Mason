@@ -76,7 +76,7 @@ export default function ProjectsListClient({
       <div className="page-container">
         <div className="page-header">
           <div className="header-content">
-            <BackButton href="/dashboard">Quay lại Dashboard</BackButton>
+            <BackButton href="/dashboard" />
             <div className="header-text">
               <h1>Quản lý Projects</h1>
               <p>Quản lý portfolio projects và case studies</p>

@@ -83,7 +83,7 @@ export default function NewSkillPage() {
       <div className="page-container">
         <div className="page-header">
           <div className="header-content">
-            <BackButton href="/dashboard/skills">← Quay lại Skills</BackButton>
+            <BackButton href="/dashboard/skills" />
             <div className="header-text">
               <h1>Thêm Skill mới</h1>
               <p>Điền thông tin để tạo skill mới</p>

@@ -181,7 +181,7 @@ export default function EditProjectPage() {
       <div className="page-container">
         <div className="page-header">
           <div className="header-content">
-            <BackButton href="/dashboard/projects">← Quay lại Projects</BackButton>
+            <BackButton href="/dashboard/projects" />
             <div className="header-text">
               <h1>Sửa Project</h1>
               <p>Cập nhật thông tin project</p>

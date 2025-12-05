@@ -125,7 +125,7 @@ export default function EditSpecializationPage() {
       <div className="page-container">
         <div className="page-header">
           <div className="header-content">
-            <BackButton href="/dashboard/specializations">← Quay lại Specializations</BackButton>
+            <BackButton href="/dashboard/specializations" />
             <div className="header-text">
               <h1>Sửa Specialization</h1>
               <p>Cập nhật thông tin specialization</p>

@@ -69,7 +69,7 @@ export default function NewSpecializationPage() {
       <div className="page-container">
         <div className="page-header">
           <div className="header-content">
-            <BackButton href="/dashboard/specializations">← Quay lại Specializations</BackButton>
+            <BackButton href="/dashboard/specializations" />
             <div className="header-text">
               <h1>Thêm Specialization mới</h1>
               <p>Điền thông tin để tạo specialization mới</p>

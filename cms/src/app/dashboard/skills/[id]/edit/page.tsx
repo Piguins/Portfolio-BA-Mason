@@ -135,7 +135,7 @@ export default function EditSkillPage() {
       <div className="page-container">
         <div className="page-header">
           <div className="header-content">
-            <BackButton href="/dashboard/skills">← Quay lại Skills</BackButton>
+            <BackButton href="/dashboard/skills" />
             <div className="header-text">
               <h1>Sửa Skill</h1>
               <p>Cập nhật thông tin skill</p>

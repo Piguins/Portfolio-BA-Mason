@@ -86,7 +86,7 @@ export default function ExperienceListClient({
       <div className="page-container">
         <div className="page-header">
           <div className="header-content">
-            <BackButton href="/dashboard">Quay lại Dashboard</BackButton>
+            <BackButton href="/dashboard" />
             <div className="header-text">
               <h1>Quản lý Experience</h1>
               <p>Quản lý kinh nghiệm làm việc và timeline</p>
