@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import BackButton from '@/components/BackButton'
@@ -114,7 +114,7 @@ export default function NewProjectPage() {
   // Auto-generate slug from title
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const title = e.target.value
-    setFormData(prev => ({
+    setFormData((prev: typeof formData) => ({
       ...prev,
       title,
       slug: prev.slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
@@ -171,7 +171,7 @@ export default function NewProjectPage() {
                 type="text"
                 required
                 value={formData.slug}
-                onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, slug: e.target.value })}
                 placeholder="project-slug"
               />
             </div>
@@ -182,7 +182,7 @@ export default function NewProjectPage() {
                 id="order_index"
                 type="number"
                 value={formData.order_index}
-                onChange={(e) => setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })}
               />
             </div>
           </div>
@@ -195,7 +195,7 @@ export default function NewProjectPage() {
                 id="description"
                 rows={3}
                 value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, description: e.target.value })}
                 placeholder="Mô tả ngắn về project..."
               />
             </div>
@@ -206,7 +206,7 @@ export default function NewProjectPage() {
                 id="content"
                 rows={8}
                 value={formData.content}
-                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, content: e.target.value })}
                 placeholder="Nội dung chi tiết về project (Markdown supported)..."
               />
             </div>
@@ -220,7 +220,7 @@ export default function NewProjectPage() {
                 id="thumbnail_url"
                 type="url"
                 value={formData.thumbnail_url}
-                onChange={(e) => setFormData({ ...formData, thumbnail_url: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, thumbnail_url: e.target.value })}
                 placeholder="https://example.com/thumbnail.jpg"
               />
             </div>
@@ -231,7 +231,7 @@ export default function NewProjectPage() {
                 id="demo_url"
                 type="url"
                 value={formData.demo_url}
-                onChange={(e) => setFormData({ ...formData, demo_url: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, demo_url: e.target.value })}
                 placeholder="https://example.com/demo"
               />
             </div>
@@ -242,7 +242,7 @@ export default function NewProjectPage() {
                 id="github_url"
                 type="url"
                 value={formData.github_url}
-                onChange={(e) => setFormData({ ...formData, github_url: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, github_url: e.target.value })}
                 placeholder="https://github.com/username/repo"
               />
             </div>
@@ -264,7 +264,7 @@ export default function NewProjectPage() {
                         <input
                           type="checkbox"
                           checked={formData.tag_ids.includes(tag.id)}
-                          onChange={(e) => {
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                             if (e.target.checked) {
                               setFormData({
                                 ...formData,
@@ -273,7 +273,7 @@ export default function NewProjectPage() {
                             } else {
                               setFormData({
                                 ...formData,
-                                tag_ids: formData.tag_ids.filter(id => id !== tag.id),
+                                tag_ids: formData.tag_ids.filter((id: number) => id !== tag.id),
                               })
                             }
                           }}
@@ -287,8 +287,8 @@ export default function NewProjectPage() {
                     <div className="selected-tags-preview">
                       <p className="selected-tags-label">Đã chọn ({formData.tag_ids.length}):</p>
                       <div className="selected-tags-tags">
-                        {formData.tag_ids.map(tagId => {
-                          const tag = tags.find(t => t.id === tagId)
+                        {formData.tag_ids.map((tagId: number) => {
+                          const tag = tags.find((t: ProjectTag) => t.id === tagId)
                           return tag ? (
                             <span key={tagId} className="selected-tag-tag" style={{ backgroundColor: tag.color || '#6366f1' }}>
                               {tag.name}
@@ -311,7 +311,7 @@ export default function NewProjectPage() {
                   id="is_published"
                   type="checkbox"
                   checked={formData.is_published}
-                  onChange={(e) => setFormData({ ...formData, is_published: e.target.checked })}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, is_published: e.target.checked })}
                 />
                 Publish project (hiển thị trên portfolio)
               </label>

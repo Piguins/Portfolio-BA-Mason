@@ -5,6 +5,15 @@ import './experience.css'
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
+// Type-safe environment variable access
+declare const process: {
+  env: {
+    [key: string]: string | undefined
+  }
+}
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+
 interface Experience {
   id: string
   company: string
@@ -25,7 +34,6 @@ interface Experience {
 // PERFORMANCE: Server Component - fetch data before render
 // Middleware already handles auth - no need to check here
 export default async function ExperiencePage() {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
   
   let experiences: Experience[] = []
   let error: string | null = null

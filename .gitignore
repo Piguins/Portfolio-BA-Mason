@@ -34,3 +34,12 @@ dist-ssr
 *.sw?
 
 .vercel
+
+# Root level package files (monorepo - no package.json at root)
+package-lock.json
+
+# Scripts (optional - uncomment if you don't want to commit)
+# install-node.sh
+
+# Husky setup files (should be committed)
+# .husky/ should be committed to share hooks with team
