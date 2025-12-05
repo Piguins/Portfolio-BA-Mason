@@ -119,7 +119,8 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 app.use(cacheMiddleware)
 
 // Routes
-app.use('/', healthRoutes)
+// Note: /health route is handled above (before middleware) for faster response
+// app.use('/', healthRoutes) // Commented out - /health is handled directly above
 // Swagger routes are handled above (before middleware) for better performance
 app.use('/api/auth', authLimiter)
 app.use('/', authRoutes)
