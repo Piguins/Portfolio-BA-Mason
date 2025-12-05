@@ -172,7 +172,6 @@ export default function NewExperiencePage() {
                   placeholder="Địa điểm"
                 />
               </div>
-
             </div>
           </div>
 

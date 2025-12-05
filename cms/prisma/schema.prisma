@@ -1,0 +1,74 @@
+// Prisma Schema for Portfolio CMS
+// All models are independent - no relationships
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Hero Section - Stores header info
+// Maps to existing hero_content table but uses new schema structure
+model HeroSection {
+  id           String   @id @default(cuid())
+  title        String
+  introduction String   @db.Text
+  linkedinUrl  String?  @map("linkedin_url")
+  email        String?
+  githubUrl    String?  @map("github_url")
+  bannerUrl    String?  @map("banner_url")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("hero_section")
+}
+
+// Specialization - Cards for "I specialize in"
+// Maps to existing specializations table
+model Specialization {
+  id          Int      @id @default(autoincrement())
+  iconUrl     String?  @map("icon_url")
+  title       String
+  description String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("specializations")
+}
+
+// Experience - Timeline items
+// Maps to existing experience table
+model Experience {
+  id          String   @id @default(uuid())
+  company     String
+  role        String
+  location    String?
+  startDate   DateTime @map("start_date") @db.Date
+  endDate     DateTime? @map("end_date") @db.Date
+  description String?  @db.Text
+  bullets     String[] @map("bullets_text") // Array of strings for bullet points
+  skills      String[] @map("skills_text") // Array of strings for tags
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("experience")
+}
+
+// Portfolio - Project showcase
+// Maps to existing projects table but with new fields
+model Portfolio {
+  id          String   @id @default(uuid())
+  title       String
+  tagRole     String   @map("tag_role")
+  description String?  @db.Text
+  imageUrl    String?  @map("image_url")
+  projectUrl  String?  @map("project_url")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("portfolio")
+}
+

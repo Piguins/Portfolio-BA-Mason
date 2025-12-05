@@ -137,8 +137,7 @@ export default function NewSpecializationPage() {
               />
             </div>
 
-            <div className="form-group">
-            </div>
+            <div className="form-group"></div>
           </div>
 
           <div className="form-actions">

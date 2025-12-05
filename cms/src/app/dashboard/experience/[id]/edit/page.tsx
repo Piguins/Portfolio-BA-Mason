@@ -166,8 +166,7 @@ export default function EditExperiencePage() {
   const removeBullet = (index: number) => {
     setFormData({
       ...formData,
-      bullets: formData.bullets
-        .filter((_, i) => i !== index)
+      bullets: formData.bullets.filter((_, i) => i !== index),
     })
   }
 
@@ -278,7 +277,6 @@ export default function EditExperiencePage() {
                   placeholder="Địa điểm"
                 />
               </div>
-
             </div>
           </div>
 

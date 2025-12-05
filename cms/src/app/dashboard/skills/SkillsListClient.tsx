@@ -35,10 +35,10 @@ export default function SkillsListClient({ initialSkills, initialError }: Skills
     try {
       setLoading(true)
       setError(null)
-      
+
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s timeout
-      
+
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
       const response = await fetch(`${API_URL}/api/skills`, {
         cache: 'no-store',
@@ -149,65 +149,70 @@ export default function SkillsListClient({ initialSkills, initialError }: Skills
             )}
 
             {filteredSkills.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-icon">🛠️</div>
-            <h3>
-              Chưa có skill nào
-              {filterCategory !== 'all' ? ` trong category "${filterCategory}"` : ''}
-            </h3>
-            <p>Hãy thêm skill đầu tiên để bắt đầu quản lý!</p>
-            <LoadingButton onClick={() => router.push('/dashboard/skills/new')} variant="primary">
-              + Thêm Skill đầu tiên
-            </LoadingButton>
-          </div>
-        ) : (
-          <div className="skills-list">
-            {filteredSkills.map((skill, index) => (
-              <motion.div
-                key={skill.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-                className="skill-card"
-              >
-                <div className="card-header">
-                  <div className="card-title-section">
-                    <div className="skill-header-row">
-                      <h3>{skill.name}</h3>
-                      {skill.is_highlight && <span className="highlight-badge">⭐ Highlight</span>}
-                    </div>
-                    <p className="slug">{skill.slug}</p>
-                    <div className="card-meta">
-                      <span className="category-badge">{skill.category}</span>
-                      <span className="level-badge">Level: {skill.level}/5</span>
-                      <span className="meta-item">Order: {skill.order_index}</span>
-                    </div>
-                    {skill.icon_url && (
-                      <div className="icon-preview">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={skill.icon_url} alt={skill.name} />
+              <div className="empty-state">
+                <div className="empty-icon">🛠️</div>
+                <h3>
+                  Chưa có skill nào
+                  {filterCategory !== 'all' ? ` trong category "${filterCategory}"` : ''}
+                </h3>
+                <p>Hãy thêm skill đầu tiên để bắt đầu quản lý!</p>
+                <LoadingButton
+                  onClick={() => router.push('/dashboard/skills/new')}
+                  variant="primary"
+                >
+                  + Thêm Skill đầu tiên
+                </LoadingButton>
+              </div>
+            ) : (
+              <div className="skills-list">
+                {filteredSkills.map((skill, index) => (
+                  <motion.div
+                    key={skill.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="skill-card"
+                  >
+                    <div className="card-header">
+                      <div className="card-title-section">
+                        <div className="skill-header-row">
+                          <h3>{skill.name}</h3>
+                          {skill.is_highlight && (
+                            <span className="highlight-badge">⭐ Highlight</span>
+                          )}
+                        </div>
+                        <p className="slug">{skill.slug}</p>
+                        <div className="card-meta">
+                          <span className="category-badge">{skill.category}</span>
+                          <span className="level-badge">Level: {skill.level}/5</span>
+                          <span className="meta-item">Order: {skill.order_index}</span>
+                        </div>
+                        {skill.icon_url && (
+                          <div className="icon-preview">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={skill.icon_url} alt={skill.name} />
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
-                  <div className="card-actions">
-                    <LoadingButton
-                      onClick={() => router.push(`/dashboard/skills/${skill.id}/edit`)}
-                      variant="primary"
-                    >
-                      Sửa
-                    </LoadingButton>
-                    <LoadingButton
-                      onClick={() => handleDelete(skill.id)}
-                      variant="danger"
-                      loading={deletingId === skill.id}
-                    >
-                      Xóa
-                    </LoadingButton>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                      <div className="card-actions">
+                        <LoadingButton
+                          onClick={() => router.push(`/dashboard/skills/${skill.id}/edit`)}
+                          variant="primary"
+                        >
+                          Sửa
+                        </LoadingButton>
+                        <LoadingButton
+                          onClick={() => handleDelete(skill.id)}
+                          variant="danger"
+                          loading={deletingId === skill.id}
+                        >
+                          Xóa
+                        </LoadingButton>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
             )}
           </>
         )}

@@ -49,11 +49,11 @@ export default function EditSpecializationPage() {
         title: data.title,
         description: data.description || '',
       })
-      } catch (err: any) {
-        const errorMsg = err.message || 'Failed to load specialization'
-        setError(errorMsg)
-        toast.error(errorMsg)
-      } finally {
+    } catch (err: any) {
+      const errorMsg = err.message || 'Failed to load specialization'
+      setError(errorMsg)
+      toast.error(errorMsg)
+    } finally {
       setLoading(false)
     }
   }, [id])
@@ -193,8 +193,7 @@ export default function EditSpecializationPage() {
               />
             </div>
 
-            <div className="form-group">
-            </div>
+            <div className="form-group"></div>
           </div>
 
           <div className="form-actions">

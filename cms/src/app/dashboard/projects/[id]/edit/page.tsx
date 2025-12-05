@@ -223,11 +223,7 @@ export default function EditProjectPage() {
                   {formData.tags_text.map((tag, index) => (
                     <span key={index} className="selected-skill-tag">
                       {tag}
-                      <button
-                        type="button"
-                        className="btn-remove"
-                        onClick={() => removeTag(index)}
-                      >
+                      <button type="button" className="btn-remove" onClick={() => removeTag(index)}>
                         ×
                       </button>
                     </span>
