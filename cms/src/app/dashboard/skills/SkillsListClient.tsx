@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import BackButton from '@/components/BackButton'
@@ -27,16 +27,25 @@ export default function SkillsListClient({ initialSkills, initialError }: Skills
   const router = useRouter()
   const [skills, setSkills] = useState<Skill[]>(initialSkills)
   const [error, setError] = useState<string | null>(initialError)
+  const [loading, setLoading] = useState(initialSkills.length === 0)
   const [deletingId, setDeletingId] = useState<number | null>(null)
   const [filterCategory, setFilterCategory] = useState<string>('all')
 
   const fetchSkills = useCallback(async () => {
     try {
+      setLoading(true)
       setError(null)
+      
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s timeout
+      
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
       const response = await fetch(`${API_URL}/api/skills`, {
         cache: 'no-store',
+        signal: controller.signal,
       })
+
+      clearTimeout(timeoutId)
 
       if (!response.ok) throw new Error('Failed to fetch skills')
       const responseData = await response.json()
@@ -44,9 +53,22 @@ export default function SkillsListClient({ initialSkills, initialError }: Skills
       const data = Array.isArray(responseData) ? responseData : responseData.data || []
       setSkills(data)
     } catch (err: any) {
-      setError(err.message || 'Failed to load skills')
+      if (err.name === 'AbortError') {
+        setError('Request timeout. Vui lòng thử lại.')
+      } else {
+        setError(err.message || 'Failed to load skills')
+      }
+    } finally {
+      setLoading(false)
     }
   }, [])
+
+  useEffect(() => {
+    // Fetch on mount if no initial data
+    if (initialSkills.length === 0) {
+      fetchSkills()
+    }
+  }, [initialSkills.length, fetchSkills])
 
   const handleDelete = async (id: number) => {
     if (!confirm('Bạn có chắc chắn muốn xóa skill này?')) return
@@ -100,26 +122,33 @@ export default function SkillsListClient({ initialSkills, initialError }: Skills
           </motion.div>
         )}
 
-        {skills.length > 0 && (
-          <div className="filter-section">
-            <label htmlFor="category-filter">Lọc theo category:</label>
-            <select
-              id="category-filter"
-              value={filterCategory}
-              onChange={(e) => setFilterCategory(e.target.value)}
-              className="filter-select"
-            >
-              <option value="all">Tất cả</option>
-              {categories.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
+        {loading ? (
+          <div className="loading-state">
+            <div className="spinner"></div>
+            <p>Đang tải dữ liệu Skills...</p>
           </div>
-        )}
+        ) : (
+          <>
+            {skills.length > 0 && (
+              <div className="filter-section">
+                <label htmlFor="category-filter">Lọc theo category:</label>
+                <select
+                  id="category-filter"
+                  value={filterCategory}
+                  onChange={(e) => setFilterCategory(e.target.value)}
+                  className="filter-select"
+                >
+                  <option value="all">Tất cả</option>
+                  {categories.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
-        {filteredSkills.length === 0 ? (
+            {filteredSkills.length === 0 ? (
           <div className="empty-state">
             <div className="empty-icon">🛠️</div>
             <h3>
@@ -179,6 +208,8 @@ export default function SkillsListClient({ initialSkills, initialError }: Skills
               </motion.div>
             ))}
           </div>
+            )}
+          </>
         )}
       </div>
     </div>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import BackButton from '@/components/BackButton'
@@ -33,15 +33,24 @@ export default function ProjectsListClient({
   const router = useRouter()
   const [projects, setProjects] = useState<Project[]>(initialProjects)
   const [error, setError] = useState<string | null>(initialError)
+  const [loading, setLoading] = useState(initialProjects.length === 0)
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
   const fetchProjects = useCallback(async () => {
     try {
+      setLoading(true)
       setError(null)
+      
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s timeout
+      
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
       const response = await fetch(`${API_URL}/api/projects?published=`, {
         cache: 'no-store',
+        signal: controller.signal,
       })
+
+      clearTimeout(timeoutId)
 
       if (!response.ok) throw new Error('Failed to fetch projects')
       const responseData = await response.json()
@@ -49,9 +58,22 @@ export default function ProjectsListClient({
       const data = Array.isArray(responseData) ? responseData : responseData.data || []
       setProjects(data)
     } catch (err: any) {
-      setError(err.message || 'Failed to load projects')
+      if (err.name === 'AbortError') {
+        setError('Request timeout. Vui lòng thử lại.')
+      } else {
+        setError(err.message || 'Failed to load projects')
+      }
+    } finally {
+      setLoading(false)
     }
   }, [])
+
+  useEffect(() => {
+    // Fetch on mount if no initial data
+    if (initialProjects.length === 0) {
+      fetchProjects()
+    }
+  }, [initialProjects.length, fetchProjects])
 
   const handleDelete = async (id: string) => {
     if (!confirm('Bạn có chắc chắn muốn xóa project này?')) return
@@ -97,7 +119,12 @@ export default function ProjectsListClient({
           </motion.div>
         )}
 
-        {projects.length === 0 ? (
+        {loading ? (
+          <div className="loading-state">
+            <div className="spinner"></div>
+            <p>Đang tải dữ liệu Projects...</p>
+          </div>
+        ) : projects.length === 0 ? (
           <div className="empty-state">
             <div className="empty-icon">📁</div>
             <h3>Chưa có project nào</h3>

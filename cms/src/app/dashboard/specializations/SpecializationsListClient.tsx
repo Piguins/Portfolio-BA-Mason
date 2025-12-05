@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import LoadingButton from '@/components/LoadingButton'
@@ -23,7 +23,47 @@ export default function SpecializationsListClient({ initialSpecializations, init
   const router = useRouter()
   const [specializations, setSpecializations] = useState<Specialization[]>(initialSpecializations)
   const [error, setError] = useState<string | null>(initialError)
+  const [loading, setLoading] = useState(initialSpecializations.length === 0)
   const [deletingId, setDeletingId] = useState<number | null>(null)
+
+  const fetchSpecializations = useCallback(async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s timeout
+      
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+      const response = await fetch(`${API_URL}/api/specializations`, {
+        cache: 'no-store',
+        signal: controller.signal,
+      })
+
+      clearTimeout(timeoutId)
+
+      if (!response.ok) throw new Error('Failed to fetch specializations')
+      const data = await response.json()
+      // Handle both array and object with data property
+      const specializationsData = Array.isArray(data) ? data : data.data || []
+      setSpecializations(specializationsData)
+    } catch (err: any) {
+      if (err.name === 'AbortError') {
+        setError('Request timeout. Vui lòng thử lại.')
+      } else {
+        setError(err.message || 'Failed to load specializations')
+      }
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    // Fetch on mount if no initial data
+    if (initialSpecializations.length === 0) {
+      fetchSpecializations()
+    }
+  }, [initialSpecializations.length, fetchSpecializations])
 
   const handleDelete = async (id: number) => {
     if (!confirm('Bạn có chắc chắn muốn xóa specialization này?')) {
@@ -42,8 +82,8 @@ export default function SpecializationsListClient({ initialSpecializations, init
         throw new Error(errorData.error || 'Failed to delete specialization')
       }
 
-      // Remove from local state
-      setSpecializations(specializations.filter((s) => s.id !== id))
+      // Refetch to ensure data is in sync
+      await fetchSpecializations()
     } catch (err: any) {
       setError(err.message || 'Failed to delete specialization')
     } finally {
@@ -83,7 +123,12 @@ export default function SpecializationsListClient({ initialSpecializations, init
           </motion.div>
         )}
 
-        {specializations.length === 0 ? (
+        {loading ? (
+          <div className="loading-state">
+            <div className="spinner"></div>
+            <p>Đang tải dữ liệu Specializations...</p>
+          </div>
+        ) : specializations.length === 0 ? (
           <div className="empty-state">
             <p>Chưa có specialization nào. Hãy tạo specialization đầu tiên!</p>
             <LoadingButton
