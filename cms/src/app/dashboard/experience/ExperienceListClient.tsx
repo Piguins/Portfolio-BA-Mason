@@ -36,15 +36,24 @@ export default function ExperienceListClient({
   const router = useRouter()
   const [experiences, setExperiences] = useState<Experience[]>(initialExperiences)
   const [error, setError] = useState<string | null>(initialError)
+  const [loading, setLoading] = useState(initialExperiences.length === 0)
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
   const fetchExperiences = useCallback(async () => {
     try {
+      setLoading(true)
       setError(null)
+      
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s timeout
+      
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
       const response = await fetch(`${API_URL}/api/experience`, {
         cache: 'no-store',
+        signal: controller.signal,
       })
+
+      clearTimeout(timeoutId)
 
       if (!response.ok) throw new Error('Failed to fetch experiences')
       const responseData = await response.json()
@@ -52,9 +61,22 @@ export default function ExperienceListClient({
       const data = Array.isArray(responseData) ? responseData : responseData.data || []
       setExperiences(data)
     } catch (err: any) {
-      setError(err.message || 'Failed to load experiences')
+      if (err.name === 'AbortError') {
+        setError('Request timeout. Vui lòng thử lại.')
+      } else {
+        setError(err.message || 'Failed to load experiences')
+      }
+    } finally {
+      setLoading(false)
     }
   }, [])
+
+  useEffect(() => {
+    // Fetch on mount if no initial data
+    if (initialExperiences.length === 0) {
+      fetchExperiences()
+    }
+  }, [initialExperiences.length, fetchExperiences])
 
   const handleDelete = async (id: string) => {
     if (!confirm('Bạn có chắc chắn muốn xóa experience này?')) return
@@ -107,7 +129,12 @@ export default function ExperienceListClient({
           </motion.div>
         )}
 
-        {experiences.length === 0 ? (
+        {loading ? (
+          <div className="loading-state">
+            <div className="loading-spinner"></div>
+            <p>Đang tải dữ liệu Experience...</p>
+          </div>
+        ) : experiences.length === 0 ? (
           <div className="empty-state">
             <div className="empty-icon">📋</div>
             <h3>Chưa có experience nào</h3>
