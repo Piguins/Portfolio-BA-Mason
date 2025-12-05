@@ -38,14 +38,6 @@ export default function ExperienceListClient({
   const [error, setError] = useState<string | null>(initialError)
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
-  // Debug: Log when component receives props
-  useEffect(() => {
-    console.log('[ExperienceListClient] Received props:', {
-      experiencesCount: initialExperiences?.length || 0,
-      error: initialError,
-    })
-  }, [initialExperiences, initialError])
-
   const fetchExperiences = useCallback(async () => {
     try {
       setError(null)

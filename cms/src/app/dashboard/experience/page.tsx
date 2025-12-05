@@ -1,5 +1,3 @@
-import { redirect } from 'next/navigation'
-import { getCurrentUser } from '@/lib/auth'
 import ExperienceListClient from './ExperienceListClient'
 import './experience.css'
 
@@ -25,42 +23,26 @@ interface Experience {
 }
 
 // PERFORMANCE: Server Component - fetch data before render
-// OPTIMIZED: Parallelize auth check and data fetching
+// Middleware already handles auth - no need to check here
 export default async function ExperiencePage() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
   
-  // OPTIMIZED: Start auth check and data fetch in parallel
-  const [user, dataResponse] = await Promise.allSettled([
-    getCurrentUser(),
-    fetch(`${API_URL}/api/experience`, {
-      cache: 'no-store', // Always fetch fresh data for dashboard
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }),
-  ])
-
-  // Check auth first
-  if (user.status === 'rejected' || !user.value) {
-    redirect('/login')
-  }
-
   let experiences: Experience[] = []
   let error: string | null = null
 
   try {
-    if (dataResponse.status === 'rejected') {
-      throw new Error('Failed to fetch experiences')
-    }
-
-    const response = dataResponse.value
+    const response = await fetch(`${API_URL}/api/experience`, {
+      cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
 
     if (!response.ok) {
       throw new Error('Failed to fetch experiences')
     }
 
     const responseData = await response.json()
-    // Handle both old format (array) and new format ({ data, pagination })
     experiences = Array.isArray(responseData) ? responseData : (responseData.data || [])
   } catch (err: any) {
     console.error('Failed to fetch experiences:', err)

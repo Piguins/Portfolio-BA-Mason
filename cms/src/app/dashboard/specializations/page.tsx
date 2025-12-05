@@ -1,5 +1,3 @@
-import { redirect } from 'next/navigation'
-import { getCurrentUser } from '@/lib/auth'
 import SpecializationsListClient from './SpecializationsListClient'
 import './specializations.css'
 
@@ -16,21 +14,15 @@ interface Specialization {
 }
 
 // PERFORMANCE: Server Component - fetch data before render
+// Middleware already handles auth - no need to check here
 export default async function SpecializationsPage() {
-  // Check auth
-  const user = await getCurrentUser()
-  if (!user) {
-    redirect('/login')
-  }
-
-  // PERFORMANCE: Fetch data on server-side (before render)
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
   let specializations: Specialization[] = []
   let error: string | null = null
 
   try {
     const response = await fetch(`${API_URL}/api/specializations`, {
-      cache: 'no-store', // Always fetch fresh data for dashboard
+      cache: 'no-store',
       headers: {
         'Content-Type': 'application/json',
       },

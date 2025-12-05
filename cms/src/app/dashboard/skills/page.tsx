@@ -1,5 +1,3 @@
-import { redirect } from 'next/navigation'
-import { getCurrentUser } from '@/lib/auth'
 import SkillsListClient from './SkillsListClient'
 import './skills.css'
 
@@ -23,38 +21,23 @@ interface Skill {
 export default async function SkillsPage() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
   
-  // OPTIMIZED: Start auth check and data fetch in parallel
-  const [user, dataResponse] = await Promise.allSettled([
-    getCurrentUser(),
-    fetch(`${API_URL}/api/skills`, {
-      cache: 'no-store', // Always fetch fresh data for dashboard
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }),
-  ])
-
-  // Check auth first
-  if (user.status === 'rejected' || !user.value) {
-    redirect('/login')
-  }
-
+  // Middleware already handles auth - no need to redirect here
   let skills: Skill[] = []
   let error: string | null = null
 
   try {
-    if (dataResponse.status === 'rejected') {
-      throw new Error('Failed to fetch skills')
-    }
-
-    const response = dataResponse.value
+    const response = await fetch(`${API_URL}/api/skills`, {
+      cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
 
     if (!response.ok) {
       throw new Error('Failed to fetch skills')
     }
 
     const responseData = await response.json()
-    // Handle both old format (array) and new format ({ data, pagination })
     skills = Array.isArray(responseData) ? responseData : (responseData.data || [])
   } catch (err: any) {
     console.error('Failed to fetch skills:', err)
