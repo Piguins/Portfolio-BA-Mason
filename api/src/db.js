@@ -22,13 +22,19 @@ function createPool() {
     throw new Error('DATABASE_URL is not configured in environment variables')
   }
 
-  // For serverless (Vercel), use transaction mode pooler (port 6543)
+  // For serverless (Vercel), prefer transaction mode pooler (port 6543)
   // Transaction mode requires pgbouncer=true to disable prepared statements
+  // For local development, session mode (port 5432) may work better
   const isServerless = process.env.VERCEL === '1'
-  const isPooler = connectionString.includes('pooler.supabase.com') || connectionString.includes(':6543')
+  const isTransactionMode = connectionString.includes(':6543')
+  const isSessionMode = connectionString.includes('pooler.supabase.com') && connectionString.includes(':5432')
   
-  if (isServerless || isPooler) {
-    // Ensure we're using port 6543 (transaction mode)
+  // Only auto-convert to transaction mode if:
+  // 1. Running on Vercel (serverless)
+  // 2. AND not already using session mode (port 5432)
+  // 3. AND not already using transaction mode (port 6543)
+  if (isServerless && !isSessionMode && !isTransactionMode) {
+    // Force transaction mode for serverless (Vercel)
     if (connectionString.includes(':5432/')) {
       connectionString = connectionString.replace(':5432/', ':6543/')
     }
@@ -38,7 +44,13 @@ function createPool() {
       const separator = connectionString.includes('?') ? '&' : '?'
       connectionString = `${connectionString}${separator}pgbouncer=true`
     }
+  } else if (isTransactionMode && !connectionString.includes('pgbouncer=true')) {
+    // If using transaction mode, ensure pgbouncer=true is present
+    const separator = connectionString.includes('?') ? '&' : '?'
+    connectionString = `${connectionString}${separator}pgbouncer=true`
   }
+  
+  // Session mode (port 5432) - no pgbouncer=true needed, supports prepared statements
 
   // Optimized pool configuration for serverless (Vercel)
   // max: 1 is correct for serverless - each function instance uses 1 connection to pooler
@@ -55,8 +67,10 @@ function createPool() {
   // Log connection info (without sensitive data)
   const connectionInfo = connectionString.replace(/:[^:@]+@/, ':****@') // Hide password
   console.log(`📊 Database pool created: ${isServerless ? 'Serverless' : 'Standard'} mode`)
-  if (isPooler) {
-    console.log(`   Using Supavisor pooler (transaction mode)`)
+  if (isTransactionMode) {
+    console.log(`   Using Supavisor pooler (transaction mode - port 6543)`)
+  } else if (isSessionMode) {
+    console.log(`   Using Supavisor pooler (session mode - port 5432)`)
   }
 
   // Error handling
