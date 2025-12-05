@@ -62,6 +62,8 @@ router.get('/api/experience/:id', experienceController.getById)
  *   post:
  *     summary: Create new experience
  *     tags: [Experience]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -118,6 +120,8 @@ router.post('/api/experience', authMiddleware, experienceController.create)
  *   put:
  *     summary: Update experience
  *     tags: [Experience]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -167,6 +171,8 @@ router.put('/api/experience/:id', authMiddleware, experienceController.update)
  *   delete:
  *     summary: Delete experience
  *     tags: [Experience]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id

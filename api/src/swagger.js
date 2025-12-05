@@ -141,6 +141,14 @@ const options = {
         description: 'Health check endpoints',
       },
       {
+        name: 'Hero',
+        description: 'Hero section content management (singleton)',
+      },
+      {
+        name: 'Specializations',
+        description: 'Specializations section management (3 cards - "I specialize in")',
+      },
+      {
         name: 'Projects',
         description: 'Portfolio projects endpoints',
       },
