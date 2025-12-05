@@ -29,7 +29,11 @@ import specializationsRoutes from './routes/specializationsRoutes.js'
 import projectsRoutes from './routes/projectsRoutes.js'
 import skillsRoutes from './routes/skillsRoutes.js'
 import experienceRoutes from './routes/experienceRoutes.js'
-import swaggerRoutes from './routes/swaggerRoutes.js'
+
+// Swagger imports for fast endpoints
+import { swaggerSpec } from './swagger.js'
+import { generateSwaggerHtml } from './utils/swaggerHtml.js'
+import { getBaseUrl } from './utils/urlHelper.js'
 
 const app = express()
 
@@ -37,14 +41,43 @@ const app = express()
 // OPTIMIZED MIDDLEWARE STACK
 // ============================================
 
-// CRITICAL: Root endpoint FIRST - before all middleware
+// CRITICAL: Fast endpoints FIRST - before all middleware
 // This ensures instant response without any middleware overhead
+
+// Root endpoint
 app.get('/', (req, res) => {
   res.json({
     message: 'Mason Portfolio API',
     docs: 'Available endpoints: /health, /api/projects, /api/skills, /api/experience',
     swagger: '/api-docs',
   })
+})
+
+// Swagger endpoints - must be fast for documentation
+// Swagger JSON spec
+app.get('/api-docs.json', (req, res) => {
+  try {
+    res.setHeader('Content-Type', 'application/json')
+    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=600') // Cache for 5min
+    res.json(swaggerSpec)
+  } catch (error) {
+    console.error('Error serving Swagger spec:', error)
+    res.status(500).json({ error: 'Failed to generate Swagger spec' })
+  }
+})
+
+// Swagger UI
+app.get('/api-docs', (req, res) => {
+  try {
+    const baseUrl = getBaseUrl(req)
+    const html = generateSwaggerHtml(baseUrl)
+    res.setHeader('Content-Type', 'text/html')
+    res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=600') // Cache for 5min
+    res.send(html)
+  } catch (error) {
+    console.error('Error serving Swagger UI:', error)
+    res.status(500).send('<h1>Error loading Swagger UI</h1><p>' + error.message + '</p>')
+  }
 })
 
 // 1. Security middleware (after root endpoint)
@@ -83,7 +116,7 @@ app.use(cacheMiddleware)
 
 // Routes
 app.use('/', healthRoutes)
-app.use('/', swaggerRoutes)
+// Swagger routes are handled above (before middleware) for better performance
 app.use('/api/auth', authLimiter)
 app.use('/', authRoutes)
 app.use('/', heroRoutes)
