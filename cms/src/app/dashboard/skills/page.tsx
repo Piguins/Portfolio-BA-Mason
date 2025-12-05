@@ -3,6 +3,10 @@ import { getCurrentUser } from '@/lib/auth'
 import SkillsListClient from './SkillsListClient'
 import './skills.css'
 
+// Force dynamic rendering - dashboard pages should not be statically generated
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 interface Skill {
   id: number
   name: string
@@ -23,10 +27,9 @@ export default async function SkillsPage() {
   const [user, dataResponse] = await Promise.allSettled([
     getCurrentUser(),
     fetch(`${API_URL}/api/skills`, {
-      next: { revalidate: 300 }, // Cache 5 minutes
+      cache: 'no-store', // Always fetch fresh data for dashboard
       headers: {
         'Content-Type': 'application/json',
-        ...(process.env.NEXT_PUBLIC_API_KEY ? { 'X-API-Key': process.env.NEXT_PUBLIC_API_KEY } : {}),
       },
     }),
   ])

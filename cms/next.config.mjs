@@ -2,6 +2,11 @@
 const nextConfig = {
   reactStrictMode: true,
   
+  // Disable static optimization for dashboard and auth pages
+  experimental: {
+    isrMemoryCacheSize: 0, // Disable ISR cache
+  },
+  
   // Security headers
   async headers() {
     return [

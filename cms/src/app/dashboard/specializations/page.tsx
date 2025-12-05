@@ -3,6 +3,10 @@ import { getCurrentUser } from '@/lib/auth'
 import SpecializationsListClient from './SpecializationsListClient'
 import './specializations.css'
 
+// Force dynamic rendering - dashboard pages should not be statically generated
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 interface Specialization {
   id: number
   number: string
@@ -26,7 +30,7 @@ export default async function SpecializationsPage() {
 
   try {
     const response = await fetch(`${API_URL}/api/specializations`, {
-      next: { revalidate: 60 }, // Cache 60 seconds
+      cache: 'no-store', // Always fetch fresh data for dashboard
       headers: {
         'Content-Type': 'application/json',
       },

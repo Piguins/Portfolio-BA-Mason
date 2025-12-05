@@ -4,6 +4,10 @@ import LogoutButton from '@/components/LogoutButton'
 import DashboardCard from '@/components/DashboardCard'
 import './dashboard.css'
 
+// Force dynamic rendering - dashboard pages should not be statically generated
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 export default async function DashboardPage() {
   const user = await getCurrentUser()
 
