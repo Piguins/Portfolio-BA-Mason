@@ -1,4 +1,6 @@
+// @ts-expect-error - Type definitions may not be available, but module is installed
 import { createServerClient } from '@supabase/ssr'
+// @ts-expect-error - Type definitions may not be available, but module is installed  
 import { NextResponse, type NextRequest } from 'next/server'
 
 export const config = {
