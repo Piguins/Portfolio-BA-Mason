@@ -6,7 +6,8 @@ import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import BackButton from '@/components/BackButton'
 import LoadingButton from '@/components/LoadingButton'
-import { fetchWithAuth, fetchWithTimeout } from '@/lib/fetchWithAuth'
+import { fetchWithAuth } from '@/lib/fetchWithAuth'
+import { fetchWithTimeout } from '@/lib/fetchWithTimeout'
 import '../../projects.css'
 
 interface Project {
