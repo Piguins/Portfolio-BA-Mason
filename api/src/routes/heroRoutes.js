@@ -1,6 +1,7 @@
 // Hero routes
 import express from 'express'
 import { heroController } from '../controllers/heroController.js'
+import { authMiddleware } from '../middleware/auth.js'
 
 const router = express.Router()
 
@@ -47,6 +48,7 @@ const router = express.Router()
  *                 profile_image_url:
  *                   type: string
  */
+// GET route is public (no authentication required)
 router.get('/api/hero', heroController.get)
 
 /**
@@ -56,6 +58,8 @@ router.get('/api/hero', heroController.get)
  *     summary: Update hero content
  *     tags: [Hero]
  *     description: Update hero section content (singleton - always updates id = 1)
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -85,7 +89,8 @@ router.get('/api/hero', heroController.get)
  *       200:
  *         description: Hero content updated successfully
  */
-router.put('/api/hero', heroController.update)
+// PUT route requires Access Token (JWT)
+router.put('/api/hero', authMiddleware, heroController.update)
 
 export default router
 

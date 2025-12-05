@@ -1,6 +1,7 @@
 // Specializations routes
 import express from 'express'
 import { specializationsController } from '../controllers/specializationsController.js'
+import { authMiddleware } from '../middleware/auth.js'
 
 const router = express.Router()
 
@@ -39,11 +40,14 @@ const router = express.Router()
  *                   order_index:
  *                     type: integer
  */
+// GET routes are public (no authentication required)
 router.get('/api/specializations', specializationsController.getAll)
 router.get('/api/specializations/:id', specializationsController.getById)
-router.post('/api/specializations', specializationsController.create)
-router.put('/api/specializations/:id', specializationsController.update)
-router.delete('/api/specializations/:id', specializationsController.delete)
+
+// POST/PUT/DELETE routes require Access Token (JWT)
+router.post('/api/specializations', authMiddleware, specializationsController.create)
+router.put('/api/specializations/:id', authMiddleware, specializationsController.update)
+router.delete('/api/specializations/:id', authMiddleware, specializationsController.delete)
 
 export default router
 

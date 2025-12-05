@@ -13,8 +13,6 @@ import { helmetMiddleware } from './middleware/helmet.js'
 import { corsMiddleware } from './middleware/cors.js'
 import { hppMiddleware } from './middleware/hpp.js'
 import { apiLimiter, authLimiter } from './middleware/rateLimiter.js'
-import { swaggerAuth } from './middleware/swaggerAuth.js'
-import { apiKeyAuth } from './middleware/apiKey.js'
 
 const config = getConfig()
 
@@ -77,17 +75,17 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }))
 // Health check (no rate limiting, no auth)
 app.use('/', healthRoutes)
 
-// Swagger documentation (protected with Basic Auth)
+// Swagger documentation (publicly accessible)
 // Must be before other routes to avoid conflicts
-// Note: swaggerAuth middleware is applied to routes in swaggerRoutes.js
 app.use('/', swaggerRoutes)
 
 // Authentication routes (stricter rate limiting)
 app.use('/api/auth', authLimiter)
 app.use('/', authRoutes)
 
-// Protected API routes (require API key)
-app.use('/api', apiKeyAuth)
+// API routes
+// GET routes are public, POST/PUT/DELETE require Access Token (JWT)
+// Authentication is applied per-route in route files
 app.use('/', heroRoutes)
 app.use('/', specializationsRoutes)
 app.use('/', projectsRoutes)

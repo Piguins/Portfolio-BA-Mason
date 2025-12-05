@@ -1,6 +1,7 @@
 // Experience routes
 import express from 'express'
 import { experienceController } from '../controllers/experienceController.js'
+import { authMiddleware } from '../middleware/auth.js'
 
 const router = express.Router()
 
@@ -109,7 +110,7 @@ router.get('/api/experience/:id', experienceController.getById)
  *       400:
  *         description: Invalid input
  */
-router.post('/api/experience', experienceController.create)
+router.post('/api/experience', authMiddleware, experienceController.create)
 
 /**
  * @swagger
@@ -158,7 +159,7 @@ router.post('/api/experience', experienceController.create)
  *       404:
  *         description: Experience not found
  */
-router.put('/api/experience/:id', experienceController.update)
+router.put('/api/experience/:id', authMiddleware, experienceController.update)
 
 /**
  * @swagger
@@ -178,6 +179,6 @@ router.put('/api/experience/:id', experienceController.update)
  *       404:
  *         description: Experience not found
  */
-router.delete('/api/experience/:id', experienceController.delete)
+router.delete('/api/experience/:id', authMiddleware, experienceController.delete)
 
 export default router

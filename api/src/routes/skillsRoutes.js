@@ -1,6 +1,7 @@
 // Skills routes
 import express from 'express'
 import { skillsController } from '../controllers/skillsController.js'
+import { authMiddleware } from '../middleware/auth.js'
 
 const router = express.Router()
 
@@ -49,11 +50,14 @@ const router = express.Router()
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
+// GET routes are public (no authentication required)
 router.get('/api/skills', skillsController.getAll)
 router.get('/api/skills/:id', skillsController.getById)
-router.post('/api/skills', skillsController.create)
-router.put('/api/skills/:id', skillsController.update)
-router.delete('/api/skills/:id', skillsController.delete)
+
+// POST/PUT/DELETE routes require Access Token (JWT)
+router.post('/api/skills', authMiddleware, skillsController.create)
+router.put('/api/skills/:id', authMiddleware, skillsController.update)
+router.delete('/api/skills/:id', authMiddleware, skillsController.delete)
 
 export default router
 

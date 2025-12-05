@@ -1,6 +1,7 @@
 // Projects routes
 import express from 'express'
 import { projectsController } from '../controllers/projectsController.js'
+import { authMiddleware } from '../middleware/auth.js'
 
 const router = express.Router()
 
@@ -51,12 +52,15 @@ const router = express.Router()
  *               $ref: '#/components/schemas/Error'
  */
 // IMPORTANT: Route order matters! More specific routes first
+// GET routes are public (no authentication required)
 router.get('/api/projects', projectsController.getAll)
 router.get('/api/projects/id/:id', projectsController.getById) // Must come before :slug
-router.post('/api/projects', projectsController.create)
-router.put('/api/projects/:id', projectsController.update)
-router.delete('/api/projects/:id', projectsController.delete)
 router.get('/api/projects/:slug', projectsController.getBySlug) // Must be last (catch-all for slugs)
+
+// POST/PUT/DELETE routes require Access Token (JWT)
+router.post('/api/projects', authMiddleware, projectsController.create)
+router.put('/api/projects/:id', authMiddleware, projectsController.update)
+router.delete('/api/projects/:id', authMiddleware, projectsController.delete)
 
 export default router
 

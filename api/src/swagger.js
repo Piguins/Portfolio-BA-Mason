@@ -22,6 +22,14 @@ const options = {
       },
     },
     components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          description: 'JWT token obtained from /api/auth/login endpoint',
+        },
+      },
       schemas: {
         Error: {
           type: 'object',
