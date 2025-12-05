@@ -12,6 +12,12 @@
 
 .dashboard-card.clickable {
   cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.dashboard-card.clickable:active {
+  transform: scale(0.98);
 }
 
 .dashboard-card.clickable:hover {
@@ -55,4 +61,3 @@
   color: var(--gray-400);
   font-weight: 500;
 }
-

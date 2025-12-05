@@ -18,51 +18,54 @@ export default function NewSpecializationPage() {
     order_index: 0,
   })
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault()
+      setLoading(true)
+      setError(null)
 
-    if (!formData.number || !formData.title) {
-      setError('Vui lòng điền đầy đủ Number và Title.')
-      setLoading(false)
-      return
-    }
-
-    const payload = {
-      ...formData,
-      order_index: Number(formData.order_index),
-    }
-
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 15000)
-
-    try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-      const response = await fetch(`${API_URL}/api/specializations`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        signal: controller.signal,
-      })
-      clearTimeout(timeoutId)
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to create specialization')
+      if (!formData.number || !formData.title) {
+        setError('Vui lòng điền đầy đủ Number và Title.')
+        setLoading(false)
+        return
       }
 
-      router.replace('/dashboard/specializations')
-    } catch (err: any) {
-      if (err.name === 'AbortError') {
-        setError('Yêu cầu tạo specialization đã hết thời gian. Vui lòng thử lại.')
-      } else {
-        setError(err.message || 'Failed to create specialization')
+      const payload = {
+        ...formData,
+        order_index: Number(formData.order_index),
       }
-    } finally {
-      setLoading(false)
-    }
-  }, [formData, router])
+
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 15000)
+
+      try {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+        const response = await fetch(`${API_URL}/api/specializations`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          signal: controller.signal,
+        })
+        clearTimeout(timeoutId)
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.error || 'Failed to create specialization')
+        }
+
+        router.replace('/dashboard/specializations')
+      } catch (err: any) {
+        if (err.name === 'AbortError') {
+          setError('Yêu cầu tạo specialization đã hết thời gian. Vui lòng thử lại.')
+        } else {
+          setError(err.message || 'Failed to create specialization')
+        }
+      } finally {
+        setLoading(false)
+      }
+    },
+    [formData, router]
+  )
 
   return (
     <div className="specializations-page">
@@ -136,7 +139,9 @@ export default function NewSpecializationPage() {
                 id="order_index"
                 type="number"
                 value={formData.order_index}
-                onChange={(e) => setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })}
+                onChange={(e) =>
+                  setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })
+                }
                 placeholder="0"
               />
             </div>
@@ -159,4 +164,3 @@ export default function NewSpecializationPage() {
     </div>
   )
 }
-

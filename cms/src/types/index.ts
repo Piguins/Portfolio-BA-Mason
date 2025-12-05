@@ -12,4 +12,3 @@ export interface ApiResponse<T = any> {
   error?: string
   message?: string
 }
-

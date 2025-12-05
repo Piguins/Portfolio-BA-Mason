@@ -105,8 +105,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .empty-state {
@@ -295,9 +299,9 @@
   font-size: 0.875rem;
 }
 
-.form-group input[type="text"],
-.form-group input[type="url"],
-.form-group input[type="number"],
+.form-group input[type='text'],
+.form-group input[type='url'],
+.form-group input[type='number'],
 .form-group select,
 .form-group textarea {
   width: 100%;
@@ -335,7 +339,7 @@
   color: var(--gray-700);
 }
 
-.checkbox-group input[type="checkbox"] {
+.checkbox-group input[type='checkbox'] {
   width: 18px;
   height: 18px;
   cursor: pointer;
@@ -362,4 +366,3 @@
     flex-direction: column;
   }
 }
-

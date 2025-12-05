@@ -72,8 +72,12 @@
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Form Styles */
@@ -121,8 +125,8 @@
   font-size: 0.875rem;
 }
 
-.form-group input[type="text"],
-.form-group input[type="url"],
+.form-group input[type='text'],
+.form-group input[type='url'],
 .form-group textarea {
   width: 100%;
   padding: 0.75rem;
@@ -189,4 +193,3 @@
     flex-direction: column-reverse;
   }
 }
-

@@ -34,7 +34,6 @@ interface Experience {
 // PERFORMANCE: Server Component - fetch data before render
 // Middleware already handles auth - no need to check here
 export default async function ExperiencePage() {
-  
   let experiences: Experience[] = []
   let error: string | null = null
 
@@ -51,7 +50,7 @@ export default async function ExperiencePage() {
     }
 
     const responseData = await response.json()
-    experiences = Array.isArray(responseData) ? responseData : (responseData.data || [])
+    experiences = Array.isArray(responseData) ? responseData : responseData.data || []
   } catch (err: any) {
     console.error('Failed to fetch experiences:', err)
     error = err.message || 'Failed to load experiences'

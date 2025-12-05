@@ -14,67 +14,72 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [errorType, setErrorType] = useState<'email' | 'password' | 'network' | 'unknown' | null>(null)
+  const [errorType, setErrorType] = useState<'email' | 'password' | 'network' | 'unknown' | null>(
+    null
+  )
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setErrorType(null)
-    setLoading(true)
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault()
+      setError('')
+      setErrorType(null)
+      setLoading(true)
 
-    // Quick validation before API call
-    if (!email.trim()) {
-      setError('Vui lòng nhập email')
-      setErrorType('email')
-      setLoading(false)
-      return
-    }
-
-    if (!password.trim()) {
-      setError('Vui lòng nhập mật khẩu')
-      setErrorType('password')
-      setLoading(false)
-      return
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
-      setError('Email không đúng định dạng')
-      setErrorType('email')
-      setLoading(false)
-      return
-    }
-
-    try {
-      const supabase = createClient()
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email: email.trim(),
-        password,
-      })
-
-      if (authError) {
-        const errorInfo = getAuthErrorMessage(authError)
-        setError(errorInfo.message)
-        setErrorType(errorInfo.type)
+      // Quick validation before API call
+      if (!email.trim()) {
+        setError('Vui lòng nhập email')
+        setErrorType('email')
         setLoading(false)
         return
       }
 
-      if (data?.user) {
-        // Wait a bit for cookies to be set by Supabase SSR
-        // Then use window.location for full page reload to ensure middleware sees the cookies
-        await new Promise(resolve => setTimeout(resolve, 100))
-        window.location.href = '/dashboard'
+      if (!password.trim()) {
+        setError('Vui lòng nhập mật khẩu')
+        setErrorType('password')
+        setLoading(false)
+        return
       }
-    } catch (err: any) {
-      const errorInfo = getAuthErrorMessage(err)
-      setError(errorInfo.message)
-      setErrorType(errorInfo.type)
-      setLoading(false)
-    }
-    // router is not used directly in the callback, removed from deps
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [email, password])
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!emailRegex.test(email)) {
+        setError('Email không đúng định dạng')
+        setErrorType('email')
+        setLoading(false)
+        return
+      }
+
+      try {
+        const supabase = createClient()
+        const { data, error: authError } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password,
+        })
+
+        if (authError) {
+          const errorInfo = getAuthErrorMessage(authError)
+          setError(errorInfo.message)
+          setErrorType(errorInfo.type)
+          setLoading(false)
+          return
+        }
+
+        if (data?.user) {
+          // Wait a bit for cookies to be set by Supabase SSR
+          // Then use window.location for full page reload to ensure middleware sees the cookies
+          await new Promise((resolve) => setTimeout(resolve, 100))
+          window.location.href = '/dashboard'
+        }
+      } catch (err: any) {
+        const errorInfo = getAuthErrorMessage(err)
+        setError(errorInfo.message)
+        setErrorType(errorInfo.type)
+        setLoading(false)
+      }
+      // router is not used directly in the callback, removed from deps
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [email, password]
+  )
 
   return (
     <main className="login-page">

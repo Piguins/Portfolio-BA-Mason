@@ -18,11 +18,7 @@ export default function LogoutButton() {
   }
 
   return (
-    <button
-      onClick={handleLogout}
-      disabled={loading}
-      className="btn-logout"
-    >
+    <button onClick={handleLogout} disabled={loading} className="btn-logout">
       {loading ? 'Đang đăng xuất...' : 'Đăng xuất'}
     </button>
   )

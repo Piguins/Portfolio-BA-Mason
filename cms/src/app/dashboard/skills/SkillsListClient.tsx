@@ -23,10 +23,7 @@ interface SkillsListClientProps {
   initialError: string | null
 }
 
-export default function SkillsListClient({ 
-  initialSkills, 
-  initialError 
-}: SkillsListClientProps) {
+export default function SkillsListClient({ initialSkills, initialError }: SkillsListClientProps) {
   const router = useRouter()
   const [skills, setSkills] = useState<Skill[]>(initialSkills)
   const [error, setError] = useState<string | null>(initialError)
@@ -40,11 +37,11 @@ export default function SkillsListClient({
       const response = await fetch(`${API_URL}/api/skills`, {
         cache: 'no-store',
       })
-      
+
       if (!response.ok) throw new Error('Failed to fetch skills')
       const responseData = await response.json()
       // Handle both old format (array) and new format ({ data, pagination })
-      const data = Array.isArray(responseData) ? responseData : (responseData.data || [])
+      const data = Array.isArray(responseData) ? responseData : responseData.data || []
       setSkills(data)
     } catch (err: any) {
       setError(err.message || 'Failed to load skills')
@@ -72,11 +69,10 @@ export default function SkillsListClient({
     }
   }
 
-  const filteredSkills = filterCategory === 'all' 
-    ? skills 
-    : skills.filter(s => s.category === filterCategory)
+  const filteredSkills =
+    filterCategory === 'all' ? skills : skills.filter((s) => s.category === filterCategory)
 
-  const categories = Array.from(new Set(skills.map(s => s.category)))
+  const categories = Array.from(new Set(skills.map((s) => s.category)))
 
   return (
     <div className="skills-page">
@@ -89,10 +85,7 @@ export default function SkillsListClient({
               <p>Quản lý skills, tools và certifications</p>
             </div>
           </div>
-          <LoadingButton
-            onClick={() => router.push('/dashboard/skills/new')}
-            variant="primary"
-          >
+          <LoadingButton onClick={() => router.push('/dashboard/skills/new')} variant="primary">
             + Thêm Skill
           </LoadingButton>
         </div>
@@ -117,8 +110,10 @@ export default function SkillsListClient({
               className="filter-select"
             >
               <option value="all">Tất cả</option>
-              {categories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
               ))}
             </select>
           </div>
@@ -127,12 +122,12 @@ export default function SkillsListClient({
         {filteredSkills.length === 0 ? (
           <div className="empty-state">
             <div className="empty-icon">🛠️</div>
-            <h3>Chưa có skill nào{filterCategory !== 'all' ? ` trong category "${filterCategory}"` : ''}</h3>
+            <h3>
+              Chưa có skill nào
+              {filterCategory !== 'all' ? ` trong category "${filterCategory}"` : ''}
+            </h3>
             <p>Hãy thêm skill đầu tiên để bắt đầu quản lý!</p>
-            <LoadingButton
-              onClick={() => router.push('/dashboard/skills/new')}
-              variant="primary"
-            >
+            <LoadingButton onClick={() => router.push('/dashboard/skills/new')} variant="primary">
               + Thêm Skill đầu tiên
             </LoadingButton>
           </div>
@@ -150,9 +145,7 @@ export default function SkillsListClient({
                   <div className="card-title-section">
                     <div className="skill-header-row">
                       <h3>{skill.name}</h3>
-                      {skill.is_highlight && (
-                        <span className="highlight-badge">⭐ Highlight</span>
-                      )}
+                      {skill.is_highlight && <span className="highlight-badge">⭐ Highlight</span>}
                     </div>
                     <p className="slug">{skill.slug}</p>
                     <div className="card-meta">
@@ -191,4 +184,3 @@ export default function SkillsListClient({
     </div>
   )
 }
-

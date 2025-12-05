@@ -75,6 +75,7 @@ The CMS uses Supabase Authentication:
 ### Middleware Protection
 
 The `middleware.ts` file automatically:
+
 - Protects `/dashboard` routes (redirects to `/login` if not authenticated)
 - Redirects authenticated users away from `/login`
 - Handles root path redirects

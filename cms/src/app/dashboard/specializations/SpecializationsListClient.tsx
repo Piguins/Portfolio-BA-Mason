@@ -43,7 +43,7 @@ export default function SpecializationsListClient({ initialSpecializations, init
       }
 
       // Remove from local state
-      setSpecializations(specializations.filter(s => s.id !== id))
+      setSpecializations(specializations.filter((s) => s.id !== id))
     } catch (err: any) {
       setError(err.message || 'Failed to delete specialization')
     } finally {
@@ -106,11 +106,15 @@ export default function SpecializationsListClient({ initialSpecializations, init
                   <div className="card-title-section">
                     <div className="specialization-number">{specialization.number}</div>
                     <h3>{specialization.title}</h3>
-                    <p className="specialization-description">{specialization.description || 'No description'}</p>
+                    <p className="specialization-description">
+                      {specialization.description || 'No description'}
+                    </p>
                   </div>
                   <div className="card-actions">
                     <LoadingButton
-                      onClick={() => router.push(`/dashboard/specializations/${specialization.id}/edit`)}
+                      onClick={() =>
+                        router.push(`/dashboard/specializations/${specialization.id}/edit`)
+                      }
                       variant="primary"
                     >
                       Sửa
@@ -135,4 +139,3 @@ export default function SpecializationsListClient({ initialSpecializations, init
     </div>
   )
 }
-

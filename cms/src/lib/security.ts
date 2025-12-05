@@ -82,4 +82,3 @@ export function containsSensitiveData(data: any): boolean {
 
   return checkObject(data)
 }
-

@@ -82,4 +82,3 @@ export function getAuthErrorMessage(error: any): AuthError {
     type: 'unknown',
   }
 }
-

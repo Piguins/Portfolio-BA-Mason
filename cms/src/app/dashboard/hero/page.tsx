@@ -65,55 +65,58 @@ export default function HeroPage() {
     fetchHero()
   }, [fetchHero])
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSaving(true)
-    setError(null)
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault()
+      setSaving(true)
+      setError(null)
 
-    const payload = {
-      greeting: formData.greeting,
-      greeting_part2: formData.greeting_part2,
-      name: formData.name,
-      title: formData.title,
-      description: formData.description || null,
-      linkedin_url: formData.linkedin_url || null,
-      github_url: formData.github_url || null,
-      email_url: formData.email_url || null,
-      profile_image_url: formData.profile_image_url || null,
-    }
-
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 15000)
-
-    try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-      const response = await fetchWithAuth(`${API_URL}/api/hero`, {
-        method: 'PUT',
-        body: JSON.stringify(payload),
-        signal: controller.signal,
-      })
-      clearTimeout(timeoutId)
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to update hero content')
+      const payload = {
+        greeting: formData.greeting,
+        greeting_part2: formData.greeting_part2,
+        name: formData.name,
+        title: formData.title,
+        description: formData.description || null,
+        linkedin_url: formData.linkedin_url || null,
+        github_url: formData.github_url || null,
+        email_url: formData.email_url || null,
+        profile_image_url: formData.profile_image_url || null,
       }
 
-      const updated = await response.json()
-      setFormData(updated.data || updated)
-      
-      // Show success message
-      alert('Hero content đã được cập nhật thành công!')
-    } catch (err: any) {
-      if (err.name === 'AbortError') {
-        setError('Yêu cầu cập nhật đã hết thời gian. Vui lòng thử lại.')
-      } else {
-        setError(err.message || 'Failed to update hero content')
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 15000)
+
+      try {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+        const response = await fetchWithAuth(`${API_URL}/api/hero`, {
+          method: 'PUT',
+          body: JSON.stringify(payload),
+          signal: controller.signal,
+        })
+        clearTimeout(timeoutId)
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.error || 'Failed to update hero content')
+        }
+
+        const updated = await response.json()
+        setFormData(updated.data || updated)
+
+        // Show success message
+        alert('Hero content đã được cập nhật thành công!')
+      } catch (err: any) {
+        if (err.name === 'AbortError') {
+          setError('Yêu cầu cập nhật đã hết thời gian. Vui lòng thử lại.')
+        } else {
+          setError(err.message || 'Failed to update hero content')
+        }
+      } finally {
+        setSaving(false)
       }
-    } finally {
-      setSaving(false)
-    }
-  }, [formData])
+    },
+    [formData]
+  )
 
   if (loading) {
     return (
@@ -261,13 +264,19 @@ export default function HeroPage() {
                 id="profile_image_url"
                 type="url"
                 value={formData.profile_image_url || ''}
-                onChange={(e) => setFormData({ ...formData, profile_image_url: e.target.value || null })}
+                onChange={(e) =>
+                  setFormData({ ...formData, profile_image_url: e.target.value || null })
+                }
                 placeholder="https://example.com/profile-image.jpg"
               />
               {formData.profile_image_url && (
                 <div className="image-preview">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={formData.profile_image_url} alt="Profile preview" onError={(e) => e.currentTarget.style.display = 'none'} />
+                  <img
+                    src={formData.profile_image_url}
+                    alt="Profile preview"
+                    onError={(e) => (e.currentTarget.style.display = 'none')}
+                  />
                 </div>
               )}
             </div>
@@ -290,4 +299,3 @@ export default function HeroPage() {
     </div>
   )
 }
-

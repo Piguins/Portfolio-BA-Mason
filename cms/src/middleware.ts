@@ -55,10 +55,10 @@ export async function middleware(request: NextRequest) {
     // Supabase SSR uses cookies like: sb-<project-ref>-auth-token
     // Check for any Supabase auth-related cookies
     const allCookies = request.cookies.getAll()
-    const hasAuthCookie = allCookies.some((cookie: CookieItem) => 
-      cookie.name.includes('sb-') && cookie.name.includes('auth-token')
+    const hasAuthCookie = allCookies.some(
+      (cookie: CookieItem) => cookie.name.includes('sb-') && cookie.name.includes('auth-token')
     )
-    
+
     // If no auth cookie and accessing protected route, redirect immediately
     if (!hasAuthCookie && pathname.startsWith('/dashboard')) {
       return NextResponse.redirect(new URL('/login', request.url))
@@ -144,12 +144,12 @@ export async function middleware(request: NextRequest) {
   } catch (error) {
     // If middleware fails completely, log and allow request through
     console.error('Middleware error:', error)
-    
+
     // Fallback: redirect root to login
     if (request.nextUrl.pathname === '/') {
       return NextResponse.redirect(new URL('/login', request.url))
     }
-    
+
     return NextResponse.next()
   }
 }

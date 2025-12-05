@@ -16,9 +16,9 @@ export async function apiRequest<T = any>(
   try {
     const method = options.method?.toUpperCase() || 'GET'
     const needsAuth = method === 'POST' || method === 'PUT' || method === 'DELETE'
-    
+
     const fetchFn = needsAuth ? fetchWithAuth : fetch
-    
+
     const response = await fetchFn(`${API_URL}${endpoint}`, {
       ...options,
       headers: {
@@ -69,4 +69,3 @@ export const authApi = {
     })
   },
 }
-

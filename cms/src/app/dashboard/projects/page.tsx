@@ -23,7 +23,7 @@ interface Project {
 // OPTIMIZED: Parallelize auth check and data fetching
 export default async function ProjectsPage() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-  
+
   // Middleware already handles auth - no need to redirect here
   let projects: Project[] = []
   let error: string | null = null
@@ -41,7 +41,7 @@ export default async function ProjectsPage() {
     }
 
     const responseData = await response.json()
-    projects = Array.isArray(responseData) ? responseData : (responseData.data || [])
+    projects = Array.isArray(responseData) ? responseData : responseData.data || []
   } catch (err: any) {
     console.error('Failed to fetch projects:', err)
     error = err.message || 'Failed to load projects'
@@ -49,4 +49,3 @@ export default async function ProjectsPage() {
 
   return <ProjectsListClient initialProjects={projects} initialError={error} />
 }
-

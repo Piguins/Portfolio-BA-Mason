@@ -42,14 +42,14 @@
 }
 
 .btn-danger {
-  background: #FEE2E2;
-  color: #DC2626;
-  border: 1.5px solid #FCA5A5;
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1.5px solid #fca5a5;
 }
 
 .btn-danger:hover:not(:disabled) {
-  background: #FCA5A5;
-  border-color: #DC2626;
+  background: #fca5a5;
+  border-color: #dc2626;
 }
 
 .btn-spinner {
@@ -59,11 +59,14 @@
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .btn-text-loading {
   opacity: 0.8;
 }
-

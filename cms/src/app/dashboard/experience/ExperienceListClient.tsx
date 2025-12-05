@@ -29,9 +29,9 @@ interface ExperienceListClientProps {
   initialError: string | null
 }
 
-export default function ExperienceListClient({ 
-  initialExperiences, 
-  initialError 
+export default function ExperienceListClient({
+  initialExperiences,
+  initialError,
 }: ExperienceListClientProps) {
   const router = useRouter()
   const [experiences, setExperiences] = useState<Experience[]>(initialExperiences)
@@ -45,11 +45,11 @@ export default function ExperienceListClient({
       const response = await fetch(`${API_URL}/api/experience`, {
         cache: 'no-store',
       })
-      
+
       if (!response.ok) throw new Error('Failed to fetch experiences')
       const responseData = await response.json()
       // Handle both old format (array) and new format ({ data, pagination })
-      const data = Array.isArray(responseData) ? responseData : (responseData.data || [])
+      const data = Array.isArray(responseData) ? responseData : responseData.data || []
       setExperiences(data)
     } catch (err: any) {
       setError(err.message || 'Failed to load experiences')
@@ -92,10 +92,7 @@ export default function ExperienceListClient({
               <p>Quản lý kinh nghiệm làm việc và timeline</p>
             </div>
           </div>
-          <LoadingButton
-            onClick={() => router.push('/dashboard/experience/new')}
-            variant="primary"
-          >
+          <LoadingButton onClick={() => router.push('/dashboard/experience/new')} variant="primary">
             + Thêm Experience
           </LoadingButton>
         </div>
@@ -139,7 +136,14 @@ export default function ExperienceListClient({
                     <div className="card-meta">
                       {exp.location && (
                         <span className="meta-item">
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
                             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                             <circle cx="12" cy="10" r="3"></circle>
                           </svg>
@@ -147,13 +151,25 @@ export default function ExperienceListClient({
                         </span>
                       )}
                       <span className="meta-item">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
                           <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                           <line x1="16" y1="2" x2="16" y2="6"></line>
                           <line x1="8" y1="2" x2="8" y2="6"></line>
                           <line x1="3" y1="10" x2="21" y2="10"></line>
                         </svg>
-                        {formatDate(exp.start_date)} - {exp.is_current ? 'Hiện tại' : exp.end_date ? formatDate(exp.end_date) : 'N/A'}
+                        {formatDate(exp.start_date)} -{' '}
+                        {exp.is_current
+                          ? 'Hiện tại'
+                          : exp.end_date
+                            ? formatDate(exp.end_date)
+                            : 'N/A'}
                       </span>
                     </div>
                   </div>
@@ -192,7 +208,7 @@ export default function ExperienceListClient({
                 )}
 
                 {(exp.skills_text && exp.skills_text.length > 0) ||
-                  (exp.skills_used && exp.skills_used.length > 0) ? (
+                (exp.skills_used && exp.skills_used.length > 0) ? (
                   <div className="card-skills">
                     <h4>Kỹ năng sử dụng</h4>
                     <div className="skills-tags">
@@ -218,4 +234,3 @@ export default function ExperienceListClient({
     </div>
   )
 }
-

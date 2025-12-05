@@ -14,4 +14,3 @@ export default function BackButton({ href }: BackButtonProps) {
     </Link>
   )
 }
-

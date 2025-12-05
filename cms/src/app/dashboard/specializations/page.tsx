@@ -41,4 +41,3 @@ export default async function SpecializationsPage() {
   // Pass data to client component for interactivity
   return <SpecializationsListClient initialSpecializations={specializations} initialError={error} />
 }
-

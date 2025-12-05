@@ -26,9 +26,9 @@ interface ProjectsListClientProps {
   initialError: string | null
 }
 
-export default function ProjectsListClient({ 
-  initialProjects, 
-  initialError 
+export default function ProjectsListClient({
+  initialProjects,
+  initialError,
 }: ProjectsListClientProps) {
   const router = useRouter()
   const [projects, setProjects] = useState<Project[]>(initialProjects)
@@ -42,11 +42,11 @@ export default function ProjectsListClient({
       const response = await fetch(`${API_URL}/api/projects?published=`, {
         cache: 'no-store',
       })
-      
+
       if (!response.ok) throw new Error('Failed to fetch projects')
       const responseData = await response.json()
       // Handle both old format (array) and new format ({ data, pagination })
-      const data = Array.isArray(responseData) ? responseData : (responseData.data || [])
+      const data = Array.isArray(responseData) ? responseData : responseData.data || []
       setProjects(data)
     } catch (err: any) {
       setError(err.message || 'Failed to load projects')
@@ -82,10 +82,7 @@ export default function ProjectsListClient({
               <p>Quản lý portfolio projects và case studies</p>
             </div>
           </div>
-          <LoadingButton
-            onClick={() => router.push('/dashboard/projects/new')}
-            variant="primary"
-          >
+          <LoadingButton onClick={() => router.push('/dashboard/projects/new')} variant="primary">
             + Thêm Project
           </LoadingButton>
         </div>
@@ -105,10 +102,7 @@ export default function ProjectsListClient({
             <div className="empty-icon">📁</div>
             <h3>Chưa có project nào</h3>
             <p>Hãy thêm project đầu tiên để bắt đầu quản lý!</p>
-            <LoadingButton
-              onClick={() => router.push('/dashboard/projects/new')}
-              variant="primary"
-            >
+            <LoadingButton onClick={() => router.push('/dashboard/projects/new')} variant="primary">
               + Thêm Project đầu tiên
             </LoadingButton>
           </div>
@@ -127,7 +121,9 @@ export default function ProjectsListClient({
                     <h3>{project.title}</h3>
                     <p className="slug">{project.slug}</p>
                     <div className="card-meta">
-                      <span className={`status-badge ${project.is_published ? 'published' : 'draft'}`}>
+                      <span
+                        className={`status-badge ${project.is_published ? 'published' : 'draft'}`}
+                      >
                         {project.is_published ? '✓ Published' : '○ Draft'}
                       </span>
                       {project.order_index !== null && (
@@ -137,8 +133,8 @@ export default function ProjectsListClient({
                     {project.tags && project.tags.length > 0 && (
                       <div className="tags-list">
                         {project.tags.map((tag) => (
-                          <span 
-                            key={tag.id} 
+                          <span
+                            key={tag.id}
                             className="tag"
                             style={{ backgroundColor: tag.color || '#e0e0e0' }}
                           >
@@ -174,17 +170,32 @@ export default function ProjectsListClient({
                 {(project.demo_url || project.github_url || project.thumbnail_url) && (
                   <div className="card-links">
                     {project.thumbnail_url && (
-                      <a href={project.thumbnail_url} target="_blank" rel="noopener noreferrer" className="link">
+                      <a
+                        href={project.thumbnail_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="link"
+                      >
                         🖼️ Thumbnail
                       </a>
                     )}
                     {project.demo_url && (
-                      <a href={project.demo_url} target="_blank" rel="noopener noreferrer" className="link">
+                      <a
+                        href={project.demo_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="link"
+                      >
                         🌐 Demo
                       </a>
                     )}
                     {project.github_url && (
-                      <a href={project.github_url} target="_blank" rel="noopener noreferrer" className="link">
+                      <a
+                        href={project.github_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="link"
+                      >
                         💻 GitHub
                       </a>
                     )}
@@ -198,4 +209,3 @@ export default function ProjectsListClient({
     </div>
   )
 }
-

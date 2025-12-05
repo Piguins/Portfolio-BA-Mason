@@ -65,51 +65,54 @@ export default function NewProjectPage() {
     fetchTags()
   }, [])
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault()
+      setLoading(true)
+      setError(null)
 
-    if (!formData.title || !formData.slug) {
-      setError('Vui lòng điền đầy đủ Title và Slug.')
-      setLoading(false)
-      return
-    }
-
-    const payload = {
-      ...formData,
-      order_index: Number(formData.order_index),
-    }
-
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 15000)
-
-    try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-      const response = await fetch(`${API_URL}/api/projects`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        signal: controller.signal,
-      })
-      clearTimeout(timeoutId)
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to create project')
+      if (!formData.title || !formData.slug) {
+        setError('Vui lòng điền đầy đủ Title và Slug.')
+        setLoading(false)
+        return
       }
 
-      router.replace('/dashboard/projects')
-    } catch (err: any) {
-      if (err.name === 'AbortError') {
-        setError('Yêu cầu tạo project đã hết thời gian. Vui lòng thử lại.')
-      } else {
-        setError(err.message || 'Failed to create project')
+      const payload = {
+        ...formData,
+        order_index: Number(formData.order_index),
       }
-    } finally {
-      setLoading(false)
-    }
-  }, [formData, router])
+
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 15000)
+
+      try {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+        const response = await fetch(`${API_URL}/api/projects`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          signal: controller.signal,
+        })
+        clearTimeout(timeoutId)
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.error || 'Failed to create project')
+        }
+
+        router.replace('/dashboard/projects')
+      } catch (err: any) {
+        if (err.name === 'AbortError') {
+          setError('Yêu cầu tạo project đã hết thời gian. Vui lòng thử lại.')
+        } else {
+          setError(err.message || 'Failed to create project')
+        }
+      } finally {
+        setLoading(false)
+      }
+    },
+    [formData, router]
+  )
 
   // Auto-generate slug from title
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -117,7 +120,12 @@ export default function NewProjectPage() {
     setFormData((prev: typeof formData) => ({
       ...prev,
       title,
-      slug: prev.slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+      slug:
+        prev.slug ||
+        title
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-|-$/g, ''),
     }))
   }
 
@@ -171,7 +179,9 @@ export default function NewProjectPage() {
                 type="text"
                 required
                 value={formData.slug}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, slug: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setFormData({ ...formData, slug: e.target.value })
+                }
                 placeholder="project-slug"
               />
             </div>
@@ -182,7 +192,9 @@ export default function NewProjectPage() {
                 id="order_index"
                 type="number"
                 value={formData.order_index}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })
+                }
               />
             </div>
           </div>
@@ -195,7 +207,9 @@ export default function NewProjectPage() {
                 id="description"
                 rows={3}
                 value={formData.description}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, description: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
                 placeholder="Mô tả ngắn về project..."
               />
             </div>
@@ -206,7 +220,9 @@ export default function NewProjectPage() {
                 id="content"
                 rows={8}
                 value={formData.content}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFormData({ ...formData, content: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  setFormData({ ...formData, content: e.target.value })
+                }
                 placeholder="Nội dung chi tiết về project (Markdown supported)..."
               />
             </div>
@@ -220,7 +236,9 @@ export default function NewProjectPage() {
                 id="thumbnail_url"
                 type="url"
                 value={formData.thumbnail_url}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, thumbnail_url: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setFormData({ ...formData, thumbnail_url: e.target.value })
+                }
                 placeholder="https://example.com/thumbnail.jpg"
               />
             </div>
@@ -231,7 +249,9 @@ export default function NewProjectPage() {
                 id="demo_url"
                 type="url"
                 value={formData.demo_url}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, demo_url: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setFormData({ ...formData, demo_url: e.target.value })
+                }
                 placeholder="https://example.com/demo"
               />
             </div>
@@ -242,7 +262,9 @@ export default function NewProjectPage() {
                 id="github_url"
                 type="url"
                 value={formData.github_url}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, github_url: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setFormData({ ...formData, github_url: e.target.value })
+                }
                 placeholder="https://github.com/username/repo"
               />
             </div>
@@ -255,12 +277,18 @@ export default function NewProjectPage() {
               {loadingTags ? (
                 <p className="text-muted">Đang tải danh sách tags...</p>
               ) : tags.length === 0 ? (
-                <p className="text-muted">Chưa có tag nào. Tags sẽ được tạo tự động khi bạn tạo project với tags mới.</p>
+                <p className="text-muted">
+                  Chưa có tag nào. Tags sẽ được tạo tự động khi bạn tạo project với tags mới.
+                </p>
               ) : (
                 <div className="tags-select-container">
                   <div className="tags-checkbox-list">
                     {tags.map((tag) => (
-                      <label key={tag.id} className="tag-checkbox-item" style={{ borderLeftColor: tag.color || '#6366f1' }}>
+                      <label
+                        key={tag.id}
+                        className="tag-checkbox-item"
+                        style={{ borderLeftColor: tag.color || '#6366f1' }}
+                      >
                         <input
                           type="checkbox"
                           checked={formData.tag_ids.includes(tag.id)}
@@ -279,7 +307,10 @@ export default function NewProjectPage() {
                           }}
                         />
                         <span>{tag.name}</span>
-                        <span className="tag-color-badge" style={{ backgroundColor: tag.color || '#6366f1' }}></span>
+                        <span
+                          className="tag-color-badge"
+                          style={{ backgroundColor: tag.color || '#6366f1' }}
+                        ></span>
                       </label>
                     ))}
                   </div>
@@ -290,7 +321,11 @@ export default function NewProjectPage() {
                         {formData.tag_ids.map((tagId: number) => {
                           const tag = tags.find((t: ProjectTag) => t.id === tagId)
                           return tag ? (
-                            <span key={tagId} className="selected-tag-tag" style={{ backgroundColor: tag.color || '#6366f1' }}>
+                            <span
+                              key={tagId}
+                              className="selected-tag-tag"
+                              style={{ backgroundColor: tag.color || '#6366f1' }}
+                            >
                               {tag.name}
                             </span>
                           ) : null
@@ -311,7 +346,9 @@ export default function NewProjectPage() {
                   id="is_published"
                   type="checkbox"
                   checked={formData.is_published}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, is_published: e.target.checked })}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setFormData({ ...formData, is_published: e.target.checked })
+                  }
                 />
                 Publish project (hiển thị trên portfolio)
               </label>
@@ -335,4 +372,3 @@ export default function NewProjectPage() {
     </div>
   )
 }
-

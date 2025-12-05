@@ -20,7 +20,7 @@ interface Skill {
 // OPTIMIZED: Parallelize auth check and data fetching
 export default async function SkillsPage() {
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-  
+
   // Middleware already handles auth - no need to redirect here
   let skills: Skill[] = []
   let error: string | null = null
@@ -38,7 +38,7 @@ export default async function SkillsPage() {
     }
 
     const responseData = await response.json()
-    skills = Array.isArray(responseData) ? responseData : (responseData.data || [])
+    skills = Array.isArray(responseData) ? responseData : responseData.data || []
   } catch (err: any) {
     console.error('Failed to fetch skills:', err)
     error = err.message || 'Failed to load skills'
@@ -46,4 +46,3 @@ export default async function SkillsPage() {
 
   return <SkillsListClient initialSkills={skills} initialError={error} />
 }
-

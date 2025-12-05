@@ -63,51 +63,54 @@ export default function EditSpecializationPage() {
     }
   }, [id, fetchSpecialization])
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSaving(true)
-    setError(null)
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault()
+      setSaving(true)
+      setError(null)
 
-    if (!formData.number || !formData.title) {
-      setError('Vui lòng điền đầy đủ Number và Title.')
-      setSaving(false)
-      return
-    }
-
-    const payload = {
-      ...formData,
-      order_index: Number(formData.order_index),
-    }
-
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 15000)
-
-    try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-      const response = await fetch(`${API_URL}/api/specializations/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        signal: controller.signal,
-      })
-      clearTimeout(timeoutId)
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to update specialization')
+      if (!formData.number || !formData.title) {
+        setError('Vui lòng điền đầy đủ Number và Title.')
+        setSaving(false)
+        return
       }
 
-      router.replace('/dashboard/specializations')
-    } catch (err: any) {
-      if (err.name === 'AbortError') {
-        setError('Yêu cầu cập nhật đã hết thời gian. Vui lòng thử lại.')
-      } else {
-        setError(err.message || 'Failed to update specialization')
+      const payload = {
+        ...formData,
+        order_index: Number(formData.order_index),
       }
-    } finally {
-      setSaving(false)
-    }
-  }, [formData, id, router])
+
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 15000)
+
+      try {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+        const response = await fetch(`${API_URL}/api/specializations/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          signal: controller.signal,
+        })
+        clearTimeout(timeoutId)
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.error || 'Failed to update specialization')
+        }
+
+        router.replace('/dashboard/specializations')
+      } catch (err: any) {
+        if (err.name === 'AbortError') {
+          setError('Yêu cầu cập nhật đã hết thời gian. Vui lòng thử lại.')
+        } else {
+          setError(err.message || 'Failed to update specialization')
+        }
+      } finally {
+        setSaving(false)
+      }
+    },
+    [formData, id, router]
+  )
 
   if (loading) {
     return (
@@ -192,7 +195,9 @@ export default function EditSpecializationPage() {
                 id="order_index"
                 type="number"
                 value={formData.order_index}
-                onChange={(e) => setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })}
+                onChange={(e) =>
+                  setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })
+                }
                 placeholder="0"
               />
             </div>
@@ -215,4 +220,3 @@ export default function EditSpecializationPage() {
     </div>
   )
 }
-

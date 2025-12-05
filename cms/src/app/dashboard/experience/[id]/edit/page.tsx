@@ -28,7 +28,7 @@ export default function EditExperiencePage() {
   const router = useRouter()
   const params = useParams()
   const id = params.id as string
-  
+
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -59,29 +59,29 @@ export default function EditExperiencePage() {
     try {
       setLoading(true)
       setError(null)
-      
+
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s timeout
-      
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/experience/${id}`, {
         signal: controller.signal,
         cache: 'no-store',
       })
-      
+
       clearTimeout(timeoutId)
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch experience')
       }
-      
+
       const data: Experience = await response.json()
-      
+
       const formatDateForInput = (dateString: string | null | undefined) => {
         if (!dateString) return ''
         const date = new Date(dateString)
         return date.toISOString().split('T')[0]
       }
-      
+
       setFormData({
         company: data.company,
         role: data.role,
@@ -91,11 +91,12 @@ export default function EditExperiencePage() {
         is_current: data.is_current || false,
         description: data.description || '',
         order_index: data.order_index || 0,
-        bullets: data.bullets?.map(b => ({ text: b.text, order_index: b.order_index })) || [],
+        bullets: data.bullets?.map((b) => ({ text: b.text, order_index: b.order_index })) || [],
         // Prefer new skills_text if present; fallback to names from old skills_used
-        skills_text: Array.isArray(data.skills_text) && data.skills_text.length > 0
-          ? data.skills_text
-          : (data.skills_used?.map((s) => s.name) || []),
+        skills_text:
+          Array.isArray(data.skills_text) && data.skills_text.length > 0
+            ? data.skills_text
+            : data.skills_used?.map((s) => s.name) || [],
       })
     } catch (err: any) {
       if (err.name === 'AbortError') {
@@ -116,7 +117,7 @@ export default function EditExperiencePage() {
     try {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 15000) // 15s timeout
-      
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/experience/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -171,11 +172,7 @@ export default function EditExperiencePage() {
     const value = newSkill.trim()
     if (!value) return
     // Avoid duplicates (case-insensitive)
-    if (
-      formData.skills_text.some(
-        (s) => s.toLowerCase() === value.toLowerCase()
-      )
-    ) {
+    if (formData.skills_text.some((s) => s.toLowerCase() === value.toLowerCase())) {
       setNewSkill('')
       return
     }
@@ -279,7 +276,9 @@ export default function EditExperiencePage() {
                   id="order_index"
                   type="number"
                   value={formData.order_index}
-                  onChange={(e) => setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })
+                  }
                   placeholder="0"
                 />
               </div>
@@ -317,7 +316,9 @@ export default function EditExperiencePage() {
                 <input
                   type="checkbox"
                   checked={formData.is_current}
-                  onChange={(e) => setFormData({ ...formData, is_current: e.target.checked, end_date: '' })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, is_current: e.target.checked, end_date: '' })
+                  }
                 />
                 <span>Đây là vị trí hiện tại</span>
               </label>
@@ -349,11 +350,7 @@ export default function EditExperiencePage() {
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addBullet())}
                   placeholder="Nhập thành tựu và nhấn Enter hoặc nút Thêm"
                 />
-                <LoadingButton
-                  type="button"
-                  onClick={addBullet}
-                  variant="primary"
-                >
+                <LoadingButton type="button" onClick={addBullet} variant="primary">
                   Thêm
                 </LoadingButton>
               </div>
@@ -368,7 +365,11 @@ export default function EditExperiencePage() {
                         className="bullet-input"
                         placeholder="Nhập thành tựu..."
                       />
-                      <button type="button" onClick={() => removeBullet(index)} className="btn-remove">
+                      <button
+                        type="button"
+                        onClick={() => removeBullet(index)}
+                        className="btn-remove"
+                      >
                         ×
                       </button>
                     </li>
@@ -379,48 +380,42 @@ export default function EditExperiencePage() {
           </div>
 
           <div className="form-section">
-        <h3 className="section-title">Kỹ năng sử dụng (Skills Used)</h3>
-        <div className="form-group">
-          <label htmlFor="skills_input">
-            Nhập kỹ năng đã sử dụng trong công việc này (ví dụ: UX/UI, SQL)
-          </label>
-          <div className="bullets-input">
-            <input
-              id="skills_input"
-              type="text"
-              value={newSkill}
-              onChange={(e) => setNewSkill(e.target.value)}
-              onKeyPress={(e) =>
-                e.key === 'Enter' && (e.preventDefault(), addSkill())
-              }
-              placeholder="Nhập skill và nhấn Enter hoặc nút Thêm"
-            />
-            <LoadingButton
-              type="button"
-              onClick={addSkill}
-              variant="primary"
-            >
-              Thêm
-            </LoadingButton>
-          </div>
-          {formData.skills_text.length > 0 && (
-            <div className="selected-skills-tags">
-              {formData.skills_text.map((skill, index) => (
-                <span key={index} className="selected-skill-tag">
-                  {skill}
-                  <button
-                    type="button"
-                    className="btn-remove"
-                    onClick={() => removeSkill(index)}
-                  >
-                    ×
-                  </button>
-                </span>
-              ))}
+            <h3 className="section-title">Kỹ năng sử dụng (Skills Used)</h3>
+            <div className="form-group">
+              <label htmlFor="skills_input">
+                Nhập kỹ năng đã sử dụng trong công việc này (ví dụ: UX/UI, SQL)
+              </label>
+              <div className="bullets-input">
+                <input
+                  id="skills_input"
+                  type="text"
+                  value={newSkill}
+                  onChange={(e) => setNewSkill(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
+                  placeholder="Nhập skill và nhấn Enter hoặc nút Thêm"
+                />
+                <LoadingButton type="button" onClick={addSkill} variant="primary">
+                  Thêm
+                </LoadingButton>
+              </div>
+              {formData.skills_text.length > 0 && (
+                <div className="selected-skills-tags">
+                  {formData.skills_text.map((skill, index) => (
+                    <span key={index} className="selected-skill-tag">
+                      {skill}
+                      <button
+                        type="button"
+                        className="btn-remove"
+                        onClick={() => removeSkill(index)}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      </div>
+          </div>
 
           <div className="form-actions">
             <LoadingButton
@@ -430,11 +425,7 @@ export default function EditExperiencePage() {
             >
               Hủy
             </LoadingButton>
-            <LoadingButton
-              type="submit"
-              loading={saving}
-              variant="primary"
-            >
+            <LoadingButton type="submit" loading={saving} variant="primary">
               Lưu thay đổi
             </LoadingButton>
           </div>

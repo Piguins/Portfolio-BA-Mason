@@ -43,21 +43,21 @@
 }
 
 .error-alert.email {
-  background: #FEF3C7;
-  color: #92400E;
-  border: 1px solid #FCD34D;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
 }
 
 .error-alert.password {
-  background: #FEE2E2;
-  color: #DC2626;
-  border: 1px solid #FCA5A5;
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
 }
 
 .error-alert.unknown {
-  background: #DBEAFE;
-  color: #1E40AF;
-  border: 1px solid #60A5FA;
+  background: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #60a5fa;
 }
 
 .login-form {
@@ -121,9 +121,8 @@
   .login-container {
     padding: var(--spacing-xl);
   }
-  
+
   .login-header h1 {
     font-size: 1.5rem;
   }
 }
-

@@ -104,7 +104,7 @@ export default function EditProjectPage() {
         github_url: data.github_url || '',
         is_published: data.is_published || false,
         order_index: data.order_index || 0,
-        tag_ids: data.tags?.map(t => t.id) || [],
+        tag_ids: data.tags?.map((t) => t.id) || [],
       })
     } catch (err: any) {
       setError(err.message || 'Failed to load project')
@@ -119,51 +119,54 @@ export default function EditProjectPage() {
     }
   }, [id, fetchProject])
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSaving(true)
-    setError(null)
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault()
+      setSaving(true)
+      setError(null)
 
-    if (!formData.title || !formData.slug) {
-      setError('Vui lòng điền đầy đủ Title và Slug.')
-      setSaving(false)
-      return
-    }
-
-    const payload = {
-      ...formData,
-      order_index: Number(formData.order_index),
-    }
-
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 15000)
-
-    try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-      const response = await fetch(`${API_URL}/api/projects/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        signal: controller.signal,
-      })
-      clearTimeout(timeoutId)
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to update project')
+      if (!formData.title || !formData.slug) {
+        setError('Vui lòng điền đầy đủ Title và Slug.')
+        setSaving(false)
+        return
       }
 
-      router.replace('/dashboard/projects')
-    } catch (err: any) {
-      if (err.name === 'AbortError') {
-        setError('Yêu cầu cập nhật project đã hết thời gian. Vui lòng thử lại.')
-      } else {
-        setError(err.message || 'Failed to update project')
+      const payload = {
+        ...formData,
+        order_index: Number(formData.order_index),
       }
-    } finally {
-      setSaving(false)
-    }
-  }, [formData, id, router])
+
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 15000)
+
+      try {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+        const response = await fetch(`${API_URL}/api/projects/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          signal: controller.signal,
+        })
+        clearTimeout(timeoutId)
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.error || 'Failed to update project')
+        }
+
+        router.replace('/dashboard/projects')
+      } catch (err: any) {
+        if (err.name === 'AbortError') {
+          setError('Yêu cầu cập nhật project đã hết thời gian. Vui lòng thử lại.')
+        } else {
+          setError(err.message || 'Failed to update project')
+        }
+      } finally {
+        setSaving(false)
+      }
+    },
+    [formData, id, router]
+  )
 
   if (loading) {
     return (
@@ -237,7 +240,9 @@ export default function EditProjectPage() {
                 id="order_index"
                 type="number"
                 value={formData.order_index}
-                onChange={(e) => setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })}
+                onChange={(e) =>
+                  setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })
+                }
               />
             </div>
           </div>
@@ -310,12 +315,18 @@ export default function EditProjectPage() {
               {loadingTags ? (
                 <p className="text-muted">Đang tải danh sách tags...</p>
               ) : tags.length === 0 ? (
-                <p className="text-muted">Chưa có tag nào. Tags sẽ được tạo tự động khi bạn tạo project với tags mới.</p>
+                <p className="text-muted">
+                  Chưa có tag nào. Tags sẽ được tạo tự động khi bạn tạo project với tags mới.
+                </p>
               ) : (
                 <div className="tags-select-container">
                   <div className="tags-checkbox-list">
                     {tags.map((tag) => (
-                      <label key={tag.id} className="tag-checkbox-item" style={{ borderLeftColor: tag.color || '#6366f1' }}>
+                      <label
+                        key={tag.id}
+                        className="tag-checkbox-item"
+                        style={{ borderLeftColor: tag.color || '#6366f1' }}
+                      >
                         <input
                           type="checkbox"
                           checked={formData.tag_ids.includes(tag.id)}
@@ -328,13 +339,16 @@ export default function EditProjectPage() {
                             } else {
                               setFormData({
                                 ...formData,
-                                tag_ids: formData.tag_ids.filter(id => id !== tag.id),
+                                tag_ids: formData.tag_ids.filter((id) => id !== tag.id),
                               })
                             }
                           }}
                         />
                         <span>{tag.name}</span>
-                        <span className="tag-color-badge" style={{ backgroundColor: tag.color || '#6366f1' }}></span>
+                        <span
+                          className="tag-color-badge"
+                          style={{ backgroundColor: tag.color || '#6366f1' }}
+                        ></span>
                       </label>
                     ))}
                   </div>
@@ -342,10 +356,14 @@ export default function EditProjectPage() {
                     <div className="selected-tags-preview">
                       <p className="selected-tags-label">Đã chọn ({formData.tag_ids.length}):</p>
                       <div className="selected-tags-tags">
-                        {formData.tag_ids.map(tagId => {
-                          const tag = tags.find(t => t.id === tagId)
+                        {formData.tag_ids.map((tagId) => {
+                          const tag = tags.find((t) => t.id === tagId)
                           return tag ? (
-                            <span key={tagId} className="selected-tag-tag" style={{ backgroundColor: tag.color || '#6366f1' }}>
+                            <span
+                              key={tagId}
+                              className="selected-tag-tag"
+                              style={{ backgroundColor: tag.color || '#6366f1' }}
+                            >
                               {tag.name}
                             </span>
                           ) : null
@@ -390,4 +408,3 @@ export default function EditProjectPage() {
     </div>
   )
 }
-

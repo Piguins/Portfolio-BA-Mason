@@ -21,60 +21,68 @@ export default function NewSkillPage() {
     order_index: 0,
   })
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault()
+      setLoading(true)
+      setError(null)
 
-    if (!formData.name || !formData.slug) {
-      setError('Vui lòng điền đầy đủ Name và Slug.')
-      setLoading(false)
-      return
-    }
-
-    const payload = {
-      ...formData,
-      level: Number(formData.level),
-      order_index: Number(formData.order_index),
-    }
-
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 15000)
-
-    try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-      const response = await fetch(`${API_URL}/api/skills`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        signal: controller.signal,
-      })
-      clearTimeout(timeoutId)
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to create skill')
+      if (!formData.name || !formData.slug) {
+        setError('Vui lòng điền đầy đủ Name và Slug.')
+        setLoading(false)
+        return
       }
 
-      router.replace('/dashboard/skills')
-    } catch (err: any) {
-      if (err.name === 'AbortError') {
-        setError('Yêu cầu tạo skill đã hết thời gian. Vui lòng thử lại.')
-      } else {
-        setError(err.message || 'Failed to create skill')
+      const payload = {
+        ...formData,
+        level: Number(formData.level),
+        order_index: Number(formData.order_index),
       }
-    } finally {
-      setLoading(false)
-    }
-  }, [formData, router])
+
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 15000)
+
+      try {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+        const response = await fetch(`${API_URL}/api/skills`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          signal: controller.signal,
+        })
+        clearTimeout(timeoutId)
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.error || 'Failed to create skill')
+        }
+
+        router.replace('/dashboard/skills')
+      } catch (err: any) {
+        if (err.name === 'AbortError') {
+          setError('Yêu cầu tạo skill đã hết thời gian. Vui lòng thử lại.')
+        } else {
+          setError(err.message || 'Failed to create skill')
+        }
+      } finally {
+        setLoading(false)
+      }
+    },
+    [formData, router]
+  )
 
   // Auto-generate slug from name
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.value
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       name,
-      slug: prev.slug || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+      slug:
+        prev.slug ||
+        name
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-|-$/g, ''),
     }))
   }
 
@@ -155,7 +163,9 @@ export default function NewSkillPage() {
                   min="1"
                   max="5"
                   value={formData.level}
-                  onChange={(e) => setFormData({ ...formData, level: parseInt(e.target.value) || 1 })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, level: parseInt(e.target.value) || 1 })
+                  }
                 />
               </div>
 
@@ -165,7 +175,9 @@ export default function NewSkillPage() {
                   id="order_index"
                   type="number"
                   value={formData.order_index}
-                  onChange={(e) => setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })
+                  }
                 />
               </div>
             </div>
@@ -214,4 +226,3 @@ export default function NewSkillPage() {
     </div>
   )
 }
-

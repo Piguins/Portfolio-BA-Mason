@@ -72,52 +72,55 @@ export default function EditSkillPage() {
     }
   }, [id, fetchSkill])
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSaving(true)
-    setError(null)
+  const handleSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault()
+      setSaving(true)
+      setError(null)
 
-    if (!formData.name || !formData.slug) {
-      setError('Vui lòng điền đầy đủ Name và Slug.')
-      setSaving(false)
-      return
-    }
-
-    const payload = {
-      ...formData,
-      level: Number(formData.level),
-      order_index: Number(formData.order_index),
-    }
-
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 15000)
-
-    try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-      const response = await fetch(`${API_URL}/api/skills/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        signal: controller.signal,
-      })
-      clearTimeout(timeoutId)
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to update skill')
+      if (!formData.name || !formData.slug) {
+        setError('Vui lòng điền đầy đủ Name và Slug.')
+        setSaving(false)
+        return
       }
 
-      router.replace('/dashboard/skills')
-    } catch (err: any) {
-      if (err.name === 'AbortError') {
-        setError('Yêu cầu cập nhật skill đã hết thời gian. Vui lòng thử lại.')
-      } else {
-        setError(err.message || 'Failed to update skill')
+      const payload = {
+        ...formData,
+        level: Number(formData.level),
+        order_index: Number(formData.order_index),
       }
-    } finally {
-      setSaving(false)
-    }
-  }, [formData, id, router])
+
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 15000)
+
+      try {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+        const response = await fetch(`${API_URL}/api/skills/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          signal: controller.signal,
+        })
+        clearTimeout(timeoutId)
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.error || 'Failed to update skill')
+        }
+
+        router.replace('/dashboard/skills')
+      } catch (err: any) {
+        if (err.name === 'AbortError') {
+          setError('Yêu cầu cập nhật skill đã hết thời gian. Vui lòng thử lại.')
+        } else {
+          setError(err.message || 'Failed to update skill')
+        }
+      } finally {
+        setSaving(false)
+      }
+    },
+    [formData, id, router]
+  )
 
   if (loading) {
     return (
@@ -207,7 +210,9 @@ export default function EditSkillPage() {
                   min="1"
                   max="5"
                   value={formData.level}
-                  onChange={(e) => setFormData({ ...formData, level: parseInt(e.target.value) || 1 })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, level: parseInt(e.target.value) || 1 })
+                  }
                 />
               </div>
 
@@ -217,7 +222,9 @@ export default function EditSkillPage() {
                   id="order_index"
                   type="number"
                   value={formData.order_index}
-                  onChange={(e) => setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })
+                  }
                 />
               </div>
             </div>
@@ -266,4 +273,3 @@ export default function EditSkillPage() {
     </div>
   )
 }
-
