@@ -6,8 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { getAuthErrorMessage } from '@/lib/auth-errors'
 import { motion } from 'framer-motion'
 import LoadingButton from '@/components/LoadingButton'
-import { FormField, Input } from '@/components/FormField'
-import { cn } from '@/lib/utils'
+import './login.css'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -83,38 +82,33 @@ export default function LoginPage() {
   )
 
   return (
-    <main className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
+    <main className="login-page">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="w-full max-w-md bg-white rounded-xl border border-slate-200 shadow-sm p-8"
+        className="login-container"
       >
-        <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-2">
-            Đăng nhập
-          </h1>
-          <p className="text-base text-slate-600 leading-relaxed">Quản lý Portfolio của bạn</p>
+        <div className="login-header">
+          <h1>Đăng nhập</h1>
+          <p>Quản lý Portfolio của bạn</p>
         </div>
 
         {error && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className={cn(
-              'mb-6 p-4 rounded-lg text-sm',
-              errorType === 'email' || errorType === 'password'
-                ? 'bg-red-50 border border-red-200 text-red-700'
-                : 'bg-amber-50 border border-amber-200 text-amber-700'
-            )}
+            className={`error-alert ${errorType || 'unknown'}`}
           >
             {error}
           </motion.div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <FormField label="Email" error={errorType === 'email' ? error : undefined}>
-            <Input
+        <form onSubmit={handleSubmit} className="login-form">
+          <div className="form-group">
+            <label htmlFor="email">Email</label>
+            <input
+              id="email"
               type="email"
               required
               value={email}
@@ -127,12 +121,14 @@ export default function LoginPage() {
               }}
               placeholder="your@email.com"
               disabled={loading}
-              error={errorType === 'email' ? error : undefined}
+              className={errorType === 'email' ? 'error' : ''}
             />
-          </FormField>
+          </div>
 
-          <FormField label="Mật khẩu" error={errorType === 'password' ? error : undefined}>
-            <Input
+          <div className="form-group">
+            <label htmlFor="password">Mật khẩu</label>
+            <input
+              id="password"
               type="password"
               required
               value={password}
@@ -145,11 +141,16 @@ export default function LoginPage() {
               }}
               placeholder="••••••••"
               disabled={loading}
-              error={errorType === 'password' ? error : undefined}
+              className={errorType === 'password' ? 'error' : ''}
             />
-          </FormField>
+          </div>
 
-          <LoadingButton type="submit" loading={loading} variant="primary" className="w-full">
+          <LoadingButton
+            type="submit"
+            loading={loading}
+            variant="primary"
+            className="btn-primary-full"
+          >
             Đăng nhập
           </LoadingButton>
         </form>

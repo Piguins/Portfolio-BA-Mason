@@ -1,6 +1,7 @@
 'use client'
 
 import SkillsListClient from './SkillsListClient'
+import './skills.css'
 
 export default function SkillsPage() {
   // Client component - fetch happens in SkillsListClient

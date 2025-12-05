@@ -1,0 +1,63 @@
+.dashboard-card {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--gray-200);
+  transition: all var(--transition-base);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-card.clickable {
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.dashboard-card.clickable:active {
+  transform: scale(0.98);
+}
+
+.dashboard-card.clickable:hover {
+  box-shadow: var(--shadow-lg);
+  border-color: var(--primary-blue-light);
+}
+
+.dashboard-card h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin-bottom: var(--spacing-sm);
+}
+
+.dashboard-card p {
+  font-size: 0.875rem;
+  color: var(--gray-600);
+  margin-bottom: var(--spacing-lg);
+  flex: 1;
+}
+
+.card-link {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--primary-blue);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.card-link span {
+  transition: transform var(--transition-base);
+}
+
+.dashboard-card.clickable:hover .card-link span {
+  transform: translateX(4px);
+}
+
+.card-status {
+  font-size: 0.8125rem;
+  color: var(--gray-400);
+  font-weight: 500;
+}

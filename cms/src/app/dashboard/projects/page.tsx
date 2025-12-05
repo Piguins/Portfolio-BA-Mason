@@ -1,6 +1,7 @@
 'use client'
 
 import ProjectsListClient from './ProjectsListClient'
+import './projects.css'
 
 export default function ProjectsPage() {
   // Client component - fetch happens in ProjectsListClient

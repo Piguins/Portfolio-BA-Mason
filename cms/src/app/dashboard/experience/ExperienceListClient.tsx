@@ -3,18 +3,9 @@
 import { useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import toast from 'react-hot-toast'
-import { Loader2, MapPin, Calendar } from 'lucide-react'
-import { fetchWithAuth } from '@/lib/fetchWithAuth'
 import BackButton from '@/components/BackButton'
 import LoadingButton from '@/components/LoadingButton'
-import { cn } from '@/lib/utils'
-
-const fadeInUp = {
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.5, ease: 'easeOut' },
-}
+import './experience.css'
 
 interface Experience {
   id: string
@@ -70,14 +61,11 @@ export default function ExperienceListClient({
       const data = Array.isArray(responseData) ? responseData : responseData.data || []
       setExperiences(data)
     } catch (err: any) {
-      let errorMsg = 'Failed to load experiences'
       if (err.name === 'AbortError') {
-        errorMsg = 'Request timeout. Vui lòng thử lại.'
-      } else if (err.message) {
-        errorMsg = err.message
+        setError('Request timeout. Vui lòng thử lại.')
+      } else {
+        setError(err.message || 'Failed to load experiences')
       }
-      setError(errorMsg)
-      toast.error(errorMsg)
     } finally {
       setLoading(false)
     }
@@ -96,20 +84,13 @@ export default function ExperienceListClient({
     try {
       setDeletingId(id)
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-      const response = await fetchWithAuth(`${API_URL}/api/experience/${id}`, {
+      const response = await fetch(`${API_URL}/api/experience/${id}`, {
         method: 'DELETE',
       })
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error || errorData.message || 'Failed to delete experience')
-      }
-      
+      if (!response.ok) throw new Error('Failed to delete experience')
       await fetchExperiences()
-      toast.success('Experience đã được xóa thành công!')
     } catch (err: any) {
-      const errorMsg = err.message || 'Failed to delete experience'
-      toast.error(errorMsg)
+      alert(err.message || 'Failed to delete experience')
     } finally {
       setDeletingId(null)
     }
@@ -123,95 +104,93 @@ export default function ExperienceListClient({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 p-6 md:p-8 lg:p-12">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="mb-8 pb-6 border-b border-slate-200"
-        >
-          <div className="flex flex-col md:flex-row justify-between items-start gap-4">
-            <div className="flex flex-col gap-4 flex-1">
-              <BackButton href="/dashboard" />
-              <div>
-                <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-slate-900 mb-2">
-                  Quản lý Experience
-                </h1>
-                <p className="text-base text-slate-600 leading-relaxed">
-                  Quản lý kinh nghiệm làm việc và timeline
-                </p>
-              </div>
+    <div className="experience-page">
+      <div className="page-container">
+        <div className="page-header">
+          <div className="header-content">
+            <BackButton href="/dashboard" />
+            <div className="header-text">
+              <h1>Quản lý Experience</h1>
+              <p>Quản lý kinh nghiệm làm việc và timeline</p>
             </div>
-            <LoadingButton onClick={() => router.push('/dashboard/experience/new')} variant="primary">
-              + Thêm Experience
-            </LoadingButton>
           </div>
-        </motion.div>
+          <LoadingButton onClick={() => router.push('/dashboard/experience/new')} variant="primary">
+            + Thêm Experience
+          </LoadingButton>
+        </div>
 
-        {/* Error Alert */}
         {error && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"
+            className="error-alert"
           >
             {error}
           </motion.div>
         )}
 
-        {/* Loading State */}
         {loading ? (
-          <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 text-slate-500">
-            <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
-            <p className="text-base">Đang tải dữ liệu Experience...</p>
+          <div className="loading-state">
+            <div className="loading-spinner"></div>
+            <p>Đang tải dữ liệu Experience...</p>
           </div>
         ) : experiences.length === 0 ? (
-          /* Empty State */
-          <motion.div
-            variants={fadeInUp}
-            initial="initial"
-            animate="animate"
-            className="text-center p-12 bg-white rounded-xl border border-slate-200 shadow-sm flex flex-col items-center gap-4"
-          >
-            <div className="text-5xl mb-4">📋</div>
-            <h3 className="text-xl font-semibold text-slate-900">Chưa có experience nào</h3>
-            <p className="text-base text-slate-600 mb-6">
-              Hãy thêm experience đầu tiên để bắt đầu quản lý!
-            </p>
+          <div className="empty-state">
+            <div className="empty-icon">📋</div>
+            <h3>Chưa có experience nào</h3>
+            <p>Hãy thêm experience đầu tiên để bắt đầu quản lý!</p>
             <LoadingButton
               onClick={() => router.push('/dashboard/experience/new')}
               variant="primary"
             >
               + Thêm Experience đầu tiên
             </LoadingButton>
-          </motion.div>
+          </div>
         ) : (
-          /* Experiences List */
-          <div className="flex flex-col gap-6">
+          <div className="experience-list">
             {experiences.map((exp, index) => (
               <motion.div
                 key={exp.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300 p-6"
+                className="experience-card"
               >
-                {/* Card Header */}
-                <div className="flex justify-between items-start gap-6 mb-4">
-                  <div className="flex-1">
-                    <h3 className="text-xl font-semibold text-slate-900 mb-1">{exp.role}</h3>
-                    <p className="text-lg font-medium text-slate-700 mb-3">{exp.company}</p>
-                    <div className="flex items-center gap-4 flex-wrap">
+                <div className="card-header">
+                  <div className="card-title-section">
+                    <h3>{exp.role}</h3>
+                    <p className="company">{exp.company}</p>
+                    <div className="card-meta">
                       {exp.location && (
-                        <span className="flex items-center gap-2 text-sm text-slate-600">
-                          <MapPin className="w-4 h-4" />
+                        <span className="meta-item">
+                          <svg
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                          >
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                          </svg>
                           {exp.location}
                         </span>
                       )}
-                      <span className="flex items-center gap-2 text-sm text-slate-600">
-                        <Calendar className="w-4 h-4" />
+                      <span className="meta-item">
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                          <line x1="16" y1="2" x2="16" y2="6"></line>
+                          <line x1="8" y1="2" x2="8" y2="6"></line>
+                          <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
                         {formatDate(exp.start_date)} -{' '}
                         {exp.is_current
                           ? 'Hiện tại'
@@ -221,7 +200,7 @@ export default function ExperienceListClient({
                       </span>
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="card-actions">
                     <LoadingButton
                       onClick={() => router.push(`/dashboard/experience/${exp.id}/edit`)}
                       variant="primary"
@@ -238,18 +217,16 @@ export default function ExperienceListClient({
                   </div>
                 </div>
 
-                {/* Description */}
                 {exp.description && (
-                  <div className="mb-4">
-                    <p className="text-base text-slate-600 leading-relaxed">{exp.description}</p>
+                  <div className="card-description">
+                    <p>{exp.description}</p>
                   </div>
                 )}
 
-                {/* Bullets */}
                 {exp.bullets && exp.bullets.length > 0 && (
-                  <div className="mb-4 pt-4 border-t border-slate-200">
-                    <h4 className="text-sm font-semibold text-slate-900 mb-2">Thành tựu chính</h4>
-                    <ul className="list-disc list-inside space-y-1 text-sm text-slate-600">
+                  <div className="card-bullets">
+                    <h4>Thành tựu chính</h4>
+                    <ul className="bullets-list">
                       {exp.bullets.map((bullet) => (
                         <li key={bullet.id}>{bullet.text}</li>
                       ))}
@@ -257,32 +234,25 @@ export default function ExperienceListClient({
                   </div>
                 )}
 
-                {/* Skills */}
-                {((exp.skills_text && exp.skills_text.length > 0) ||
-                  (exp.skills_used && exp.skills_used.length > 0)) && (
-                  <div className="pt-4 border-t border-slate-200">
-                    <h4 className="text-sm font-semibold text-slate-900 mb-2">Kỹ năng sử dụng</h4>
-                    <div className="flex flex-wrap gap-2">
+                {(exp.skills_text && exp.skills_text.length > 0) ||
+                (exp.skills_used && exp.skills_used.length > 0) ? (
+                  <div className="card-skills">
+                    <h4>Kỹ năng sử dụng</h4>
+                    <div className="skills-tags">
                       {exp.skills_text && exp.skills_text.length > 0
                         ? exp.skills_text.map((skill, index) => (
-                            <span
-                              key={index}
-                              className="px-2 py-1 rounded text-xs font-medium bg-blue-50 text-blue-700"
-                            >
+                            <span key={index} className="skill-tag">
                               {skill}
                             </span>
                           ))
                         : exp.skills_used?.map((skill) => (
-                            <span
-                              key={skill.id}
-                              className="px-2 py-1 rounded text-xs font-medium bg-blue-50 text-blue-700"
-                            >
+                            <span key={skill.id} className="skill-tag">
                               {skill.name}
                             </span>
                           ))}
                     </div>
                   </div>
-                )}
+                ) : null}
               </motion.div>
             ))}
           </div>
