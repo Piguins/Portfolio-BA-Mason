@@ -6,9 +6,5 @@ export interface User {
   name?: string
 }
 
-export interface ApiResponse<T = any> {
-  success: boolean
-  data?: T
-  error?: string
-  message?: string
-}
+// Re-export API types
+export * from './api'
