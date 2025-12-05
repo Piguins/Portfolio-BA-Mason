@@ -8,10 +8,6 @@ import { motion } from 'framer-motion'
 import LoadingButton from '@/components/LoadingButton'
 import './login.css'
 
-// Force dynamic rendering - login page should not be statically generated
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
-
 export default function LoginPage() {
   const router = useRouter()
   const [email, setEmail] = useState('')
