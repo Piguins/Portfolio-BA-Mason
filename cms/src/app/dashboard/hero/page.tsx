@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import BackButton from '@/components/BackButton'
 import LoadingButton from '@/components/LoadingButton'
+import { fetchWithAuth } from '@/lib/fetchWithAuth'
 import './hero.css'
 
 interface HeroData {
@@ -43,10 +44,8 @@ export default function HeroPage() {
       setLoading(true)
       setError(null)
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-      const API_KEY = process.env.NEXT_PUBLIC_API_KEY || ''
       const response = await fetch(`${API_URL}/api/hero`, {
         cache: 'no-store',
-        headers: API_KEY ? { 'X-API-Key': API_KEY } : {},
       })
 
       if (!response.ok) {
@@ -88,13 +87,8 @@ export default function HeroPage() {
 
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-      const API_KEY = process.env.NEXT_PUBLIC_API_KEY || ''
-      const response = await fetch(`${API_URL}/api/hero`, {
+      const response = await fetchWithAuth(`${API_URL}/api/hero`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(API_KEY ? { 'X-API-Key': API_KEY } : {}),
-        },
         body: JSON.stringify(payload),
         signal: controller.signal,
       })

@@ -1,5 +1,6 @@
+import { fetchWithAuth } from './fetchWithAuth'
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-const API_KEY = process.env.NEXT_PUBLIC_API_KEY || ''
 
 export interface ApiResponse<T = any> {
   success: boolean
@@ -13,15 +14,17 @@ export async function apiRequest<T = any>(
   options: RequestInit = {}
 ): Promise<ApiResponse<T>> {
   try {
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-      ...(API_KEY ? { 'X-API-Key': API_KEY } : {}),
-      ...options.headers,
-    }
-
-    const response = await fetch(`${API_URL}${endpoint}`, {
+    const method = options.method?.toUpperCase() || 'GET'
+    const needsAuth = method === 'POST' || method === 'PUT' || method === 'DELETE'
+    
+    const fetchFn = needsAuth ? fetchWithAuth : fetch
+    
+    const response = await fetchFn(`${API_URL}${endpoint}`, {
       ...options,
-      headers,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
     })
 
     const data = await response.json()
