@@ -43,10 +43,16 @@ export const performanceLogger = (req, res, next) => {
       console.log(logMessage)
     }
     
-    // Set performance header for monitoring
-    res.setHeader('X-Response-Time', `${duration}ms`)
-    if (dbTime) {
-      res.setHeader('X-DB-Query-Time', `${dbTime}ms`)
+    // Set performance header for monitoring (only if headers not sent)
+    if (!res.headersSent) {
+      try {
+        res.setHeader('X-Response-Time', `${duration}ms`)
+        if (dbTime) {
+          res.setHeader('X-DB-Query-Time', `${dbTime}ms`)
+        }
+      } catch (err) {
+        // Ignore errors if headers already sent
+      }
     }
     
     // Call original end function

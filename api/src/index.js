@@ -53,9 +53,10 @@ app.get('/', (req, res) => {
   })
 })
 
-// Health endpoint - CRITICAL: Must be fast and before all middleware
+// Health endpoints - CRITICAL: Must be fast and before all middleware
 import { healthController } from './controllers/healthController.js'
 app.get('/health', healthController.check)
+app.get('/health/db', healthController.dbCheck)
 
 // Swagger endpoints - must be fast for documentation
 // Swagger JSON spec
