@@ -15,8 +15,8 @@
   "functions": {
     "index.js": {
       "memory": 1024,
-      "maxDuration": 10,
-      "regions": ["sin1"]
+      "maxDuration": 10
     }
-  }
+  },
+  "regions": ["sin1"]
 }
