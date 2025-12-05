@@ -63,11 +63,28 @@ export default function LoginPage() {
           return
         }
 
-        if (data?.user) {
+        if (data?.user && data?.session) {
+          // Ensure session is saved to cookies before redirect
           // Wait a bit for cookies to be set by Supabase SSR
-          // Then use window.location for full page reload to ensure middleware sees the cookies
-          await new Promise((resolve) => setTimeout(resolve, 100))
-          window.location.href = '/dashboard'
+          await new Promise((resolve) => setTimeout(resolve, 200))
+          
+          // Verify session is available before redirect
+          const { data: { session: verifySession }, error: sessionError } = await supabase.auth.getSession()
+          
+          if (verifySession && !sessionError) {
+            // Use window.location for full page reload to ensure middleware sees the cookies
+            window.location.href = '/dashboard'
+          } else {
+            // If session not available, try to refresh it
+            const { data: { session: refreshedSession } } = await supabase.auth.refreshSession()
+            if (refreshedSession) {
+              window.location.href = '/dashboard'
+            } else {
+              setError('Không thể lưu phiên đăng nhập. Vui lòng thử lại.')
+              setErrorType('unknown')
+              setLoading(false)
+            }
+          }
         }
       } catch (err: any) {
         const errorInfo = getAuthErrorMessage(err)
