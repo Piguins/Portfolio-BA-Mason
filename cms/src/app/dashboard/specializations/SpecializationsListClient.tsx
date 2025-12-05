@@ -174,7 +174,6 @@ export default function SpecializationsListClient({ initialSpecializations, init
                   </div>
                 </div>
                 <div className="card-meta">
-                  <span className="meta-item">Order: {specialization.order_index}</span>
                 </div>
               </motion.div>
             ))}

@@ -32,15 +32,13 @@ export const experienceService = {
         e.end_date,
         e.is_current,
         e.description,
-        e.order_index,
         e.created_at,
         e.updated_at,
         e.skills_text,
         COALESCE(
           json_agg(DISTINCT jsonb_build_object(
             'id', eb.id,
-            'text', eb.text,
-            'order_index', eb.order_index
+            'text', eb.text
           )) FILTER (WHERE eb.id IS NOT NULL),
           '[]'
         ) AS bullets
@@ -65,8 +63,8 @@ export const experienceService = {
     
     query += `
       GROUP BY e.id, e.company, e.role, e.location, e.start_date, e.end_date, 
-               e.is_current, e.description, e.order_index, e.created_at, e.updated_at, e.skills_text
-      ORDER BY e.order_index ASC, e.start_date DESC
+               e.is_current, e.description, e.created_at, e.updated_at, e.skills_text
+      ORDER BY e.start_date DESC
       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
     `
     params.push(limit, offset)
@@ -138,15 +136,13 @@ export const experienceService = {
         e.end_date,
         e.is_current,
         e.description,
-        e.order_index,
         e.created_at,
         e.updated_at,
         e.skills_text,
         COALESCE(
           json_agg(DISTINCT jsonb_build_object(
             'id', eb.id,
-            'text', eb.text,
-            'order_index', eb.order_index
+            'text', eb.text
           )) FILTER (WHERE eb.id IS NOT NULL),
           '[]'
         ) AS bullets
@@ -154,7 +150,7 @@ export const experienceService = {
       LEFT JOIN public.experience_bullets eb ON eb.experience_id = e.id
       WHERE e.id = $1
       GROUP BY e.id, e.company, e.role, e.location, e.start_date, e.end_date, 
-               e.is_current, e.description, e.order_index, e.created_at, e.updated_at, e.skills_text
+               e.is_current, e.description, e.created_at, e.updated_at, e.skills_text
     `, [id])
     return result.rows[0] || null
   },
@@ -171,7 +167,6 @@ export const experienceService = {
       end_date,
       is_current,
       description,
-      order_index,
       bullets = [],
       // New free-text skills stored directly on experience as text[]
       skills_text = [],
@@ -184,8 +179,8 @@ export const experienceService = {
       // Insert experience
       const expResult = await client.query(
         `INSERT INTO public.experience 
-         (company, role, location, start_date, end_date, is_current, description, order_index, skills_text)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+         (company, role, location, start_date, end_date, is_current, description, skills_text)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
          RETURNING *`,
         [
           company,
@@ -195,25 +190,24 @@ export const experienceService = {
           end_date || null,
           is_current || false,
           description || null,
-          order_index || 0,
           Array.isArray(skills_text) ? skills_text : [],
         ]
       )
       const experience = expResult.rows[0]
 
-      // OPTIMIZED: Batch insert bullets in a single query
+      // Simple batch insert bullets (no order_index)
       if (bullets.length > 0) {
         const values = bullets.map((bullet, i) => 
-          `($1, $${i * 3 + 2}, $${i * 3 + 3})`
+          `($1, $${i + 2})`
         ).join(', ')
         
         const params = [experience.id]
-        bullets.forEach((bullet, i) => {
-          params.push(bullet.text, bullet.order_index || i)
+        bullets.forEach((bullet) => {
+          params.push(bullet.text || bullet) // Support both object and string
         })
         
         await client.query(
-          `INSERT INTO public.experience_bullets (experience_id, text, order_index)
+          `INSERT INTO public.experience_bullets (experience_id, text)
            VALUES ${values}`,
           params
         )
@@ -241,7 +235,6 @@ export const experienceService = {
       end_date,
       is_current,
       description,
-      order_index,
       bullets = [],
       // New free-text skills stored directly on experience as text[]
       skills_text = [],
@@ -254,10 +247,10 @@ export const experienceService = {
       await client.query(
         `UPDATE public.experience 
          SET company = $1, role = $2, location = $3, start_date = $4, 
-             end_date = $5, is_current = $6, description = $7, order_index = $8,
-             skills_text = $9,
+             end_date = $5, is_current = $6, description = $7,
+             skills_text = $8,
              updated_at = NOW()
-         WHERE id = $10`,
+         WHERE id = $9`,
         [
           company,
           role,
@@ -266,7 +259,6 @@ export const experienceService = {
           end_date || null,
           is_current || false,
           description || null,
-          order_index || 0,
           Array.isArray(skills_text) ? skills_text : [],
           id,
         ]
@@ -275,19 +267,19 @@ export const experienceService = {
       // Delete existing bullets
       await client.query('DELETE FROM public.experience_bullets WHERE experience_id = $1', [id])
 
-      // OPTIMIZED: Batch insert new bullets
+      // Simple batch insert new bullets (no order_index)
       if (bullets.length > 0) {
         const values = bullets.map((bullet, i) => 
-          `($1, $${i * 3 + 2}, $${i * 3 + 3})`
+          `($1, $${i + 2})`
         ).join(', ')
         
         const params = [id]
-        bullets.forEach((bullet, i) => {
-          params.push(bullet.text, bullet.order_index || i)
+        bullets.forEach((bullet) => {
+          params.push(bullet.text || bullet) // Support both object and string
         })
         
         await client.query(
-          `INSERT INTO public.experience_bullets (experience_id, text, order_index)
+          `INSERT INTO public.experience_bullets (experience_id, text)
            VALUES ${values}`,
           params
         )

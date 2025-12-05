@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 import BackButton from '@/components/BackButton'
 import LoadingButton from '@/components/LoadingButton'
+import { fetchWithAuth, fetchWithTimeout } from '@/lib/fetchWithAuth'
 import '../../experience.css'
 
 interface Experience {
@@ -16,8 +18,7 @@ interface Experience {
   end_date?: string
   is_current: boolean
   description?: string
-  order_index: number
-  bullets?: Array<{ id: number; text: string; order_index: number }>
+  bullets?: Array<{ id: number; text: string }>
   // New free-text skills stored directly on experience
   skills_text?: string[]
   // Legacy: old skills relation (for backward compatibility)
@@ -40,8 +41,7 @@ export default function EditExperiencePage() {
     end_date: '',
     is_current: false,
     description: '',
-    order_index: 0,
-    bullets: [] as Array<{ text: string; order_index: number }>,
+    bullets: [] as Array<{ text: string }>,
     // Free-text skills, e.g. ["UX/UI", "SQL"]
     skills_text: [] as string[],
   })
@@ -63,7 +63,8 @@ export default function EditExperiencePage() {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s timeout
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/experience/${id}`, {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+      const response = await fetch(`${API_URL}/api/experience/${id}`, {
         signal: controller.signal,
         cache: 'no-store',
       })
@@ -90,8 +91,7 @@ export default function EditExperiencePage() {
         end_date: formatDateForInput(data.end_date),
         is_current: data.is_current || false,
         description: data.description || '',
-        order_index: data.order_index || 0,
-        bullets: data.bullets?.map((b) => ({ text: b.text, order_index: b.order_index })) || [],
+        bullets: data.bullets?.map((b) => ({ text: b.text })) || [],
         // Prefer new skills_text if present; fallback to names from old skills_used
         skills_text:
           Array.isArray(data.skills_text) && data.skills_text.length > 0
@@ -100,9 +100,13 @@ export default function EditExperiencePage() {
       })
     } catch (err: any) {
       if (err.name === 'AbortError') {
-        setError('Request timeout. Vui lòng thử lại.')
+        const errorMsg = 'Request timeout. Vui lòng thử lại.'
+        setError(errorMsg)
+        toast.error(errorMsg)
       } else {
-        setError(err.message || 'Failed to load experience')
+        const errorMsg = err.message || 'Failed to load experience'
+        setError(errorMsg)
+        toast.error(errorMsg)
       }
     } finally {
       setLoading(false)
@@ -118,9 +122,9 @@ export default function EditExperiencePage() {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 15000) // 15s timeout
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/experience/${id}`, {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+      const response = await fetchWithAuth(`${API_URL}/api/experience/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
         signal: controller.signal,
       })
@@ -129,15 +133,20 @@ export default function EditExperiencePage() {
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to update experience')
+        throw new Error(errorData.error || errorData.message || 'Failed to update experience')
       }
 
+      toast.success('Experience đã được cập nhật thành công!')
       router.replace('/dashboard/experience')
     } catch (err: any) {
       if (err.name === 'AbortError') {
-        setError('Request timeout. Vui lòng thử lại.')
+        const errorMsg = 'Request timeout. Vui lòng thử lại.'
+        setError(errorMsg)
+        toast.error(errorMsg)
       } else {
-        setError(err.message || 'Failed to update experience')
+        const errorMsg = err.message || 'Failed to update experience'
+        setError(errorMsg)
+        toast.error(errorMsg)
       }
     } finally {
       setSaving(false)
@@ -148,7 +157,7 @@ export default function EditExperiencePage() {
     if (!newBullet.trim()) return
     setFormData({
       ...formData,
-      bullets: [...formData.bullets, { text: newBullet, order_index: formData.bullets.length }],
+      bullets: [...formData.bullets, { text: newBullet }],
     })
     setNewBullet('')
   }
@@ -158,7 +167,6 @@ export default function EditExperiencePage() {
       ...formData,
       bullets: formData.bullets
         .filter((_, i) => i !== index)
-        .map((bullet, i) => ({ ...bullet, order_index: i })),
     })
   }
 
@@ -270,18 +278,6 @@ export default function EditExperiencePage() {
                 />
               </div>
 
-              <div className="form-group">
-                <label htmlFor="order_index">Order Index</label>
-                <input
-                  id="order_index"
-                  type="number"
-                  value={formData.order_index}
-                  onChange={(e) =>
-                    setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })
-                  }
-                  placeholder="0"
-                />
-              </div>
             </div>
           </div>
 

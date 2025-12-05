@@ -3,12 +3,12 @@ import { queryWithTimeout } from '../utils/dbQuery.js'
 
 export const specializationsService = {
   /**
-   * Get all specializations ordered by order_index
+   * Get all specializations
    */
   async getAll() {
     const result = await queryWithTimeout(`
       SELECT * FROM public.specializations
-      ORDER BY order_index ASC
+      ORDER BY id ASC
     `)
     return result.rows
   },
@@ -32,14 +32,13 @@ export const specializationsService = {
       number,
       title,
       description,
-      order_index = 0,
     } = data
 
     const result = await queryWithTimeout(`
-      INSERT INTO public.specializations (number, title, description, order_index)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO public.specializations (number, title, description)
+      VALUES ($1, $2, $3)
       RETURNING *
-    `, [number, title, description || null, order_index])
+    `, [number, title, description || null])
     
     return result.rows[0]
   },
@@ -52,15 +51,14 @@ export const specializationsService = {
       number,
       title,
       description,
-      order_index,
     } = data
 
     const result = await queryWithTimeout(`
       UPDATE public.specializations
-      SET number = $1, title = $2, description = $3, order_index = $4, updated_at = NOW()
-      WHERE id = $5
+      SET number = $1, title = $2, description = $3, updated_at = NOW()
+      WHERE id = $4
       RETURNING *
-    `, [number, title, description || null, order_index, id])
+    `, [number, title, description || null, id])
     
     return result.rows[0] || null
   },

@@ -3,8 +3,10 @@
 import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 import BackButton from '@/components/BackButton'
 import LoadingButton from '@/components/LoadingButton'
+import { fetchWithAuth } from '@/lib/fetchWithAuth'
 import '../specializations.css'
 
 export default function NewSpecializationPage() {
@@ -15,7 +17,6 @@ export default function NewSpecializationPage() {
     number: '',
     title: '',
     description: '',
-    order_index: 0,
   })
 
   const handleSubmit = useCallback(
@@ -32,7 +33,6 @@ export default function NewSpecializationPage() {
 
       const payload = {
         ...formData,
-        order_index: Number(formData.order_index),
       }
 
       const controller = new AbortController()
@@ -40,9 +40,8 @@ export default function NewSpecializationPage() {
 
       try {
         const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-        const response = await fetch(`${API_URL}/api/specializations`, {
+        const response = await fetchWithAuth(`${API_URL}/api/specializations`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
           signal: controller.signal,
         })
@@ -50,15 +49,20 @@ export default function NewSpecializationPage() {
 
         if (!response.ok) {
           const errorData = await response.json()
-          throw new Error(errorData.error || 'Failed to create specialization')
+          throw new Error(errorData.error || errorData.message || 'Failed to create specialization')
         }
 
+        toast.success('Specialization đã được tạo thành công!')
         router.replace('/dashboard/specializations')
       } catch (err: any) {
         if (err.name === 'AbortError') {
-          setError('Yêu cầu tạo specialization đã hết thời gian. Vui lòng thử lại.')
+          const errorMsg = 'Yêu cầu tạo specialization đã hết thời gian. Vui lòng thử lại.'
+          setError(errorMsg)
+          toast.error(errorMsg)
         } else {
-          setError(err.message || 'Failed to create specialization')
+          const errorMsg = err.message || 'Failed to create specialization'
+          setError(errorMsg)
+          toast.error(errorMsg)
         }
       } finally {
         setLoading(false)
@@ -134,16 +138,6 @@ export default function NewSpecializationPage() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="order_index">Order Index</label>
-              <input
-                id="order_index"
-                type="number"
-                value={formData.order_index}
-                onChange={(e) =>
-                  setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })
-                }
-                placeholder="0"
-              />
             </div>
           </div>
 

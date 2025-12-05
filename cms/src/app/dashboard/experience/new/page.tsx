@@ -1,10 +1,12 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 import BackButton from '@/components/BackButton'
 import LoadingButton from '@/components/LoadingButton'
+import { fetchWithAuth } from '@/lib/fetchWithAuth'
 import '../experience.css'
 
 export default function NewExperiencePage() {
@@ -19,8 +21,7 @@ export default function NewExperiencePage() {
     end_date: '',
     is_current: false,
     description: '',
-    order_index: 0,
-    bullets: [] as Array<{ text: string; order_index: number }>,
+    bullets: [] as Array<{ text: string }>,
     // Free-text skills, e.g. ["UX/UI", "SQL"]
     skills_text: [] as string[],
   })
@@ -36,9 +37,9 @@ export default function NewExperiencePage() {
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 15000) // 15s timeout
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/experience`, {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
+      const response = await fetchWithAuth(`${API_URL}/api/experience`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
         signal: controller.signal,
       })
@@ -47,15 +48,20 @@ export default function NewExperiencePage() {
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to create experience')
+        throw new Error(errorData.error || errorData.message || 'Failed to create experience')
       }
 
+      toast.success('Experience đã được tạo thành công!')
       router.replace('/dashboard/experience')
     } catch (err: any) {
       if (err.name === 'AbortError') {
-        setError('Request timeout. Vui lòng thử lại.')
+        const errorMsg = 'Request timeout. Vui lòng thử lại.'
+        setError(errorMsg)
+        toast.error(errorMsg)
       } else {
-        setError(err.message || 'Failed to create experience')
+        const errorMsg = err.message || 'Failed to create experience'
+        setError(errorMsg)
+        toast.error(errorMsg)
       }
     } finally {
       setLoading(false)
@@ -66,7 +72,7 @@ export default function NewExperiencePage() {
     if (!newBullet.trim()) return
     setFormData({
       ...formData,
-      bullets: [...formData.bullets, { text: newBullet, order_index: formData.bullets.length }],
+      bullets: [...formData.bullets, { text: newBullet }],
     })
     setNewBullet('')
   }
@@ -74,9 +80,7 @@ export default function NewExperiencePage() {
   const removeBullet = (index: number) => {
     setFormData({
       ...formData,
-      bullets: formData.bullets
-        .filter((_, i) => i !== index)
-        .map((bullet, i) => ({ ...bullet, order_index: i })),
+      bullets: formData.bullets.filter((_, i) => i !== index),
     })
   }
 
@@ -169,18 +173,6 @@ export default function NewExperiencePage() {
                 />
               </div>
 
-              <div className="form-group">
-                <label htmlFor="order_index">Order Index</label>
-                <input
-                  id="order_index"
-                  type="number"
-                  value={formData.order_index}
-                  onChange={(e) =>
-                    setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })
-                  }
-                  placeholder="0"
-                />
-              </div>
             </div>
           </div>
 

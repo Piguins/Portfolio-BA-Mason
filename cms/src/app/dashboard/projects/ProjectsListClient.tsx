@@ -10,15 +10,10 @@ import './projects.css'
 interface Project {
   id: string
   title: string
-  slug: string
-  description?: string
-  content?: string
-  thumbnail_url?: string
-  demo_url?: string
-  github_url?: string
-  is_published: boolean
-  order_index: number
-  tags?: Array<{ id: number; name: string; color: string }>
+  summary?: string
+  hero_image_url?: string
+  case_study_url?: string
+  tags_text?: string[]
 }
 
 interface ProjectsListClientProps {
@@ -146,26 +141,11 @@ export default function ProjectsListClient({
                 <div className="card-header">
                   <div className="card-title-section">
                     <h3>{project.title}</h3>
-                    <p className="slug">{project.slug}</p>
-                    <div className="card-meta">
-                      <span
-                        className={`status-badge ${project.is_published ? 'published' : 'draft'}`}
-                      >
-                        {project.is_published ? '✓ Published' : '○ Draft'}
-                      </span>
-                      {project.order_index !== null && (
-                        <span className="meta-item">Order: {project.order_index}</span>
-                      )}
-                    </div>
-                    {project.tags && project.tags.length > 0 && (
+                    {project.tags_text && project.tags_text.length > 0 && (
                       <div className="tags-list">
-                        {project.tags.map((tag) => (
-                          <span
-                            key={tag.id}
-                            className="tag"
-                            style={{ backgroundColor: tag.color || '#e0e0e0' }}
-                          >
-                            {tag.name}
+                        {project.tags_text.map((tag, index) => (
+                          <span key={index} className="tag">
+                            {tag}
                           </span>
                         ))}
                       </div>
@@ -188,42 +168,32 @@ export default function ProjectsListClient({
                   </div>
                 </div>
 
-                {project.description && (
+                {project.summary && (
                   <div className="card-description">
-                    <p>{project.description}</p>
+                    <p>{project.summary}</p>
                   </div>
                 )}
 
-                {(project.demo_url || project.github_url || project.thumbnail_url) && (
+                {(project.case_study_url || project.hero_image_url) && (
                   <div className="card-links">
-                    {project.thumbnail_url && (
+                    {project.case_study_url && (
                       <a
-                        href={project.thumbnail_url}
+                        href={project.case_study_url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="link"
                       >
-                        🖼️ Thumbnail
+                        📄 Case Study
                       </a>
                     )}
-                    {project.demo_url && (
+                    {project.hero_image_url && (
                       <a
-                        href={project.demo_url}
+                        href={project.hero_image_url}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="link"
                       >
-                        🌐 Demo
-                      </a>
-                    )}
-                    {project.github_url && (
-                      <a
-                        href={project.github_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="link"
-                      >
-                        💻 GitHub
+                        🖼️ Hero Image
                       </a>
                     )}
                   </div>

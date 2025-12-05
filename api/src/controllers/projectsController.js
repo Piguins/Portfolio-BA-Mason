@@ -4,54 +4,15 @@ import { asyncHandler } from '../middleware/errorHandler.js'
 
 export const projectsController = {
   /**
-   * Get all projects (CMS: all, Public: published only)
-   * OPTIMIZED: Supports pagination, backward compatible
+   * Get all projects
    */
   getAll: asyncHandler(async (req, res) => {
-    const filters = {
-      published: req.query.published === 'true' ? true : req.query.published === 'false' ? false : undefined,
-      limit: req.query.limit ? parseInt(req.query.limit) : undefined,
-      offset: req.query.offset ? parseInt(req.query.offset) : undefined,
-    }
-    
-    // If no published filter, default to published=true for public API
-    if (filters.published === undefined) {
-      filters.published = true
-    }
-    
-    const result = await projectsService.getAll(filters)
+    const projects = await projectsService.getAll()
     
     // Add cache headers for GET requests
     res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=60')
     
-    // Backward compatible: return array if no pagination requested, otherwise return object
-    if (result.pagination) {
-      res.json({
-        success: true,
-        data: result.data,
-        pagination: result.pagination,
-      })
-    } else {
-      res.json(result.data)
-    }
-  }),
-  
-  /**
-   * Get project by slug (public)
-   */
-  getBySlug: asyncHandler(async (req, res) => {
-    const { slug } = req.params
-    const project = await projectsService.getBySlug(slug)
-    
-    if (!project) {
-      return res.status(404).json({ 
-        success: false,
-        error: 'Project not found' 
-      })
-    }
-    
-    res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=60')
-    res.json(project)
+    res.json(projects)
   }),
 
   /**
@@ -76,10 +37,10 @@ export const projectsController = {
    */
   create: asyncHandler(async (req, res) => {
     // Basic validation
-    if (!req.body.title || !req.body.slug) {
+    if (!req.body.title) {
       return res.status(400).json({
         success: false,
-        error: 'Title and slug are required',
+        error: 'Title is required',
       })
     }
 

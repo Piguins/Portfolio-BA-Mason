@@ -1,69 +1,47 @@
 'use client'
 
-import React, { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 import BackButton from '@/components/BackButton'
 import LoadingButton from '@/components/LoadingButton'
+import { fetchWithAuth } from '@/lib/fetchWithAuth'
 import '../projects.css'
-
-interface ProjectTag {
-  id: number
-  name: string
-  color: string
-}
 
 export default function NewProjectPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [tags, setTags] = useState<ProjectTag[]>([])
-  const [loadingTags, setLoadingTags] = useState(true)
   const [formData, setFormData] = useState({
     title: '',
-    slug: '',
-    description: '',
-    content: '',
-    thumbnail_url: '',
-    demo_url: '',
-    github_url: '',
-    is_published: false,
-    order_index: 0,
-    tag_ids: [] as number[],
+    summary: '',
+    hero_image_url: '',
+    case_study_url: '',
+    tags_text: [] as string[],
   })
+  const [newTag, setNewTag] = useState('')
 
-  // Fetch all project tags for selection
-  useEffect(() => {
-    const fetchTags = async () => {
-      try {
-        // First, fetch all projects to get tags
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-        const response = await fetch(`${API_URL}/api/projects?published=true`)
-        if (response.ok) {
-          const projects = await response.json()
-          // Extract unique tags from all projects
-          const allTags = new Map<number, ProjectTag>()
-          projects.forEach((project: any) => {
-            if (project.tags && Array.isArray(project.tags)) {
-              project.tags.forEach((tag: ProjectTag) => {
-                if (!allTags.has(tag.id)) {
-                  allTags.set(tag.id, tag)
-                }
-              })
-            }
-          })
-          setTags(Array.from(allTags.values()))
-        }
-      } catch (err) {
-        // Failed to fetch tags - error already handled by catch block
-        // If that fails, try to get tags from a single project or create empty array
-        setTags([])
-      } finally {
-        setLoadingTags(false)
-      }
+  const addTag = () => {
+    const value = newTag.trim()
+    if (!value) return
+    if (formData.tags_text.some((t) => t.toLowerCase() === value.toLowerCase())) {
+      setNewTag('')
+      return
     }
-    fetchTags()
-  }, [])
+    setFormData({
+      ...formData,
+      tags_text: [...formData.tags_text, value],
+    })
+    setNewTag('')
+  }
+
+  const removeTag = (index: number) => {
+    setFormData({
+      ...formData,
+      tags_text: formData.tags_text.filter((_, i) => i !== index),
+    })
+  }
 
   const handleSubmit = useCallback(
     async (e: React.FormEvent) => {
@@ -71,15 +49,10 @@ export default function NewProjectPage() {
       setLoading(true)
       setError(null)
 
-      if (!formData.title || !formData.slug) {
-        setError('Vui lòng điền đầy đủ Title và Slug.')
+      if (!formData.title) {
+        setError('Vui lòng điền Title.')
         setLoading(false)
         return
-      }
-
-      const payload = {
-        ...formData,
-        order_index: Number(formData.order_index),
       }
 
       const controller = new AbortController()
@@ -87,25 +60,29 @@ export default function NewProjectPage() {
 
       try {
         const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-        const response = await fetch(`${API_URL}/api/projects`, {
+        const response = await fetchWithAuth(`${API_URL}/api/projects`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
+          body: JSON.stringify(formData),
           signal: controller.signal,
         })
         clearTimeout(timeoutId)
 
         if (!response.ok) {
           const errorData = await response.json()
-          throw new Error(errorData.error || 'Failed to create project')
+          throw new Error(errorData.error || errorData.message || 'Failed to create project')
         }
 
+        toast.success('Project đã được tạo thành công!')
         router.replace('/dashboard/projects')
       } catch (err: any) {
         if (err.name === 'AbortError') {
-          setError('Yêu cầu tạo project đã hết thời gian. Vui lòng thử lại.')
+          const errorMsg = 'Request timeout. Vui lòng thử lại.'
+          setError(errorMsg)
+          toast.error(errorMsg)
         } else {
-          setError(err.message || 'Failed to create project')
+          const errorMsg = err.message || 'Failed to create project'
+          setError(errorMsg)
+          toast.error(errorMsg)
         }
       } finally {
         setLoading(false)
@@ -113,21 +90,6 @@ export default function NewProjectPage() {
     },
     [formData, router]
   )
-
-  // Auto-generate slug from title
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const title = e.target.value
-    setFormData((prev: typeof formData) => ({
-      ...prev,
-      title,
-      slug:
-        prev.slug ||
-        title
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/^-|-$/g, ''),
-    }))
-  }
 
   return (
     <div className="projects-page">
@@ -167,191 +129,79 @@ export default function NewProjectPage() {
                 type="text"
                 required
                 value={formData.title}
-                onChange={handleTitleChange}
-                placeholder="Tên project"
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                placeholder="Re-Design For Business Analyst Portfolio"
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="slug">Slug *</label>
-              <input
-                id="slug"
-                type="text"
-                required
-                value={formData.slug}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setFormData({ ...formData, slug: e.target.value })
-                }
-                placeholder="project-slug"
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="order_index">Order Index</label>
-              <input
-                id="order_index"
-                type="number"
-                value={formData.order_index}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })
-                }
-              />
-            </div>
-          </div>
-
-          <div className="form-section">
-            <h3 className="section-title">Nội dung</h3>
-            <div className="form-group">
-              <label htmlFor="description">Description</label>
+              <label htmlFor="summary">Summary / Description</label>
               <textarea
-                id="description"
-                rows={3}
-                value={formData.description}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
-                placeholder="Mô tả ngắn về project..."
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="content">Content</label>
-              <textarea
-                id="content"
-                rows={8}
-                value={formData.content}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                  setFormData({ ...formData, content: e.target.value })
-                }
-                placeholder="Nội dung chi tiết về project (Markdown supported)..."
+                id="summary"
+                rows={4}
+                value={formData.summary}
+                onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
+                placeholder="It is a long established fact that a reader will be distracted by the readable content..."
               />
             </div>
           </div>
 
           <div className="form-section">
-            <h3 className="section-title">Links & Media</h3>
+            <h3 className="section-title">Tags</h3>
             <div className="form-group">
-              <label htmlFor="thumbnail_url">Thumbnail URL</label>
-              <input
-                id="thumbnail_url"
-                type="url"
-                value={formData.thumbnail_url}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setFormData({ ...formData, thumbnail_url: e.target.value })
-                }
-                placeholder="https://example.com/thumbnail.jpg"
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="demo_url">Demo URL</label>
-              <input
-                id="demo_url"
-                type="url"
-                value={formData.demo_url}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setFormData({ ...formData, demo_url: e.target.value })
-                }
-                placeholder="https://example.com/demo"
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="github_url">GitHub URL</label>
-              <input
-                id="github_url"
-                type="url"
-                value={formData.github_url}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  setFormData({ ...formData, github_url: e.target.value })
-                }
-                placeholder="https://github.com/username/repo"
-              />
-            </div>
-          </div>
-
-          <div className="form-section">
-            <h3 className="section-title">Tags (Project Tags)</h3>
-            <div className="form-group">
-              <label htmlFor="tags">Chọn các tags cho project này</label>
-              {loadingTags ? (
-                <p className="text-muted">Đang tải danh sách tags...</p>
-              ) : tags.length === 0 ? (
-                <p className="text-muted">
-                  Chưa có tag nào. Tags sẽ được tạo tự động khi bạn tạo project với tags mới.
-                </p>
-              ) : (
-                <div className="tags-select-container">
-                  <div className="tags-checkbox-list">
-                    {tags.map((tag) => (
-                      <label
-                        key={tag.id}
-                        className="tag-checkbox-item"
-                        style={{ borderLeftColor: tag.color || '#6366f1' }}
+              <div className="bullets-input">
+                <input
+                  type="text"
+                  value={newTag}
+                  onChange={(e) => setNewTag(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                  placeholder="Nhập tag và nhấn Enter hoặc nút Thêm"
+                />
+                <LoadingButton type="button" onClick={addTag} variant="primary">
+                  Thêm
+                </LoadingButton>
+              </div>
+              {formData.tags_text.length > 0 && (
+                <div className="selected-skills-tags">
+                  {formData.tags_text.map((tag, index) => (
+                    <span key={index} className="selected-skill-tag">
+                      {tag}
+                      <button
+                        type="button"
+                        className="btn-remove"
+                        onClick={() => removeTag(index)}
                       >
-                        <input
-                          type="checkbox"
-                          checked={formData.tag_ids.includes(tag.id)}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                            if (e.target.checked) {
-                              setFormData({
-                                ...formData,
-                                tag_ids: [...formData.tag_ids, tag.id],
-                              })
-                            } else {
-                              setFormData({
-                                ...formData,
-                                tag_ids: formData.tag_ids.filter((id: number) => id !== tag.id),
-                              })
-                            }
-                          }}
-                        />
-                        <span>{tag.name}</span>
-                        <span
-                          className="tag-color-badge"
-                          style={{ backgroundColor: tag.color || '#6366f1' }}
-                        ></span>
-                      </label>
-                    ))}
-                  </div>
-                  {formData.tag_ids.length > 0 && (
-                    <div className="selected-tags-preview">
-                      <p className="selected-tags-label">Đã chọn ({formData.tag_ids.length}):</p>
-                      <div className="selected-tags-tags">
-                        {formData.tag_ids.map((tagId: number) => {
-                          const tag = tags.find((t: ProjectTag) => t.id === tagId)
-                          return tag ? (
-                            <span
-                              key={tagId}
-                              className="selected-tag-tag"
-                              style={{ backgroundColor: tag.color || '#6366f1' }}
-                            >
-                              {tag.name}
-                            </span>
-                          ) : null
-                        })}
-                      </div>
-                    </div>
-                  )}
+                        ×
+                      </button>
+                    </span>
+                  ))}
                 </div>
               )}
             </div>
           </div>
 
           <div className="form-section">
-            <h3 className="section-title">Publish Settings</h3>
-            <div className="form-group checkbox-group">
-              <label htmlFor="is_published">
-                <input
-                  id="is_published"
-                  type="checkbox"
-                  checked={formData.is_published}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    setFormData({ ...formData, is_published: e.target.checked })
-                  }
-                />
-                Publish project (hiển thị trên portfolio)
-              </label>
+            <h3 className="section-title">Links & Media</h3>
+            <div className="form-group">
+              <label htmlFor="case_study_url">Case Study URL</label>
+              <input
+                id="case_study_url"
+                type="url"
+                value={formData.case_study_url}
+                onChange={(e) => setFormData({ ...formData, case_study_url: e.target.value })}
+                placeholder="https://example.com/case-study"
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="hero_image_url">Hero Image URL</label>
+              <input
+                id="hero_image_url"
+                type="url"
+                value={formData.hero_image_url}
+                onChange={(e) => setFormData({ ...formData, hero_image_url: e.target.value })}
+                placeholder="https://example.com/image.jpg"
+              />
             </div>
           </div>
 

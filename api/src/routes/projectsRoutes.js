@@ -79,32 +79,7 @@ router.get('/api/projects', projectsController.getAll)
  *       404:
  *         description: Project not found
  */
-router.get('/api/projects/id/:id', projectsController.getById) // Must come before :slug
-
-/**
- * @swagger
- * /api/projects/{slug}:
- *   get:
- *     summary: Get project by slug
- *     tags: [Projects]
- *     parameters:
- *       - in: path
- *         name: slug
- *         required: true
- *         schema:
- *           type: string
- *         description: Project slug (URL-friendly identifier)
- *     responses:
- *       200:
- *         description: Project details
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Project'
- *       404:
- *         description: Project not found
- */
-router.get('/api/projects/:slug', projectsController.getBySlug) // Must be last (catch-all for slugs)
+router.get('/api/projects/:id', projectsController.getById)
 
 /**
  * @swagger

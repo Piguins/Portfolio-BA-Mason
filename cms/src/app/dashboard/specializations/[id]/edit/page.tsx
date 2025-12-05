@@ -3,8 +3,10 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 import BackButton from '@/components/BackButton'
 import LoadingButton from '@/components/LoadingButton'
+import { fetchWithAuth } from '@/lib/fetchWithAuth'
 import '../../specializations.css'
 
 interface Specialization {
@@ -12,7 +14,6 @@ interface Specialization {
   number: string
   title: string
   description?: string
-  order_index: number
 }
 
 export default function EditSpecializationPage() {
@@ -27,7 +28,6 @@ export default function EditSpecializationPage() {
     number: '',
     title: '',
     description: '',
-    order_index: 0,
   })
 
   const fetchSpecialization = useCallback(async () => {
@@ -48,11 +48,12 @@ export default function EditSpecializationPage() {
         number: data.number,
         title: data.title,
         description: data.description || '',
-        order_index: data.order_index || 0,
       })
-    } catch (err: any) {
-      setError(err.message || 'Failed to load specialization')
-    } finally {
+      } catch (err: any) {
+        const errorMsg = err.message || 'Failed to load specialization'
+        setError(errorMsg)
+        toast.error(errorMsg)
+      } finally {
       setLoading(false)
     }
   }, [id])
@@ -77,7 +78,6 @@ export default function EditSpecializationPage() {
 
       const payload = {
         ...formData,
-        order_index: Number(formData.order_index),
       }
 
       const controller = new AbortController()
@@ -85,9 +85,8 @@ export default function EditSpecializationPage() {
 
       try {
         const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'
-        const response = await fetch(`${API_URL}/api/specializations/${id}`, {
+        const response = await fetchWithAuth(`${API_URL}/api/specializations/${id}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
           signal: controller.signal,
         })
@@ -95,15 +94,20 @@ export default function EditSpecializationPage() {
 
         if (!response.ok) {
           const errorData = await response.json()
-          throw new Error(errorData.error || 'Failed to update specialization')
+          throw new Error(errorData.error || errorData.message || 'Failed to update specialization')
         }
 
+        toast.success('Specialization đã được cập nhật thành công!')
         router.replace('/dashboard/specializations')
       } catch (err: any) {
         if (err.name === 'AbortError') {
-          setError('Yêu cầu cập nhật đã hết thời gian. Vui lòng thử lại.')
+          const errorMsg = 'Yêu cầu cập nhật đã hết thời gian. Vui lòng thử lại.'
+          setError(errorMsg)
+          toast.error(errorMsg)
         } else {
-          setError(err.message || 'Failed to update specialization')
+          const errorMsg = err.message || 'Failed to update specialization'
+          setError(errorMsg)
+          toast.error(errorMsg)
         }
       } finally {
         setSaving(false)
@@ -190,16 +194,6 @@ export default function EditSpecializationPage() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="order_index">Order Index</label>
-              <input
-                id="order_index"
-                type="number"
-                value={formData.order_index}
-                onChange={(e) =>
-                  setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })
-                }
-                placeholder="0"
-              />
             </div>
           </div>
 
