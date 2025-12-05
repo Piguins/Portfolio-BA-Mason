@@ -14,6 +14,17 @@ export const config = {
   ],
 }
 
+interface CookieItem {
+  name: string
+  value: string
+}
+
+interface CookieToSet {
+  name: string
+  value: string
+  options?: any
+}
+
 export async function middleware(request: NextRequest) {
   try {
     // PERFORMANCE: Skip auth check for static assets and API routes
@@ -42,7 +53,7 @@ export async function middleware(request: NextRequest) {
     // Supabase SSR uses cookies like: sb-<project-ref>-auth-token
     // Check for any Supabase auth-related cookies
     const allCookies = request.cookies.getAll()
-    const hasAuthCookie = allCookies.some(cookie => 
+    const hasAuthCookie = allCookies.some((cookie: CookieItem) => 
       cookie.name.includes('sb-') && cookie.name.includes('auth-token')
     )
     
@@ -72,17 +83,17 @@ export async function middleware(request: NextRequest) {
         getAll() {
           return request.cookies.getAll()
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet: CookieToSet[]) {
           try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              request.cookies.set(name, value)
-            )
+            cookiesToSet.forEach((cookie) => {
+              request.cookies.set(cookie.name, cookie.value)
+            })
             response = NextResponse.next({
               request,
             })
-            cookiesToSet.forEach(({ name, value, options }) =>
-              response.cookies.set(name, value, options)
-            )
+            cookiesToSet.forEach((cookie) => {
+              response.cookies.set(cookie.name, cookie.value, cookie.options)
+            })
           } catch (error) {
             console.error('Cookie setting error:', error)
           }
@@ -140,4 +151,3 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 }
-
