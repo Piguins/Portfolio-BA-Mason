@@ -18,6 +18,8 @@ export async function OPTIONS(request: NextRequest) {
 // GET - Get all experiences (with bullets from experience_bullets)
 export async function GET(request: NextRequest) {
   try {
+    console.log('[Experience GET] Starting query...')
+    
     const experiences = await queryAll<{
       id: string
       company: string
@@ -49,7 +51,7 @@ export async function GET(request: NextRequest) {
             'id', eb.id,
             'text', eb.text
           )) FILTER (WHERE eb.id IS NOT NULL),
-          '[]'
+          '[]'::json
         ) AS bullets
       FROM public.experience e
       LEFT JOIN public.experience_bullets eb ON eb.experience_id = e.id
@@ -58,8 +60,33 @@ export async function GET(request: NextRequest) {
       ORDER BY e.start_date DESC
     `)
 
-    return createSuccessResponse(experiences, request)
+    console.log(`[Experience GET] Query successful, found ${experiences.length} experiences`)
+    
+    // Transform bullets from JSON string to array if needed
+    const transformedExperiences = experiences.map(exp => {
+      let bullets = exp.bullets
+      // Handle case where bullets might be a JSON string
+      if (typeof bullets === 'string') {
+        try {
+          bullets = JSON.parse(bullets)
+        } catch (e) {
+          console.error('[Experience GET] Error parsing bullets:', e)
+          bullets = []
+        }
+      }
+      // Ensure bullets is an array
+      if (!Array.isArray(bullets)) {
+        bullets = []
+      }
+      return {
+        ...exp,
+        bullets
+      }
+    })
+
+    return createSuccessResponse(transformedExperiences, request)
   } catch (error) {
+    console.error('[Experience GET] Error caught:', error)
     return handleDatabaseError(error, 'fetch experiences', request)
   }
 }

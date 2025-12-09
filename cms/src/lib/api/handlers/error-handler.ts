@@ -21,6 +21,20 @@ export function createErrorResponse(
 ): NextResponse {
   // Log full error for debugging (server-side only)
   console.error(`[API Error] ${defaultMessage}:`, error)
+  
+  // Log error details for debugging
+  if (error instanceof Error) {
+    console.error(`[API Error] Message:`, error.message)
+    console.error(`[API Error] Stack:`, error.stack)
+    if ((error as any).code) {
+      console.error(`[API Error] Code:`, (error as any).code)
+    }
+    if ((error as any).meta) {
+      console.error(`[API Error] Meta:`, (error as any).meta)
+    }
+  } else if (typeof error === 'object' && error !== null) {
+    console.error(`[API Error] Error object:`, JSON.stringify(error, null, 2))
+  }
 
   // Extract error details
   let errorMessage = defaultMessage

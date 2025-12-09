@@ -28,15 +28,25 @@ export function sanitizeError(error: any): string {
 
   const errorMessage = error.message || error.toString()
 
-  // Don't expose internal errors, stack traces, or sensitive info
+  // Don't expose sensitive information (passwords, tokens, secrets, keys)
   if (
     errorMessage.includes('password') ||
     errorMessage.includes('token') ||
     errorMessage.includes('secret') ||
-    errorMessage.includes('key') ||
-    errorMessage.includes('database') ||
-    errorMessage.includes('connection')
+    errorMessage.includes('api_key') ||
+    errorMessage.includes('private key')
   ) {
+    return 'An error occurred. Please try again later.'
+  }
+
+  // For database connection errors, return generic message but log details
+  if (
+    errorMessage.includes('database') ||
+    errorMessage.includes('connection') ||
+    errorMessage.includes('timeout')
+  ) {
+    // Log full error for debugging
+    console.error('[Sanitized Error] Database/Connection error:', errorMessage)
     return 'An error occurred. Please try again later.'
   }
 
@@ -45,6 +55,8 @@ export function sanitizeError(error: any): string {
     return 'Invalid request'
   }
 
+  // For other errors, return generic message but log for debugging
+  console.error('[Sanitized Error] Unknown error:', errorMessage)
   return 'An error occurred'
 }
 
