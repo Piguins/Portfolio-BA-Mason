@@ -1,5 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { NextRequest } from 'next/server'
+import { parseRequestBody, createSuccessResponse } from '@/lib/api/handlers/request-handler'
+import { handleDatabaseError, createErrorResponse } from '@/lib/api/handlers/error-handler'
+import { validateRequiredFields } from '@/lib/api/validators/request-validator'
+import { queryAll, queryFirst, executeQuery } from '@/lib/api/database/query-helpers'
 
 // GET - Get all skills
 export async function GET(request: NextRequest) {
@@ -24,7 +27,7 @@ export async function GET(request: NextRequest) {
       FROM public.skills
       WHERE 1=1
     `
-    const params: any[] = []
+    const params: unknown[] = []
     let paramIndex = 1
 
     if (category) {
@@ -41,30 +44,62 @@ export async function GET(request: NextRequest) {
 
     query += ` ORDER BY order_index ASC, name ASC`
 
-    const result = await prisma.$queryRawUnsafe(query, ...params)
-    const skills = Array.isArray(result) ? result : [result]
+    const skills = await queryAll<{
+      id: number
+      name: string
+      slug: string | null
+      category: string
+      level: string | null
+      icon_url: string | null
+      description: string | null
+      order_index: number
+      is_highlight: boolean
+      created_at: Date
+      updated_at: Date
+    }>(query, ...params)
 
-    return NextResponse.json(skills)
+    return createSuccessResponse(skills, request)
   } catch (error) {
-    console.error('Error fetching skills:', error)
-    return NextResponse.json({ error: 'Failed to fetch skills' }, { status: 500 })
+    return handleDatabaseError(error, 'fetch skills', request)
   }
 }
 
 // POST - Create skill
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { name, slug, category, level, icon_url, description, order_index, is_highlight } = body
-
-    if (!name || !category) {
-      return NextResponse.json({ error: 'Name and category are required' }, { status: 400 })
+    // Parse request body
+    const parseResult = await parseRequestBody<{
+      name?: string
+      slug?: string
+      category?: string
+      level?: string
+      icon_url?: string
+      description?: string
+      order_index?: number
+      is_highlight?: boolean
+    }>(request)
+    if (parseResult.error) {
+      return parseResult.error
     }
 
-    const result = await prisma.$executeRawUnsafe(
+    const body = parseResult.data
+    const { name, slug, category, level, icon_url, description, order_index, is_highlight } = body
+
+    // Validate required fields
+    const validation = validateRequiredFields(body as Record<string, unknown>, ['name', 'category'])
+    if (!validation.isValid) {
+      return createErrorResponse(
+        new Error(`Missing required fields: ${validation.missingFields.join(', ')}`),
+        `Missing required fields: ${validation.missingFields.join(', ')}`,
+        request,
+        400
+      )
+    }
+
+    const result = await queryFirst<{ id: number }>(
       `INSERT INTO public.skills (name, slug, category, level, icon_url, description, order_index, is_highlight)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-       RETURNING *`,
+       RETURNING id`,
       name,
       slug || null,
       category,
@@ -75,10 +110,26 @@ export async function POST(request: NextRequest) {
       is_highlight || false
     )
 
-    const skill = Array.isArray(result) ? result[0] : result
-    return NextResponse.json(skill, { status: 201 })
+    if (!result) {
+      throw new Error('Failed to create skill')
+    }
+
+    const skill = await queryFirst<{
+      id: number
+      name: string
+      slug: string | null
+      category: string
+      level: string | null
+      icon_url: string | null
+      description: string | null
+      order_index: number
+      is_highlight: boolean
+      created_at: Date
+      updated_at: Date
+    }>(`SELECT * FROM public.skills WHERE id = $1`, result.id)
+
+    return createSuccessResponse(skill, request, 201)
   } catch (error) {
-    console.error('Error creating skill:', error)
-    return NextResponse.json({ error: 'Failed to create skill' }, { status: 500 })
+    return handleDatabaseError(error, 'create skill', request)
   }
 }

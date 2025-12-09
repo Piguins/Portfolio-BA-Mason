@@ -1,35 +1,103 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { parseRequestBody, createSuccessResponse } from '@/lib/api/handlers/request-handler'
+import { createErrorResponse, handleDatabaseError } from '@/lib/api/handlers/error-handler'
+import { validateRequiredFields } from '@/lib/api/validators/request-validator'
+import { validateUUID } from '@/lib/api/validators/uuid-validator'
 
 // GET - Get portfolio project by ID
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const { id } = params
+
+    // Validate UUID format
+    try {
+      validateUUID(id)
+    } catch (error) {
+      return createErrorResponse(
+        error as Error,
+        'Invalid portfolio ID format',
+        request,
+        400
+      )
+    }
 
     const portfolio = await prisma.portfolio.findUnique({
       where: { id },
     })
 
     if (!portfolio) {
-      return NextResponse.json({ error: 'Portfolio project not found' }, { status: 404 })
+      return createErrorResponse(
+        new Error('Portfolio project not found'),
+        'Portfolio project not found',
+        request,
+        404
+      )
     }
 
-    return NextResponse.json(portfolio)
+    return createSuccessResponse(portfolio, request)
   } catch (error) {
-    console.error('Error fetching portfolio:', error)
-    return NextResponse.json({ error: 'Failed to fetch portfolio' }, { status: 500 })
+    return handleDatabaseError(error, 'fetch portfolio', request)
   }
 }
 
 // PUT - Update portfolio project
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const { id } = params
-    const body = await request.json()
+
+    // Validate UUID format
+    try {
+      validateUUID(id)
+    } catch (error) {
+      return createErrorResponse(
+        error as Error,
+        'Invalid portfolio ID format',
+        request,
+        400
+      )
+    }
+
+    // Parse request body
+    const parseResult = await parseRequestBody<{
+      title?: string
+      tagRole?: string
+      description?: string | null
+      imageUrl?: string | null
+      projectUrl?: string | null
+    }>(request)
+    if (parseResult.error) {
+      return parseResult.error
+    }
+
+    const body = parseResult.data
     const { title, tagRole, description, imageUrl, projectUrl } = body
 
+    // Validate required fields
+    const validation = validateRequiredFields(body as Record<string, unknown>, ['title', 'tagRole'])
+    if (!validation.isValid) {
+      return createErrorResponse(
+        new Error(`Missing required fields: ${validation.missingFields.join(', ')}`),
+        `Missing required fields: ${validation.missingFields.join(', ')}`,
+        request,
+        400
+      )
+    }
+
+    // Type assertion after validation
     if (!title || !tagRole) {
-      return NextResponse.json({ error: 'Title and tagRole are required' }, { status: 400 })
+      return createErrorResponse(
+        new Error('Title and tagRole are required'),
+        'Title and tagRole are required',
+        request,
+        400
+      )
     }
 
     const portfolio = await prisma.portfolio.update({
@@ -43,25 +111,41 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       },
     })
 
-    return NextResponse.json(portfolio)
+    return createSuccessResponse(portfolio, request)
   } catch (error) {
-    console.error('Error updating portfolio:', error)
-    return NextResponse.json({ error: 'Failed to update portfolio' }, { status: 500 })
+    return handleDatabaseError(error, 'update portfolio', request)
   }
 }
 
 // DELETE - Delete portfolio project
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const { id } = params
+
+    // Validate UUID format
+    try {
+      validateUUID(id)
+    } catch (error) {
+      return createErrorResponse(
+        error as Error,
+        'Invalid portfolio ID format',
+        request,
+        400
+      )
+    }
 
     await prisma.portfolio.delete({
       where: { id },
     })
 
-    return NextResponse.json({ message: 'Portfolio project deleted successfully' })
+    return createSuccessResponse(
+      { message: 'Portfolio project deleted successfully' },
+      request
+    )
   } catch (error) {
-    console.error('Error deleting portfolio:', error)
-    return NextResponse.json({ error: 'Failed to delete portfolio' }, { status: 500 })
+    return handleDatabaseError(error, 'delete portfolio', request)
   }
 }

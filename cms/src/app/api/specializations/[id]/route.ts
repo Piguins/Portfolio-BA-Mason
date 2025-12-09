@@ -1,53 +1,102 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { NextRequest } from 'next/server'
+import { parseRequestBody, createSuccessResponse } from '@/lib/api/handlers/request-handler'
+import { createErrorResponse, handleDatabaseError } from '@/lib/api/handlers/error-handler'
+import { validateRequiredFields, validateIntegerId } from '@/lib/api/validators/request-validator'
+import { queryFirst, executeQuery } from '@/lib/api/database/query-helpers'
 
 // GET - Get specialization by ID
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const { id } = params
-    const idNum = parseInt(id, 10)
 
-    if (isNaN(idNum)) {
-      return NextResponse.json({ error: 'Invalid ID format' }, { status: 400 })
+    // Validate integer ID
+    const idValidation = validateIntegerId(id)
+    if (!idValidation.isValid) {
+      return createErrorResponse(
+        new Error(idValidation.error),
+        idValidation.error,
+        request,
+        400
+      )
     }
 
-    const result = await prisma.$queryRawUnsafe(
+    const specialization = await queryFirst<{
+      id: number
+      number: number | null
+      title: string
+      description: string | null
+      icon_url: string | null
+      created_at: Date
+      updated_at: Date
+    }>(
       `SELECT id, number, title, description, icon_url, created_at, updated_at
        FROM public.specializations WHERE id = $1`,
-      idNum
+      idValidation.value
     )
 
-    const specialization = Array.isArray(result) ? result[0] : result
-
     if (!specialization) {
-      return NextResponse.json({ error: 'Specialization not found' }, { status: 404 })
+      return createErrorResponse(
+        new Error('Specialization not found'),
+        'Specialization not found',
+        request,
+        404
+      )
     }
 
-    return NextResponse.json(specialization)
+    return createSuccessResponse(specialization, request)
   } catch (error) {
-    console.error('Error fetching specialization:', error)
-    return NextResponse.json({ error: 'Failed to fetch specialization' }, { status: 500 })
+    return handleDatabaseError(error, 'fetch specialization', request)
   }
 }
 
 // PUT - Update specialization
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const { id } = params
-    const idNum = parseInt(id, 10)
 
-    if (isNaN(idNum)) {
-      return NextResponse.json({ error: 'Invalid ID format' }, { status: 400 })
+    // Validate integer ID
+    const idValidation = validateIntegerId(id)
+    if (!idValidation.isValid) {
+      return createErrorResponse(
+        new Error(idValidation.error),
+        idValidation.error,
+        request,
+        400
+      )
     }
 
-    const body = await request.json()
+    // Parse request body
+    const parseResult = await parseRequestBody<{
+      number?: number | null
+      title?: string
+      description?: string | null
+      icon_url?: string | null
+    }>(request)
+    if (parseResult.error) {
+      return parseResult.error
+    }
+
+    const body = parseResult.data
     const { number, title, description, icon_url } = body
 
-    if (!title) {
-      return NextResponse.json({ error: 'Title is required' }, { status: 400 })
+    // Validate required fields
+    const validation = validateRequiredFields(body as Record<string, unknown>, ['title'])
+    if (!validation.isValid) {
+      return createErrorResponse(
+        new Error(`Missing required fields: ${validation.missingFields.join(', ')}`),
+        `Missing required fields: ${validation.missingFields.join(', ')}`,
+        request,
+        400
+      )
     }
 
-    await prisma.$executeRawUnsafe(
+    await executeQuery(
       `UPDATE public.specializations
        SET number = $1, title = $2, description = $3, icon_url = $4, updated_at = NOW()
        WHERE id = $5`,
@@ -55,39 +104,55 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       title,
       description || null,
       icon_url || null,
-      idNum
+      idValidation.value
     )
 
-    const result = await prisma.$queryRawUnsafe(
+    const specialization = await queryFirst<{
+      id: number
+      number: number | null
+      title: string
+      description: string | null
+      icon_url: string | null
+      created_at: Date
+      updated_at: Date
+    }>(
       `SELECT id, number, title, description, icon_url, created_at, updated_at
        FROM public.specializations WHERE id = $1`,
-      idNum
+      idValidation.value
     )
 
-    const specialization = Array.isArray(result) ? result[0] : result
-
-    return NextResponse.json(specialization)
+    return createSuccessResponse(specialization, request)
   } catch (error) {
-    console.error('Error updating specialization:', error)
-    return NextResponse.json({ error: 'Failed to update specialization' }, { status: 500 })
+    return handleDatabaseError(error, 'update specialization', request)
   }
 }
 
 // DELETE - Delete specialization
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const { id } = params
-    const idNum = parseInt(id, 10)
 
-    if (isNaN(idNum)) {
-      return NextResponse.json({ error: 'Invalid ID format' }, { status: 400 })
+    // Validate integer ID
+    const idValidation = validateIntegerId(id)
+    if (!idValidation.isValid) {
+      return createErrorResponse(
+        new Error(idValidation.error),
+        idValidation.error,
+        request,
+        400
+      )
     }
 
-    await prisma.$executeRawUnsafe(`DELETE FROM public.specializations WHERE id = $1`, idNum)
+    await executeQuery(`DELETE FROM public.specializations WHERE id = $1`, idValidation.value)
 
-    return NextResponse.json({ message: 'Specialization deleted successfully' })
+    return createSuccessResponse(
+      { message: 'Specialization deleted successfully' },
+      request
+    )
   } catch (error) {
-    console.error('Error deleting specialization:', error)
-    return NextResponse.json({ error: 'Failed to delete specialization' }, { status: 500 })
+    return handleDatabaseError(error, 'delete specialization', request)
   }
 }

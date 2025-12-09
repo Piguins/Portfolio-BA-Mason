@@ -1,49 +1,106 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { NextRequest } from 'next/server'
+import { parseRequestBody, createSuccessResponse } from '@/lib/api/handlers/request-handler'
+import { createErrorResponse, handleDatabaseError } from '@/lib/api/handlers/error-handler'
+import { validateRequiredFields, validateIntegerId } from '@/lib/api/validators/request-validator'
+import { queryFirst, executeQuery } from '@/lib/api/database/query-helpers'
 
 // GET - Get skill by ID
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const { id } = params
-    const idNum = parseInt(id, 10)
 
-    if (isNaN(idNum)) {
-      return NextResponse.json({ error: 'Invalid ID format' }, { status: 400 })
+    // Validate integer ID
+    const idValidation = validateIntegerId(id)
+    if (!idValidation.isValid) {
+      return createErrorResponse(
+        new Error(idValidation.error),
+        idValidation.error,
+        request,
+        400
+      )
     }
 
-    const result = await prisma.$queryRawUnsafe(`SELECT * FROM public.skills WHERE id = $1`, idNum)
-
-    const skill = Array.isArray(result) ? result[0] : result
+    const skill = await queryFirst<{
+      id: number
+      name: string
+      slug: string | null
+      category: string
+      level: string | null
+      icon_url: string | null
+      description: string | null
+      order_index: number
+      is_highlight: boolean
+      created_at: Date
+      updated_at: Date
+    }>(`SELECT * FROM public.skills WHERE id = $1`, idValidation.value)
 
     if (!skill) {
-      return NextResponse.json({ error: 'Skill not found' }, { status: 404 })
+      return createErrorResponse(
+        new Error('Skill not found'),
+        'Skill not found',
+        request,
+        404
+      )
     }
 
-    return NextResponse.json(skill)
+    return createSuccessResponse(skill, request)
   } catch (error) {
-    console.error('Error fetching skill:', error)
-    return NextResponse.json({ error: 'Failed to fetch skill' }, { status: 500 })
+    return handleDatabaseError(error, 'fetch skill', request)
   }
 }
 
 // PUT - Update skill
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const { id } = params
-    const idNum = parseInt(id, 10)
 
-    if (isNaN(idNum)) {
-      return NextResponse.json({ error: 'Invalid ID format' }, { status: 400 })
+    // Validate integer ID
+    const idValidation = validateIntegerId(id)
+    if (!idValidation.isValid) {
+      return createErrorResponse(
+        new Error(idValidation.error),
+        idValidation.error,
+        request,
+        400
+      )
     }
 
-    const body = await request.json()
+    // Parse request body
+    const parseResult = await parseRequestBody<{
+      name?: string
+      slug?: string
+      category?: string
+      level?: string
+      icon_url?: string
+      description?: string
+      order_index?: number
+      is_highlight?: boolean
+    }>(request)
+    if (parseResult.error) {
+      return parseResult.error
+    }
+
+    const body = parseResult.data
     const { name, slug, category, level, icon_url, description, order_index, is_highlight } = body
 
-    if (!name || !category) {
-      return NextResponse.json({ error: 'Name and category are required' }, { status: 400 })
+    // Validate required fields
+    const validation = validateRequiredFields(body as Record<string, unknown>, ['name', 'category'])
+    if (!validation.isValid) {
+      return createErrorResponse(
+        new Error(`Missing required fields: ${validation.missingFields.join(', ')}`),
+        `Missing required fields: ${validation.missingFields.join(', ')}`,
+        request,
+        400
+      )
     }
 
-    await prisma.$executeRawUnsafe(
+    await executeQuery(
       `UPDATE public.skills
        SET name = $1, slug = $2, category = $3, level = $4, icon_url = $5,
            description = $6, order_index = $7, is_highlight = $8, updated_at = NOW()
@@ -56,33 +113,55 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       description || null,
       order_index || 0,
       is_highlight || false,
-      idNum
+      idValidation.value
     )
 
-    const skill = await prisma.$queryRawUnsafe(`SELECT * FROM public.skills WHERE id = $1`, idNum)
+    const skill = await queryFirst<{
+      id: number
+      name: string
+      slug: string | null
+      category: string
+      level: string | null
+      icon_url: string | null
+      description: string | null
+      order_index: number
+      is_highlight: boolean
+      created_at: Date
+      updated_at: Date
+    }>(`SELECT * FROM public.skills WHERE id = $1`, idValidation.value)
 
-    return NextResponse.json(Array.isArray(skill) ? skill[0] : skill)
+    return createSuccessResponse(skill, request)
   } catch (error) {
-    console.error('Error updating skill:', error)
-    return NextResponse.json({ error: 'Failed to update skill' }, { status: 500 })
+    return handleDatabaseError(error, 'update skill', request)
   }
 }
 
 // DELETE - Delete skill
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const { id } = params
-    const idNum = parseInt(id, 10)
 
-    if (isNaN(idNum)) {
-      return NextResponse.json({ error: 'Invalid ID format' }, { status: 400 })
+    // Validate integer ID
+    const idValidation = validateIntegerId(id)
+    if (!idValidation.isValid) {
+      return createErrorResponse(
+        new Error(idValidation.error),
+        idValidation.error,
+        request,
+        400
+      )
     }
 
-    await prisma.$executeRawUnsafe(`DELETE FROM public.skills WHERE id = $1`, idNum)
+    await executeQuery(`DELETE FROM public.skills WHERE id = $1`, idValidation.value)
 
-    return NextResponse.json({ message: 'Skill deleted successfully' })
+    return createSuccessResponse(
+      { message: 'Skill deleted successfully' },
+      request
+    )
   } catch (error) {
-    console.error('Error deleting skill:', error)
-    return NextResponse.json({ error: 'Failed to delete skill' }, { status: 500 })
+    return handleDatabaseError(error, 'delete skill', request)
   }
 }

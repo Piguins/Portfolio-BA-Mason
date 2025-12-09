@@ -1,18 +1,29 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { NextRequest } from 'next/server'
+import { parseRequestBody, createSuccessResponse } from '@/lib/api/handlers/request-handler'
+import { createErrorResponse, handleDatabaseError } from '@/lib/api/handlers/error-handler'
+import { queryFirst, executeQuery } from '@/lib/api/database/query-helpers'
 
 // GET - Get hero section (singleton) - Uses hero_content table
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    // Use raw query to access hero_content table (not Prisma model)
-    const result = await prisma.$queryRawUnsafe(
-      `SELECT * FROM public.hero_content WHERE id = 1 LIMIT 1`
-    )
-    const hero = Array.isArray(result) ? result[0] : result
+    const hero = await queryFirst<{
+      id: number
+      greeting: string
+      greeting_part2: string
+      name: string
+      title: string
+      description: string | null
+      linkedin_url: string | null
+      github_url: string | null
+      email_url: string | null
+      profile_image_url: string | null
+      created_at: Date
+      updated_at: Date
+    }>(`SELECT * FROM public.hero_content WHERE id = 1 LIMIT 1`)
 
     if (!hero) {
       // Return default if not exists
-      return NextResponse.json({
+      return createSuccessResponse({
         id: 1,
         greeting: 'Hey!',
         greeting_part2: "I'm",
@@ -25,25 +36,45 @@ export async function GET() {
         profile_image_url: null,
         created_at: new Date(),
         updated_at: new Date(),
-      })
+      }, request)
     }
 
-    return NextResponse.json(hero)
+    return createSuccessResponse(hero, request)
   } catch (error) {
-    console.error('Error fetching hero section:', error)
-    return NextResponse.json({ error: 'Failed to fetch hero section' }, { status: 500 })
+    return handleDatabaseError(error, 'fetch hero section', request)
   }
 }
 
 // POST - Not used (hero is singleton, use PUT instead)
-export async function POST() {
-  return NextResponse.json({ error: 'Use PUT to update hero content' }, { status: 405 })
+export async function POST(request: NextRequest) {
+  return createErrorResponse(
+    new Error('Use PUT to update hero content'),
+    'Use PUT to update hero content',
+    request,
+    405
+  )
 }
 
 // PUT - Update hero section (singleton - always updates id = 1)
 export async function PUT(request: NextRequest) {
   try {
-    const body = await request.json()
+    // Parse request body
+    const parseResult = await parseRequestBody<{
+      greeting?: string
+      greeting_part2?: string
+      name?: string
+      title?: string
+      description?: string | null
+      linkedin_url?: string | null
+      github_url?: string | null
+      email_url?: string | null
+      profile_image_url?: string | null
+    }>(request)
+    if (parseResult.error) {
+      return parseResult.error
+    }
+
+    const body = parseResult.data
     const {
       greeting,
       greeting_part2,
@@ -56,7 +87,7 @@ export async function PUT(request: NextRequest) {
       profile_image_url,
     } = body
 
-    await prisma.$executeRawUnsafe(
+    await executeQuery(
       `INSERT INTO public.hero_content (
         id, greeting, greeting_part2, name, title, description,
         linkedin_url, github_url, email_url, profile_image_url, updated_at
@@ -84,18 +115,33 @@ export async function PUT(request: NextRequest) {
       profile_image_url || null
     )
 
-    const hero = await prisma.$queryRawUnsafe(
-      `SELECT * FROM public.hero_content WHERE id = 1 LIMIT 1`
-    )
+    const hero = await queryFirst<{
+      id: number
+      greeting: string
+      greeting_part2: string
+      name: string
+      title: string
+      description: string | null
+      linkedin_url: string | null
+      github_url: string | null
+      email_url: string | null
+      profile_image_url: string | null
+      created_at: Date
+      updated_at: Date
+    }>(`SELECT * FROM public.hero_content WHERE id = 1 LIMIT 1`)
 
-    return NextResponse.json(Array.isArray(hero) ? hero[0] : hero)
+    return createSuccessResponse(hero, request)
   } catch (error) {
-    console.error('Error updating hero section:', error)
-    return NextResponse.json({ error: 'Failed to update hero section' }, { status: 500 })
+    return handleDatabaseError(error, 'update hero section', request)
   }
 }
 
 // DELETE - Not allowed (hero is singleton)
-export async function DELETE() {
-  return NextResponse.json({ error: 'Cannot delete hero content (singleton)' }, { status: 405 })
+export async function DELETE(request: NextRequest) {
+  return createErrorResponse(
+    new Error('Cannot delete hero content (singleton)'),
+    'Cannot delete hero content (singleton)',
+    request,
+    405
+  )
 }

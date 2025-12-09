@@ -1,12 +1,44 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { NextRequest } from 'next/server'
+import { parseRequestBody, createSuccessResponse } from '@/lib/api/handlers/request-handler'
+import { createErrorResponse, handleDatabaseError } from '@/lib/api/handlers/error-handler'
+import { validateRequiredFields } from '@/lib/api/validators/request-validator'
+import { validateUUID } from '@/lib/api/validators/uuid-validator'
+import { queryFirst, executeTransaction } from '@/lib/api/database/query-helpers'
 
 // GET - Get experience by ID (with bullets from experience_bullets)
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const { id } = params
 
-    const result = await prisma.$queryRawUnsafe(
+    // Validate UUID format
+    try {
+      validateUUID(id)
+    } catch (error) {
+      return createErrorResponse(
+        error as Error,
+        'Invalid experience ID format',
+        request,
+        400
+      )
+    }
+
+    const experience = await queryFirst<{
+      id: string
+      company: string
+      role: string
+      location: string | null
+      start_date: Date
+      end_date: Date | null
+      is_current: boolean
+      description: string | null
+      created_at: Date
+      updated_at: Date
+      skills_text: string[]
+      bullets: Array<{ id: string; text: string }>
+    }>(
       `SELECT
         e.id,
         e.company,
@@ -32,24 +64,58 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       id
     )
 
-    const experience = Array.isArray(result) ? result[0] : result
-
     if (!experience) {
-      return NextResponse.json({ error: 'Experience not found' }, { status: 404 })
+      return createErrorResponse(
+        new Error('Experience not found'),
+        'Experience not found',
+        request,
+        404
+      )
     }
 
-    return NextResponse.json(experience)
+    return createSuccessResponse(experience, request)
   } catch (error) {
-    console.error('Error fetching experience:', error)
-    return NextResponse.json({ error: 'Failed to fetch experience' }, { status: 500 })
+    return handleDatabaseError(error, 'fetch experience', request)
   }
 }
 
 // PUT - Update experience (with bullets in experience_bullets table)
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const { id } = params
-    const body = await request.json()
+
+    // Validate UUID format
+    try {
+      validateUUID(id)
+    } catch (error) {
+      return createErrorResponse(
+        error as Error,
+        'Invalid experience ID format',
+        request,
+        400
+      )
+    }
+
+    // Parse request body
+    const parseResult = await parseRequestBody<{
+      company?: string
+      role?: string
+      location?: string
+      start_date?: string
+      end_date?: string | null
+      is_current?: boolean
+      description?: string | null
+      bullets?: Array<{ text?: string } | string>
+      skills_text?: string[]
+    }>(request)
+    if (parseResult.error) {
+      return parseResult.error
+    }
+
+    const body = parseResult.data
     const {
       company,
       role,
@@ -62,15 +128,19 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       skills_text = [],
     } = body
 
-    if (!company || !role || !start_date) {
-      return NextResponse.json(
-        { error: 'Company, role, and start_date are required' },
-        { status: 400 }
+    // Validate required fields
+    const validation = validateRequiredFields(body as Record<string, unknown>, ['company', 'role', 'start_date'])
+    if (!validation.isValid) {
+      return createErrorResponse(
+        new Error(`Missing required fields: ${validation.missingFields.join(', ')}`),
+        `Missing required fields: ${validation.missingFields.join(', ')}`,
+        request,
+        400
       )
     }
 
     // Use transaction
-    const experience = await prisma.$transaction(async (tx) => {
+    const experience = await executeTransaction(async (tx) => {
       // Update experience
       await tx.$executeRawUnsafe(
         `UPDATE public.experience 
@@ -98,16 +168,30 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       // Insert new bullets
       if (bullets.length > 0) {
         for (const bullet of bullets) {
+          const bulletText = typeof bullet === 'string' ? bullet : (bullet.text || '')
           await tx.$executeRawUnsafe(
             `INSERT INTO public.experience_bullets (experience_id, text) VALUES ($1::uuid, $2)`,
             id,
-            bullet.text || bullet
+            bulletText
           )
         }
       }
 
       // Return full experience with bullets
-      const fullExp = await tx.$queryRawUnsafe(
+      const fullExp = await tx.$queryRawUnsafe<Array<{
+        id: string
+        company: string
+        role: string
+        location: string | null
+        start_date: Date
+        end_date: Date | null
+        is_current: boolean
+        description: string | null
+        created_at: Date
+        updated_at: Date
+        skills_text: string[]
+        bullets: Array<{ id: string; text: string }>
+      }>>(
         `SELECT
           e.*,
           COALESCE(
@@ -122,23 +206,37 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         id
       )
 
-      return Array.isArray(fullExp) ? fullExp[0] : fullExp
+      return fullExp[0]
     })
 
-    return NextResponse.json(experience)
+    return createSuccessResponse(experience, request)
   } catch (error) {
-    console.error('Error updating experience:', error)
-    return NextResponse.json({ error: 'Failed to update experience' }, { status: 500 })
+    return handleDatabaseError(error, 'update experience', request)
   }
 }
 
 // DELETE - Delete experience (cascades to experience_bullets)
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
   try {
     const { id } = params
 
+    // Validate UUID format
+    try {
+      validateUUID(id)
+    } catch (error) {
+      return createErrorResponse(
+        error as Error,
+        'Invalid experience ID format',
+        request,
+        400
+      )
+    }
+
     // Use transaction to delete bullets first, then experience
-    await prisma.$transaction(async (tx) => {
+    await executeTransaction(async (tx) => {
       await tx.$executeRawUnsafe(
         `DELETE FROM public.experience_bullets WHERE experience_id = $1::uuid`,
         id
@@ -146,9 +244,11 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       await tx.$executeRawUnsafe(`DELETE FROM public.experience WHERE id = $1::uuid`, id)
     })
 
-    return NextResponse.json({ message: 'Experience deleted successfully' })
+    return createSuccessResponse(
+      { message: 'Experience deleted successfully' },
+      request
+    )
   } catch (error) {
-    console.error('Error deleting experience:', error)
-    return NextResponse.json({ error: 'Failed to delete experience' }, { status: 500 })
+    return handleDatabaseError(error, 'delete experience', request)
   }
 }

@@ -1,28 +1,60 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { createSuccessResponse } from '@/lib/api/handlers/request-handler'
+import { handleDatabaseError, createErrorResponse } from '@/lib/api/handlers/error-handler'
+import { parseRequestBody } from '@/lib/api/handlers/request-handler'
+import { validateRequiredFields } from '@/lib/api/validators/request-validator'
 
 // GET - Get all portfolio projects
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const portfolios = await prisma.portfolio.findMany({
       orderBy: { createdAt: 'desc' },
     })
 
-    return NextResponse.json(portfolios)
+    return createSuccessResponse(portfolios, request)
   } catch (error) {
-    console.error('Error fetching portfolios:', error)
-    return NextResponse.json({ error: 'Failed to fetch portfolios' }, { status: 500 })
+    return handleDatabaseError(error, 'fetch portfolios', request)
   }
 }
 
 // POST - Create portfolio project
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
+    // Parse request body
+    const parseResult = await parseRequestBody<{
+      title?: string
+      tagRole?: string
+      description?: string | null
+      imageUrl?: string | null
+      projectUrl?: string | null
+    }>(request)
+    if (parseResult.error) {
+      return parseResult.error
+    }
+
+    const body = parseResult.data
     const { title, tagRole, description, imageUrl, projectUrl } = body
 
+    // Validate required fields
+    const validation = validateRequiredFields(body as Record<string, unknown>, ['title', 'tagRole'])
+    if (!validation.isValid) {
+      return createErrorResponse(
+        new Error(`Missing required fields: ${validation.missingFields.join(', ')}`),
+        `Missing required fields: ${validation.missingFields.join(', ')}`,
+        request,
+        400
+      )
+    }
+
+    // Type assertion after validation
     if (!title || !tagRole) {
-      return NextResponse.json({ error: 'Title and tagRole are required' }, { status: 400 })
+      return createErrorResponse(
+        new Error('Title and tagRole are required'),
+        'Title and tagRole are required',
+        request,
+        400
+      )
     }
 
     const portfolio = await prisma.portfolio.create({
@@ -35,9 +67,8 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    return NextResponse.json(portfolio, { status: 201 })
+    return createSuccessResponse(portfolio, request, 201)
   } catch (error) {
-    console.error('Error creating portfolio:', error)
-    return NextResponse.json({ error: 'Failed to create portfolio' }, { status: 500 })
+    return handleDatabaseError(error, 'create portfolio', request)
   }
 }
