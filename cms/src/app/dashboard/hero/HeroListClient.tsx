@@ -200,11 +200,14 @@ export default function HeroListClient({ initialHero, initialError }: HeroListCl
         )}
       </div>
 
-      {isModalOpen && (
-        <Modal onClose={handleCloseModal} size="large">
-          <HeroForm onSuccess={handleSuccess} onCancel={handleCloseModal} />
-        </Modal>
-      )}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        title="Chỉnh sửa Hero Section"
+        size="large"
+      >
+        <HeroForm onSuccess={handleSuccess} onCancel={handleCloseModal} />
+      </Modal>
     </div>
   )
 }
