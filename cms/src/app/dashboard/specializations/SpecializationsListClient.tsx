@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import DashboardHeader from '@/components/DashboardHeader'
 import Modal from '@/components/Modal'
+import ConfirmModal from '@/components/ConfirmModal'
 import SpecializationForm from '@/components/SpecializationForm'
 import LoadingButton from '@/components/LoadingButton'
 import './specializations.css'
@@ -29,6 +30,8 @@ export default function SpecializationsListClient({ initialSpecializations, init
   const [deletingId, setDeletingId] = useState<number | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingId, setEditingId] = useState<number | null>(null)
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false)
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null)
 
   const fetchSpecializations = useCallback(async () => {
     try {
@@ -71,14 +74,19 @@ export default function SpecializationsListClient({ initialSpecializations, init
     }
   }, [initialSpecializations.length, fetchSpecializations])
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('Bạn có chắc chắn muốn xóa specialization này?')) {
-      return
-    }
+  const handleDeleteClick = (id: number) => {
+    setConfirmDeleteId(id)
+    setIsConfirmOpen(true)
+  }
 
-    setDeletingId(id)
+  const handleConfirmDelete = async () => {
+    if (!confirmDeleteId) return
+
+    setDeletingId(confirmDeleteId)
+    setIsConfirmOpen(false)
+    
     try {
-      const response = await fetch(`/api/specializations/${id}`, {
+      const response = await fetch(`/api/specializations/${confirmDeleteId}`, {
         method: 'DELETE',
       })
 
@@ -96,7 +104,13 @@ export default function SpecializationsListClient({ initialSpecializations, init
       toast.error(errorMsg)
     } finally {
       setDeletingId(null)
+      setConfirmDeleteId(null)
     }
+  }
+
+  const handleCancelDelete = () => {
+    setIsConfirmOpen(false)
+    setConfirmDeleteId(null)
   }
 
   const handleOpenCreate = () => {
@@ -183,7 +197,7 @@ export default function SpecializationsListClient({ initialSpecializations, init
                       Sửa
                     </LoadingButton>
                     <LoadingButton
-                      onClick={() => handleDelete(specialization.id)}
+                      onClick={() => handleDeleteClick(specialization.id)}
                       variant="danger"
                       loading={deletingId === specialization.id}
                     >
@@ -209,6 +223,18 @@ export default function SpecializationsListClient({ initialSpecializations, init
             onCancel={handleModalClose}
           />
         </Modal>
+
+        <ConfirmModal
+          isOpen={isConfirmOpen}
+          onClose={handleCancelDelete}
+          onConfirm={handleConfirmDelete}
+          title="Xác nhận xóa"
+          message="Bạn có chắc chắn muốn xóa specialization này? Hành động này không thể hoàn tác."
+          confirmText="Xóa"
+          cancelText="Hủy"
+          variant="danger"
+          loading={deletingId !== null}
+        />
       </div>
     </div>
   )

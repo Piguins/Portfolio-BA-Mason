@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import DashboardHeader from '@/components/DashboardHeader'
 import Modal from '@/components/Modal'
+import ConfirmModal from '@/components/ConfirmModal'
 import ExperienceForm from '@/components/ExperienceForm'
 import LoadingButton from '@/components/LoadingButton'
 import './experience.css'
@@ -40,6 +41,8 @@ export default function ExperienceListClient({
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false)
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
 
   const fetchExperiences = useCallback(async () => {
     try {
@@ -82,13 +85,19 @@ export default function ExperienceListClient({
     }
   }, [initialExperiences.length, fetchExperiences])
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Bạn có chắc chắn muốn xóa experience này?')) return
+  const handleDeleteClick = (id: string) => {
+    setConfirmDeleteId(id)
+    setIsConfirmOpen(true)
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!confirmDeleteId) return
 
     try {
-      setDeletingId(id)
+      setDeletingId(confirmDeleteId)
+      setIsConfirmOpen(false)
 
-      const response = await fetch(`/api/experience/${id}`, {
+      const response = await fetch(`/api/experience/${confirmDeleteId}`, {
         method: 'DELETE',
       })
       if (!response.ok) {
@@ -102,7 +111,13 @@ export default function ExperienceListClient({
       toast.error(errorMsg)
     } finally {
       setDeletingId(null)
+      setConfirmDeleteId(null)
     }
+  }
+
+  const handleCancelDelete = () => {
+    setIsConfirmOpen(false)
+    setConfirmDeleteId(null)
   }
 
   const handleOpenCreate = () => {
@@ -232,7 +247,7 @@ export default function ExperienceListClient({
                       Sửa
                     </LoadingButton>
                     <LoadingButton
-                      onClick={() => handleDelete(exp.id)}
+                      onClick={() => handleDeleteClick(exp.id)}
                       variant="danger"
                       loading={deletingId === exp.id}
                     >
@@ -294,6 +309,18 @@ export default function ExperienceListClient({
             onCancel={handleModalClose}
           />
         </Modal>
+
+        <ConfirmModal
+          isOpen={isConfirmOpen}
+          onClose={handleCancelDelete}
+          onConfirm={handleConfirmDelete}
+          title="Xác nhận xóa"
+          message="Bạn có chắc chắn muốn xóa experience này? Hành động này không thể hoàn tác."
+          confirmText="Xóa"
+          cancelText="Hủy"
+          variant="danger"
+          loading={deletingId !== null}
+        />
       </div>
     </div>
   )

@@ -32,6 +32,14 @@
   --warning: #f59e0b;
   --info: #3b82f6;
 
+  /* Color variants for modals */
+  --red-100: #fee2e2;
+  --red-600: #dc2626;
+  --yellow-100: #fef3c7;
+  --yellow-600: #d97706;
+  --blue-100: #dbeafe;
+  --blue-600: #2563eb;
+
   /* Shadows - Minimalist */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);

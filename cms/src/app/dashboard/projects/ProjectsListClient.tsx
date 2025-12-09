@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import DashboardHeader from '@/components/DashboardHeader'
 import Modal from '@/components/Modal'
+import ConfirmModal from '@/components/ConfirmModal'
 import ProjectForm from '@/components/ProjectForm'
 import LoadingButton from '@/components/LoadingButton'
 import './projects.css'
@@ -33,6 +34,8 @@ export default function ProjectsListClient({
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false)
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null)
 
   const fetchProjects = useCallback(async () => {
     try {
@@ -75,13 +78,19 @@ export default function ProjectsListClient({
     }
   }, [initialProjects.length, fetchProjects])
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Bạn có chắc chắn muốn xóa project này?')) return
+  const handleDeleteClick = (id: string) => {
+    setConfirmDeleteId(id)
+    setIsConfirmOpen(true)
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!confirmDeleteId) return
 
     try {
-      setDeletingId(id)
+      setDeletingId(confirmDeleteId)
+      setIsConfirmOpen(false)
 
-      const response = await fetch(`/api/projects/${id}`, {
+      const response = await fetch(`/api/projects/${confirmDeleteId}`, {
         method: 'DELETE',
       })
       if (!response.ok) {
@@ -95,7 +104,13 @@ export default function ProjectsListClient({
       toast.error(errorMsg)
     } finally {
       setDeletingId(null)
+      setConfirmDeleteId(null)
     }
+  }
+
+  const handleCancelDelete = () => {
+    setIsConfirmOpen(false)
+    setConfirmDeleteId(null)
   }
 
   const handleOpenCreate = () => {
@@ -187,7 +202,7 @@ export default function ProjectsListClient({
                       Sửa
                     </LoadingButton>
                     <LoadingButton
-                      onClick={() => handleDelete(project.id)}
+                      onClick={() => handleDeleteClick(project.id)}
                       variant="danger"
                       loading={deletingId === project.id}
                     >
@@ -243,6 +258,18 @@ export default function ProjectsListClient({
             onCancel={handleModalClose}
           />
         </Modal>
+
+        <ConfirmModal
+          isOpen={isConfirmOpen}
+          onClose={handleCancelDelete}
+          onConfirm={handleConfirmDelete}
+          title="Xác nhận xóa"
+          message="Bạn có chắc chắn muốn xóa project này? Hành động này không thể hoàn tác."
+          confirmText="Xóa"
+          cancelText="Hủy"
+          variant="danger"
+          loading={deletingId !== null}
+        />
       </div>
     </div>
   )

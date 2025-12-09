@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import DashboardHeader from '@/components/DashboardHeader'
 import Modal from '@/components/Modal'
+import ConfirmModal from '@/components/ConfirmModal'
 import SkillForm from '@/components/SkillForm'
 import LoadingButton from '@/components/LoadingButton'
 import './skills.css'
@@ -36,6 +37,8 @@ export default function SkillsListClient({ initialSkills, initialError }: Skills
   const [editingId, setEditingId] = useState<number | null>(null)
   const [currentPage, setCurrentPage] = useState(1)
   const itemsPerPage = 5
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false)
+  const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null)
 
   const fetchSkills = useCallback(async () => {
     try {
@@ -78,13 +81,19 @@ export default function SkillsListClient({ initialSkills, initialError }: Skills
     }
   }, [initialSkills.length, fetchSkills])
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('Bạn có chắc chắn muốn xóa skill này?')) return
+  const handleDeleteClick = (id: number) => {
+    setConfirmDeleteId(id)
+    setIsConfirmOpen(true)
+  }
+
+  const handleConfirmDelete = async () => {
+    if (!confirmDeleteId) return
 
     try {
-      setDeletingId(id)
+      setDeletingId(confirmDeleteId)
+      setIsConfirmOpen(false)
 
-      const response = await fetch(`/api/skills/${id}`, {
+      const response = await fetch(`/api/skills/${confirmDeleteId}`, {
         method: 'DELETE',
       })
       if (!response.ok) {
@@ -98,7 +107,13 @@ export default function SkillsListClient({ initialSkills, initialError }: Skills
       toast.error(errorMsg)
     } finally {
       setDeletingId(null)
+      setConfirmDeleteId(null)
     }
+  }
+
+  const handleCancelDelete = () => {
+    setIsConfirmOpen(false)
+    setConfirmDeleteId(null)
   }
 
   const handleOpenCreate = () => {
@@ -245,7 +260,7 @@ export default function SkillsListClient({ initialSkills, initialError }: Skills
                           Sửa
                         </LoadingButton>
                         <LoadingButton
-                          onClick={() => handleDelete(skill.id)}
+                          onClick={() => handleDeleteClick(skill.id)}
                           variant="danger"
                           loading={deletingId === skill.id}
                         >
@@ -314,6 +329,18 @@ export default function SkillsListClient({ initialSkills, initialError }: Skills
             onCancel={handleModalClose}
           />
         </Modal>
+
+        <ConfirmModal
+          isOpen={isConfirmOpen}
+          onClose={handleCancelDelete}
+          onConfirm={handleConfirmDelete}
+          title="Xác nhận xóa"
+          message="Bạn có chắc chắn muốn xóa skill này? Hành động này không thể hoàn tác."
+          confirmText="Xóa"
+          cancelText="Hủy"
+          variant="danger"
+          loading={deletingId !== null}
+        />
       </div>
     </div>
   )
