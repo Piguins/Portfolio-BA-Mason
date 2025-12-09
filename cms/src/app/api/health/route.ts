@@ -25,8 +25,8 @@ export async function GET(request: NextRequest) {
     if (hasDatabaseUrl) {
       try {
         const startTime = Date.now()
-        // Simple query to test connection
-        await prisma.$queryRaw`SELECT 1 as test`
+        // Use $queryRawUnsafe to avoid prepared statement issues with connection pooling
+        await prisma.$queryRawUnsafe('SELECT 1 as test')
         const endTime = Date.now()
         dbResponseTime = endTime - startTime
         dbStatus = 'connected'

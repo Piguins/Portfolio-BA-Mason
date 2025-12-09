@@ -191,7 +191,13 @@ Supabase cung cấp connection pooler. Thay vì dùng direct connection string, 
 1. Vào Supabase Dashboard → Settings → Database
 2. Copy **Connection Pooling** URL (không phải direct connection)
 3. Format: `postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres?pgbouncer=true`
-4. Set vào `DATABASE_URL` trong Vercel
+4. **QUAN TRỌNG**: Đảm bảo connection string có `?pgbouncer=true` ở cuối
+5. Set vào `DATABASE_URL` trong Vercel
+
+**Lưu ý về Prepared Statements:**
+- Với connection pooling, Prisma có thể gặp lỗi "prepared statement already exists"
+- Đảm bảo connection string có `pgbouncer=true` parameter
+- Code đã được cập nhật để tự động thêm parameter này nếu thiếu
 
 **Nếu dùng PostgreSQL khác:**
 

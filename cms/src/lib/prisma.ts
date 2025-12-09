@@ -33,9 +33,18 @@ function getPrismaClient(): PrismaClient {
   // Only set datasources if DATABASE_URL is available
   // Otherwise, Prisma will read from env var directly (from schema.prisma)
   if (databaseUrl) {
+    // For connection pooling (Supabase pooler), ensure proper parameters
+    // Add pgbouncer=true if not already present to handle prepared statements correctly
+    let connectionUrl = databaseUrl
+    if (connectionUrl.includes('pooler.supabase.com') && !connectionUrl.includes('pgbouncer=true')) {
+      // Add pgbouncer parameter if using pooler
+      const separator = connectionUrl.includes('?') ? '&' : '?'
+      connectionUrl = `${connectionUrl}${separator}pgbouncer=true`
+    }
+    
     clientConfig.datasources = {
       db: {
-        url: databaseUrl,
+        url: connectionUrl,
       },
     }
   } else {
