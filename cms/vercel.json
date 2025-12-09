@@ -1,0 +1,6 @@
+{
+  "buildCommand": "cd cms && npm install && npm run build",
+  "framework": "nextjs",
+  "installCommand": "cd cms && npm install"
+}
+

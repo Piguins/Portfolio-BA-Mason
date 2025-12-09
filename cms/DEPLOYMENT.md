@@ -40,6 +40,21 @@
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Supabase anon key
    - `NEXT_PUBLIC_APP_URL` - App URL
 
+### Vercel Project Settings
+
+**QUAN TRỌNG**: Với monorepo structure, bạn cần set:
+
+1. **Root Directory**: `cms`
+   - Vào Vercel Dashboard → Project → Settings → General
+   - Scroll xuống phần **Root Directory**
+   - Set thành `cms`
+   - Save
+
+2. **Build Command**: `npm run build` (hoặc để Vercel auto-detect)
+   - Vercel sẽ tự động detect Next.js và dùng build command từ `package.json`
+
+3. **Output Directory**: `.next` (Next.js default, không cần set)
+
 ### Verify Environment Variables
 
 Sau khi set environment variables, bạn có thể verify bằng cách:
@@ -76,10 +91,34 @@ Nếu bạn gặp lỗi **503 Service Unavailable**, có thể do:
     ```json
     {
       "scripts": {
-        "postinstall": "prisma generate"
+        "postinstall": "prisma generate",
+        "build": "prisma generate && next build"
       }
     }
     ```
+
+## 🐛 Troubleshooting Deploy Errors
+
+### Lỗi "Error: Deploying outputs..."
+
+Có thể do:
+
+1. **Root Directory không đúng**
+   - **Solution**: Set Root Directory thành `cms` trong Vercel Settings
+   - Vào Settings → General → Root Directory → Set `cms`
+
+2. **Build Command không đúng**
+   - **Solution**: Đảm bảo build command chạy từ `cms/` directory
+   - Hoặc set Root Directory = `cms` và dùng `npm run build`
+
+3. **Output Directory không đúng**
+   - **Solution**: Next.js tự động output vào `.next/`, không cần set
+
+4. **Monorepo structure issues**
+   - **Solution**: 
+     - Set Root Directory = `cms`
+     - Đảm bảo `package.json` ở trong `cms/` folder
+     - Build command sẽ tự động chạy từ root directory đã set
 
 ## 📋 Build Command
 
@@ -99,6 +138,8 @@ Hoặc thêm vào `package.json`:
   }
 }
 ```
+
+**Lưu ý**: Nếu Root Directory = `cms`, thì build command chỉ cần `npm run build` (Vercel sẽ tự động cd vào `cms/`)
 
 ## 🔍 Debugging Production Errors
 
@@ -189,7 +230,7 @@ curl https://admin.mason.id.vn/api/health
 - [ ] NEXT_PUBLIC_SUPABASE_URL đã được set
 - [ ] NEXT_PUBLIC_SUPABASE_ANON_KEY đã được set
 - [ ] NEXT_PUBLIC_APP_URL đã được set
+- [ ] **Root Directory đã được set thành `cms` trong Vercel Settings**
 - [ ] Prisma client đã được generate (thêm vào build command)
 - [ ] Database cho phép connections từ Vercel
 - [ ] Test API endpoints sau khi deploy
-
