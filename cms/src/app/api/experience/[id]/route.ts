@@ -5,6 +5,10 @@ import { validateRequiredFields } from '@/lib/api/validators/request-validator'
 import { validateUUID } from '@/lib/api/validators/uuid-validator'
 import { queryFirst, executeTransaction } from '@/lib/api/database/query-helpers'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 // GET - Get experience by ID (with bullets from experience_bullets)
 export async function GET(
   request: NextRequest,

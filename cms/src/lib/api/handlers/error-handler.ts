@@ -102,7 +102,14 @@ export function handleDatabaseError(
       )
     }
 
-    if (error.message.includes('connection') || error.message.includes('timeout')) {
+    if (
+      error.message.includes('connection') || 
+      error.message.includes('timeout') ||
+      error.message.includes('DATABASE_URL') ||
+      error.message.includes('Can\'t reach database server') ||
+      error.message.includes('P1001') ||
+      error.message.includes('P1000')
+    ) {
       return createErrorResponse(
         error,
         'Database connection error. Please try again later.',

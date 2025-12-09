@@ -5,6 +5,10 @@ import { createErrorResponse, handleDatabaseError } from '@/lib/api/handlers/err
 import { validateRequiredFields } from '@/lib/api/validators/request-validator'
 import { validateUUID } from '@/lib/api/validators/uuid-validator'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 // GET - Get portfolio project by ID
 export async function GET(
   request: NextRequest,

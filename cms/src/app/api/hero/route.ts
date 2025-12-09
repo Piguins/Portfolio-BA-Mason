@@ -3,6 +3,10 @@ import { parseRequestBody, createSuccessResponse } from '@/lib/api/handlers/requ
 import { createErrorResponse, handleDatabaseError } from '@/lib/api/handlers/error-handler'
 import { queryFirst, executeQuery } from '@/lib/api/database/query-helpers'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 // GET - Get hero section (singleton) - Uses hero_content table
 export async function GET(request: NextRequest) {
   try {

@@ -4,6 +4,10 @@ import { handleDatabaseError, createErrorResponse } from '@/lib/api/handlers/err
 import { validateRequiredFields } from '@/lib/api/validators/request-validator'
 import { queryAll, queryFirst, executeQuery } from '@/lib/api/database/query-helpers'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
 // GET - Get all skills
 export async function GET(request: NextRequest) {
   try {

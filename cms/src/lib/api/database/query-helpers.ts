@@ -31,6 +31,9 @@ export async function queryFirst<T = unknown>(
     return result as T
   } catch (error) {
     console.error('[queryFirst] Error:', error)
+    if (error instanceof Error) {
+      console.error('[queryFirst] Error message:', error.message)
+    }
     throw error
   }
 }
@@ -58,6 +61,9 @@ export async function queryAll<T = unknown>(
     return [result] as T[]
   } catch (error) {
     console.error('[queryAll] Error:', error)
+    if (error instanceof Error) {
+      console.error('[queryAll] Error message:', error.message)
+    }
     throw error
   }
 }
