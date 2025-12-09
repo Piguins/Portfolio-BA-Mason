@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import BackButton from '@/components/BackButton'
+import DashboardHeader from '@/components/DashboardHeader'
+import Modal from '@/components/Modal'
+import ExperienceForm from '@/components/ExperienceForm'
 import LoadingButton from '@/components/LoadingButton'
 import './experience.css'
 
@@ -32,11 +33,12 @@ export default function ExperienceListClient({
   initialExperiences,
   initialError,
 }: ExperienceListClientProps) {
-  const router = useRouter()
   const [experiences, setExperiences] = useState<Experience[]>(initialExperiences)
   const [error, setError] = useState<string | null>(initialError)
   const [loading, setLoading] = useState(initialExperiences.length === 0)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
 
   const fetchExperiences = useCallback(async () => {
     try {
@@ -94,6 +96,27 @@ export default function ExperienceListClient({
     }
   }
 
+  const handleOpenCreate = () => {
+    setEditingId(null)
+    setIsModalOpen(true)
+  }
+
+  const handleOpenEdit = (id: string) => {
+    setEditingId(id)
+    setIsModalOpen(true)
+  }
+
+  const handleModalClose = () => {
+    setIsModalOpen(false)
+    setEditingId(null)
+  }
+
+  const handleFormSuccess = () => {
+    setIsModalOpen(false)
+    setEditingId(null)
+    fetchExperiences()
+  }
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('vi-VN', {
       year: 'numeric',
@@ -104,15 +127,15 @@ export default function ExperienceListClient({
   return (
     <div className="experience-page">
       <div className="page-container">
-        <div className="page-header">
-          <div className="header-content">
-            <BackButton href="/dashboard" />
-            <div className="header-text">
-              <h1>Quản lý Experience</h1>
-              <p>Quản lý kinh nghiệm làm việc và timeline</p>
-            </div>
-          </div>
-          <LoadingButton onClick={() => router.push('/dashboard/experience/new')} variant="primary">
+        <DashboardHeader
+          title="Quản lý Experience"
+          subtitle="Quản lý kinh nghiệm làm việc và timeline"
+          showBack={true}
+          backHref="/dashboard"
+        />
+
+        <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'flex-end' }}>
+          <LoadingButton onClick={handleOpenCreate} variant="primary">
             + Thêm Experience
           </LoadingButton>
         </div>
@@ -137,10 +160,7 @@ export default function ExperienceListClient({
             <div className="empty-icon">📋</div>
             <h3>Chưa có experience nào</h3>
             <p>Hãy thêm experience đầu tiên để bắt đầu quản lý!</p>
-            <LoadingButton
-              onClick={() => router.push('/dashboard/experience/new')}
-              variant="primary"
-            >
+            <LoadingButton onClick={handleOpenCreate} variant="primary">
               + Thêm Experience đầu tiên
             </LoadingButton>
           </div>
@@ -199,10 +219,7 @@ export default function ExperienceListClient({
                     </div>
                   </div>
                   <div className="card-actions">
-                    <LoadingButton
-                      onClick={() => router.push(`/dashboard/experience/${exp.id}/edit`)}
-                      variant="primary"
-                    >
+                    <LoadingButton onClick={() => handleOpenEdit(exp.id)} variant="primary">
                       Sửa
                     </LoadingButton>
                     <LoadingButton
@@ -255,6 +272,19 @@ export default function ExperienceListClient({
             ))}
           </div>
         )}
+
+        <Modal
+          isOpen={isModalOpen}
+          onClose={handleModalClose}
+          title={editingId ? 'Sửa Experience' : 'Thêm Experience mới'}
+          size="xlarge"
+        >
+          <ExperienceForm
+            experienceId={editingId || undefined}
+            onSuccess={handleFormSuccess}
+            onCancel={handleModalClose}
+          />
+        </Modal>
       </div>
     </div>
   )
