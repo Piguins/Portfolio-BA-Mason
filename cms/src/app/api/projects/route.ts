@@ -3,10 +3,16 @@ import { parseRequestBody, createSuccessResponse } from '@/lib/api/handlers/requ
 import { handleDatabaseError, createErrorResponse } from '@/lib/api/handlers/error-handler'
 import { validateRequiredFields } from '@/lib/api/validators/request-validator'
 import { queryAll, queryFirst, executeQuery } from '@/lib/api/database/query-helpers'
+import { corsOptionsHandler } from '@/middleware/cors'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+// Handle OPTIONS request for CORS
+export async function OPTIONS(request: NextRequest) {
+  return corsOptionsHandler(request)
+}
 
 // GET - Get all projects (uses projects table)
 export async function GET(request: NextRequest) {

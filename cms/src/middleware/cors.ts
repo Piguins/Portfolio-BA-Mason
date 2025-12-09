@@ -8,6 +8,7 @@ export function corsHeaders(request: NextRequest) {
   const allowedOrigins = [
     'https://mason.id.vn',
     'https://www.mason.id.vn',
+    'https://portfolio.mason.id.vn',
     'http://localhost:5173',
     'http://localhost:3000',
   ]
