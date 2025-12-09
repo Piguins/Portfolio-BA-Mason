@@ -33,6 +33,8 @@ export default function SkillsListClient({ initialSkills, initialError }: Skills
   const [filterCategory, setFilterCategory] = useState<string>('all')
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingId, setEditingId] = useState<number | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+  const itemsPerPage = 5
 
   const fetchSkills = useCallback(async () => {
     try {
@@ -119,6 +121,23 @@ export default function SkillsListClient({ initialSkills, initialError }: Skills
 
   const categories = Array.from(new Set(skills.map((s) => s.category)))
 
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredSkills.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = startIndex + itemsPerPage
+  const paginatedSkills = filteredSkills.slice(startIndex, endIndex)
+
+  // Reset to page 1 when filter changes
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [filterCategory])
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    // Scroll to top of list
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   return (
     <div className="skills-page">
       <div className="page-container">
@@ -184,15 +203,16 @@ export default function SkillsListClient({ initialSkills, initialError }: Skills
                 </LoadingButton>
               </div>
             ) : (
-              <div className="skills-list">
-                {filteredSkills.map((skill, index) => (
-                  <motion.div
-                    key={skill.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="skill-card"
-                  >
+              <>
+                <div className="skills-list">
+                  {paginatedSkills.map((skill, index) => (
+                    <motion.div
+                      key={skill.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      className="skill-card"
+                    >
                     <div className="card-header">
                       <div className="card-title-section">
                         <div className="skill-header-row">
@@ -228,8 +248,50 @@ export default function SkillsListClient({ initialSkills, initialError }: Skills
                       </div>
                     </div>
                   </motion.div>
-                ))}
-              </div>
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="pagination">
+                    <LoadingButton
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      variant="secondary"
+                      disabled={currentPage === 1}
+                    >
+                      ← Trước
+                    </LoadingButton>
+
+                    <div className="pagination-pages">
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                        <button
+                          key={page}
+                          onClick={() => handlePageChange(page)}
+                          className={`pagination-page ${currentPage === page ? 'active' : ''}`}
+                        >
+                          {page}
+                        </button>
+                      ))}
+                    </div>
+
+                    <LoadingButton
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      variant="secondary"
+                      disabled={currentPage === totalPages}
+                    >
+                      Sau →
+                    </LoadingButton>
+                  </div>
+                )}
+
+                {/* Pagination info */}
+                {filteredSkills.length > 0 && (
+                  <div className="pagination-info">
+                    Hiển thị {startIndex + 1}-{Math.min(endIndex, filteredSkills.length)} trong tổng số{' '}
+                    {filteredSkills.length} skills
+                  </div>
+                )}
+              </>
             )}
           </>
         )}
