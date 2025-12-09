@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 import DashboardHeader from '@/components/DashboardHeader'
 import Modal from '@/components/Modal'
 import ProjectForm from '@/components/ProjectForm'
@@ -48,17 +49,20 @@ export default function ProjectsListClient({
 
       clearTimeout(timeoutId)
 
-      if (!response.ok) throw new Error('Failed to fetch projects')
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || errorData.message || 'Failed to fetch projects')
+      }
       const responseData = await response.json()
       // Handle both old format (array) and new format ({ data, pagination })
       const data = Array.isArray(responseData) ? responseData : responseData.data || []
       setProjects(data)
     } catch (err: any) {
-      if (err.name === 'AbortError') {
-        setError('Request timeout. Vui lòng thử lại.')
-      } else {
-        setError(err.message || 'Failed to load projects')
-      }
+      const errorMsg = err.name === 'AbortError' 
+        ? 'Request timeout. Vui lòng thử lại.' 
+        : err.message || 'Failed to load projects'
+      setError(errorMsg)
+      toast.error(errorMsg)
     } finally {
       setLoading(false)
     }
@@ -80,10 +84,15 @@ export default function ProjectsListClient({
       const response = await fetch(`/api/projects/${id}`, {
         method: 'DELETE',
       })
-      if (!response.ok) throw new Error('Failed to delete project')
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || errorData.message || 'Failed to delete project')
+      }
+      toast.success('Project đã được xóa thành công!')
       await fetchProjects()
     } catch (err: any) {
-      alert(err.message || 'Failed to delete project')
+      const errorMsg = err.message || 'Failed to delete project'
+      toast.error(errorMsg)
     } finally {
       setDeletingId(null)
     }

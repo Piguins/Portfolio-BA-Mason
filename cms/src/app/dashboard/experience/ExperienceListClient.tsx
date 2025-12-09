@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 import DashboardHeader from '@/components/DashboardHeader'
 import Modal from '@/components/Modal'
 import ExperienceForm from '@/components/ExperienceForm'
@@ -55,17 +56,20 @@ export default function ExperienceListClient({
 
       clearTimeout(timeoutId)
 
-      if (!response.ok) throw new Error('Failed to fetch experiences')
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || errorData.message || 'Failed to fetch experiences')
+      }
       const responseData = await response.json()
       // Handle both old format (array) and new format ({ data, pagination })
       const data = Array.isArray(responseData) ? responseData : responseData.data || []
       setExperiences(data)
     } catch (err: any) {
-      if (err.name === 'AbortError') {
-        setError('Request timeout. Vui lòng thử lại.')
-      } else {
-        setError(err.message || 'Failed to load experiences')
-      }
+      const errorMsg = err.name === 'AbortError' 
+        ? 'Request timeout. Vui lòng thử lại.' 
+        : err.message || 'Failed to load experiences'
+      setError(errorMsg)
+      toast.error(errorMsg)
     } finally {
       setLoading(false)
     }
@@ -87,10 +91,15 @@ export default function ExperienceListClient({
       const response = await fetch(`/api/experience/${id}`, {
         method: 'DELETE',
       })
-      if (!response.ok) throw new Error('Failed to delete experience')
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || errorData.message || 'Failed to delete experience')
+      }
+      toast.success('Experience đã được xóa thành công!')
       await fetchExperiences()
     } catch (err: any) {
-      alert(err.message || 'Failed to delete experience')
+      const errorMsg = err.message || 'Failed to delete experience'
+      toast.error(errorMsg)
     } finally {
       setDeletingId(null)
     }

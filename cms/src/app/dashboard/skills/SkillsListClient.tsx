@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 import DashboardHeader from '@/components/DashboardHeader'
 import Modal from '@/components/Modal'
 import SkillForm from '@/components/SkillForm'
@@ -51,17 +52,20 @@ export default function SkillsListClient({ initialSkills, initialError }: Skills
 
       clearTimeout(timeoutId)
 
-      if (!response.ok) throw new Error('Failed to fetch skills')
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || errorData.message || 'Failed to fetch skills')
+      }
       const responseData = await response.json()
       // Handle both old format (array) and new format ({ data, pagination })
       const data = Array.isArray(responseData) ? responseData : responseData.data || []
       setSkills(data)
     } catch (err: any) {
-      if (err.name === 'AbortError') {
-        setError('Request timeout. Vui lòng thử lại.')
-      } else {
-        setError(err.message || 'Failed to load skills')
-      }
+      const errorMsg = err.name === 'AbortError' 
+        ? 'Request timeout. Vui lòng thử lại.' 
+        : err.message || 'Failed to load skills'
+      setError(errorMsg)
+      toast.error(errorMsg)
     } finally {
       setLoading(false)
     }
@@ -85,11 +89,13 @@ export default function SkillsListClient({ initialSkills, initialError }: Skills
       })
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to delete skill')
+        throw new Error(errorData.error || errorData.message || 'Failed to delete skill')
       }
+      toast.success('Skill đã được xóa thành công!')
       await fetchSkills()
     } catch (err: any) {
-      alert(err.message || 'Failed to delete skill')
+      const errorMsg = err.message || 'Failed to delete skill'
+      toast.error(errorMsg)
     } finally {
       setDeletingId(null)
     }

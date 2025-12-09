@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import toast from 'react-hot-toast'
 import DashboardHeader from '@/components/DashboardHeader'
 import Modal from '@/components/Modal'
 import HeroForm from '@/components/HeroForm'
@@ -49,15 +50,18 @@ export default function HeroListClient({ initialHero, initialError }: HeroListCl
 
       clearTimeout(timeoutId)
 
-      if (!response.ok) throw new Error('Failed to fetch hero content')
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || errorData.message || 'Failed to fetch hero content')
+      }
       const data: HeroData = await response.json()
       setHero(data)
     } catch (err: any) {
-      if (err.name === 'AbortError') {
-        setError('Request timeout. Vui lòng thử lại.')
-      } else {
-        setError(err.message || 'Failed to load hero content')
-      }
+      const errorMsg = err.name === 'AbortError' 
+        ? 'Request timeout. Vui lòng thử lại.' 
+        : err.message || 'Failed to load hero content'
+      setError(errorMsg)
+      toast.error(errorMsg)
     } finally {
       setLoading(false)
     }
