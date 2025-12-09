@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
     // Use transaction for atomicity
     const experience = await executeTransaction(async (tx) => {
       // Insert experience and get ID
-      const expResult = await tx.$queryRawUnsafe<Array<{ id: string }>>(
+      const expResult = await tx.$queryRawUnsafe(
         `INSERT INTO public.experience 
          (company, role, location, start_date, end_date, is_current, description, skills_text)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8::text[])
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
         is_current || false,
         description || null,
         Array.isArray(skills_text) ? skills_text : []
-      )
+      ) as Array<{ id: string }>
 
       const exp = expResult[0]
       const expId = exp.id
@@ -137,20 +137,7 @@ export async function POST(request: NextRequest) {
       }
 
       // Return full experience with bullets
-      const fullExp = await tx.$queryRawUnsafe<Array<{
-        id: string
-        company: string
-        role: string
-        location: string | null
-        start_date: Date
-        end_date: Date | null
-        is_current: boolean
-        description: string | null
-        created_at: Date
-        updated_at: Date
-        skills_text: string[]
-        bullets: Array<{ id: string; text: string }>
-      }>>(
+      const fullExp = await tx.$queryRawUnsafe(
         `SELECT
           e.*,
           COALESCE(
@@ -163,7 +150,20 @@ export async function POST(request: NextRequest) {
          WHERE e.id = $1::uuid
          GROUP BY e.id`,
         expId
-      )
+      ) as Array<{
+        id: string
+        company: string
+        role: string
+        location: string | null
+        start_date: Date
+        end_date: Date | null
+        is_current: boolean
+        description: string | null
+        created_at: Date
+        updated_at: Date
+        skills_text: string[]
+        bullets: Array<{ id: string; text: string }>
+      }>
 
       return fullExp[0]
     })

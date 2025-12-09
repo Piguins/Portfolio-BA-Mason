@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma'
  * Transaction client type (simplified to avoid Prisma type issues)
  */
 type TransactionClient = {
-  $queryRawUnsafe: <T = unknown>(query: string, ...params: unknown[]) => Promise<T>
+  $queryRawUnsafe: (query: string, ...params: unknown[]) => Promise<unknown>
   $executeRawUnsafe: (query: string, ...params: unknown[]) => Promise<number>
 }
 
@@ -15,13 +15,24 @@ export async function queryFirst<T = unknown>(
   query: string,
   ...params: unknown[]
 ): Promise<T | null> {
-  const result = await prisma.$queryRawUnsafe<T[]>(query, ...params)
-  
-  if (!result || !Array.isArray(result) || result.length === 0) {
-    return null
+  try {
+    const result = await prisma.$queryRawUnsafe(query, ...params)
+    
+    if (!result) {
+      return null
+    }
+    
+    // Prisma returns array for SELECT queries
+    if (Array.isArray(result)) {
+      return result.length > 0 ? (result[0] as T) : null
+    }
+    
+    // If not array, return as is (for single row queries)
+    return result as T
+  } catch (error) {
+    console.error('[queryFirst] Error:', error)
+    throw error
   }
-  
-  return result[0] as T
 }
 
 /**
@@ -31,13 +42,24 @@ export async function queryAll<T = unknown>(
   query: string,
   ...params: unknown[]
 ): Promise<T[]> {
-  const result = await prisma.$queryRawUnsafe<T[]>(query, ...params)
-  
-  if (!result) {
-    return []
+  try {
+    const result = await prisma.$queryRawUnsafe(query, ...params)
+    
+    if (!result) {
+      return []
+    }
+    
+    // Prisma always returns array for SELECT queries
+    if (Array.isArray(result)) {
+      return result as T[]
+    }
+    
+    // If not array, wrap in array
+    return [result] as T[]
+  } catch (error) {
+    console.error('[queryAll] Error:', error)
+    throw error
   }
-  
-  return Array.isArray(result) ? result : [result]
 }
 
 /**
@@ -47,7 +69,12 @@ export async function executeQuery(
   query: string,
   ...params: unknown[]
 ): Promise<void> {
-  await prisma.$executeRawUnsafe(query, ...params)
+  try {
+    await prisma.$executeRawUnsafe(query, ...params)
+  } catch (error) {
+    console.error('[executeQuery] Error:', error)
+    throw error
+  }
 }
 
 /**
@@ -56,6 +83,11 @@ export async function executeQuery(
 export async function executeTransaction<T>(
   callback: (tx: TransactionClient) => Promise<T>
 ): Promise<T> {
-  return prisma.$transaction(callback as any) as Promise<T>
+  try {
+    return (await prisma.$transaction(callback as any)) as T
+  } catch (error) {
+    console.error('[executeTransaction] Error:', error)
+    throw error
+  }
 }
 

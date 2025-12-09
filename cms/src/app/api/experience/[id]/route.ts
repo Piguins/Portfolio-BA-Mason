@@ -178,20 +178,7 @@ export async function PUT(
       }
 
       // Return full experience with bullets
-      const fullExp = await tx.$queryRawUnsafe<Array<{
-        id: string
-        company: string
-        role: string
-        location: string | null
-        start_date: Date
-        end_date: Date | null
-        is_current: boolean
-        description: string | null
-        created_at: Date
-        updated_at: Date
-        skills_text: string[]
-        bullets: Array<{ id: string; text: string }>
-      }>>(
+      const fullExp = await tx.$queryRawUnsafe(
         `SELECT
           e.*,
           COALESCE(
@@ -204,7 +191,20 @@ export async function PUT(
          WHERE e.id = $1::uuid
          GROUP BY e.id`,
         id
-      )
+      ) as Array<{
+        id: string
+        company: string
+        role: string
+        location: string | null
+        start_date: Date
+        end_date: Date | null
+        is_current: boolean
+        description: string | null
+        created_at: Date
+        updated_at: Date
+        skills_text: string[]
+        bullets: Array<{ id: string; text: string }>
+      }>
 
       return fullExp[0]
     })
