@@ -1,5 +1,6 @@
 // Prisma Client Singleton
 // Prevents multiple instances in development
+// Optimized for serverless environments (Vercel)
 
 import { PrismaClient } from '@prisma/client'
 
@@ -15,16 +16,42 @@ function getPrismaClient(): PrismaClient {
   // Check DATABASE_URL at runtime (not build time)
   const databaseUrl = process.env.DATABASE_URL
   
-  if (!databaseUrl) {
-    console.error('[Prisma] DATABASE_URL is not set in environment variables')
-    // Still create client but it will fail on first query
-    // This allows build to succeed but runtime will catch the error
+  // Prisma Client configuration optimized for serverless
+  // Only set datasources if DATABASE_URL is available
+  // During build, DATABASE_URL might not be set, so we let Prisma use env var directly
+  const clientConfig: {
+    log: ('query' | 'error' | 'warn')[]
+    datasources?: {
+      db: {
+        url: string
+      }
+    }
+  } = {
+    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
   }
   
-  const client = new PrismaClient({
-    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+  // Only set datasources if DATABASE_URL is available
+  // Otherwise, Prisma will read from env var directly (from schema.prisma)
+  if (databaseUrl) {
+    clientConfig.datasources = {
+      db: {
+        url: databaseUrl,
+      },
+    }
+  } else {
+    console.warn('[Prisma] DATABASE_URL is not set. Prisma will use env var from schema.prisma')
+  }
+  
+  const client = new PrismaClient(clientConfig)
+
+  // Handle connection errors gracefully
+  client.$on('error' as never, (e: unknown) => {
+    console.error('[Prisma] Client error:', e)
   })
 
+  // In production (serverless), don't cache the client globally
+  // Each serverless function should create its own instance
+  // In development, cache to prevent multiple instances
   if (process.env.NODE_ENV !== 'production') {
     globalForPrisma.prisma = client
   }
@@ -33,3 +60,10 @@ function getPrismaClient(): PrismaClient {
 }
 
 export const prisma = getPrismaClient()
+
+// Graceful shutdown handler
+if (typeof process !== 'undefined') {
+  process.on('beforeExit', async () => {
+    await prisma.$disconnect()
+  })
+}

@@ -102,10 +102,24 @@ Hoặc thêm vào `package.json`:
 
 ## 🔍 Debugging Production Errors
 
+### Health Check Endpoint
+
+Sử dụng health check endpoint để test database connection:
+
+```bash
+curl https://admin.mason.id.vn/api/health
+```
+
+Response sẽ cho biết:
+- Database connection status
+- Response time
+- Environment variables status
+- Chi tiết lỗi nếu có
+
 ### Check Vercel Logs
 
 1. Vào Vercel Dashboard → Project → **Logs**
-2. Filter theo function name (ví dụ: `/api/experience`)
+2. Filter theo function name (ví dụ: `/api/experience` hoặc `/api/health`)
 3. Xem error messages để biết chính xác lỗi gì
 
 ### Common Error Patterns
@@ -118,6 +132,56 @@ Hoặc thêm vào `package.json`:
   
 - **"P1001: Can't reach database server"**
   → Database không accessible từ Vercel network
+  
+- **Connection timeout errors**
+  → Có thể cần dùng connection pooler (xem bên dưới)
+
+### Connection Pooling cho Serverless (Vercel)
+
+Vercel serverless functions có thể gặp vấn đề với database connections do:
+- Mỗi function tạo connection mới
+- Connection limit của database
+- Cold start latency
+
+**Nếu dùng Supabase:**
+
+Supabase cung cấp connection pooler. Thay vì dùng direct connection string, dùng pooler:
+
+1. Vào Supabase Dashboard → Settings → Database
+2. Copy **Connection Pooling** URL (không phải direct connection)
+3. Format: `postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres?pgbouncer=true`
+4. Set vào `DATABASE_URL` trong Vercel
+
+**Nếu dùng PostgreSQL khác:**
+
+Có thể cần setup connection pooler như PgBouncer hoặc dùng managed service có pooling.
+
+### Test Database Connection
+
+Sau khi set DATABASE_URL, test bằng health check:
+
+```bash
+# Test health endpoint
+curl https://admin.mason.id.vn/api/health
+
+# Expected response khi OK:
+{
+  "status": "healthy",
+  "database": {
+    "status": "connected",
+    "responseTime": 50
+  }
+}
+
+# Expected response khi lỗi:
+{
+  "status": "unhealthy",
+  "database": {
+    "status": "error",
+    "error": "Can't reach database server"
+  }
+}
+```
 
 ## ✅ Checklist Before Deployment
 
