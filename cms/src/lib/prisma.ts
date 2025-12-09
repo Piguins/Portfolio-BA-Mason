@@ -12,17 +12,17 @@ function getPrismaClient(): PrismaClient {
     return globalForPrisma.prisma
   }
 
-  // Only create client if DATABASE_URL is available (runtime check)
-  // During build time, DATABASE_URL might not be available
-  const databaseUrl = process.env.DATABASE_URL || 'postgresql://dummy:dummy@localhost:5432/dummy'
+  // Check DATABASE_URL at runtime (not build time)
+  const databaseUrl = process.env.DATABASE_URL
+  
+  if (!databaseUrl) {
+    console.error('[Prisma] DATABASE_URL is not set in environment variables')
+    // Still create client but it will fail on first query
+    // This allows build to succeed but runtime will catch the error
+  }
   
   const client = new PrismaClient({
     log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-    datasources: {
-      db: {
-        url: databaseUrl,
-      },
-    },
   })
 
   if (process.env.NODE_ENV !== 'production') {

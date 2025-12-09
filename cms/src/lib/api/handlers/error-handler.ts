@@ -73,9 +73,25 @@ export function handleDatabaseError(
   operation: string,
   request: NextRequest
 ): NextResponse {
+  // Log full error details for debugging
+  console.error(`[Database Error] ${operation}:`, error)
+  
+  // Check if DATABASE_URL is missing
+  if (!process.env.DATABASE_URL) {
+    console.error('[Database Error] DATABASE_URL is not set in environment variables')
+    return createErrorResponse(
+      new Error('DATABASE_URL environment variable is not configured'),
+      'Database configuration error. Please contact administrator.',
+      request,
+      503
+    )
+  }
+
   if (error instanceof Error) {
+    const errorMsg = error.message.toLowerCase()
+    
     // Prisma/PostgreSQL specific errors
-    if (error.message.includes('Unique constraint')) {
+    if (errorMsg.includes('unique constraint') || errorMsg.includes('duplicate key')) {
       return createErrorResponse(
         error,
         'Resource already exists',
@@ -84,7 +100,7 @@ export function handleDatabaseError(
       )
     }
 
-    if (error.message.includes('Foreign key constraint')) {
+    if (errorMsg.includes('foreign key constraint')) {
       return createErrorResponse(
         error,
         'Invalid reference to related resource',
@@ -93,7 +109,7 @@ export function handleDatabaseError(
       )
     }
 
-    if (error.message.includes('invalid input syntax')) {
+    if (errorMsg.includes('invalid input syntax')) {
       return createErrorResponse(
         error,
         'Invalid data format',
@@ -102,14 +118,27 @@ export function handleDatabaseError(
       )
     }
 
+    // Database connection errors
     if (
-      error.message.includes('connection') || 
-      error.message.includes('timeout') ||
-      error.message.includes('DATABASE_URL') ||
-      error.message.includes('Can\'t reach database server') ||
-      error.message.includes('P1001') ||
-      error.message.includes('P1000')
+      errorMsg.includes('connection') || 
+      errorMsg.includes('timeout') ||
+      errorMsg.includes('database_url') ||
+      errorMsg.includes("can't reach database server") ||
+      errorMsg.includes('p1001') ||
+      errorMsg.includes('p1000') ||
+      errorMsg.includes('p1017') ||
+      errorMsg.includes('server closed the connection') ||
+      errorMsg.includes('connection refused') ||
+      errorMsg.includes('econnrefused') ||
+      errorMsg.includes('enotfound')
     ) {
+      // Log connection error details (not exposed to client)
+      console.error('[Database Error] Connection failed:', {
+        message: error.message,
+        code: (error as any).code,
+        meta: (error as any).meta,
+      })
+      
       return createErrorResponse(
         error,
         'Database connection error. Please try again later.',
@@ -118,7 +147,7 @@ export function handleDatabaseError(
       )
     }
 
-    if (error.message.includes('Record to update not found') || error.message.includes('Record to delete does not exist')) {
+    if (errorMsg.includes('record to update not found') || errorMsg.includes('record to delete does not exist') || errorMsg.includes('p2025')) {
       return createErrorResponse(
         error,
         'Resource not found',
@@ -127,6 +156,13 @@ export function handleDatabaseError(
       )
     }
   }
+
+  // Log unknown errors
+  console.error('[Database Error] Unknown error type:', {
+    error,
+    operation,
+    type: typeof error,
+  })
 
   return createErrorResponse(
     error,

@@ -16,6 +16,11 @@ export async function queryFirst<T = unknown>(
   ...params: unknown[]
 ): Promise<T | null> {
   try {
+    // Check DATABASE_URL before executing query
+    if (!process.env.DATABASE_URL) {
+      throw new Error('DATABASE_URL environment variable is not set. Please configure it in your environment variables.')
+    }
+
     const result = await prisma.$queryRawUnsafe(query, ...params)
     
     if (!result) {
@@ -30,9 +35,10 @@ export async function queryFirst<T = unknown>(
     // If not array, return as is (for single row queries)
     return result as T
   } catch (error) {
-    console.error('[queryFirst] Error:', error)
+    console.error('[queryFirst] Error executing query:', error)
     if (error instanceof Error) {
       console.error('[queryFirst] Error message:', error.message)
+      console.error('[queryFirst] Error code:', (error as any).code)
     }
     throw error
   }
@@ -46,6 +52,11 @@ export async function queryAll<T = unknown>(
   ...params: unknown[]
 ): Promise<T[]> {
   try {
+    // Check DATABASE_URL before executing query
+    if (!process.env.DATABASE_URL) {
+      throw new Error('DATABASE_URL environment variable is not set. Please configure it in your environment variables.')
+    }
+
     const result = await prisma.$queryRawUnsafe(query, ...params)
     
     if (!result) {
@@ -60,9 +71,10 @@ export async function queryAll<T = unknown>(
     // If not array, wrap in array
     return [result] as T[]
   } catch (error) {
-    console.error('[queryAll] Error:', error)
+    console.error('[queryAll] Error executing query:', error)
     if (error instanceof Error) {
       console.error('[queryAll] Error message:', error.message)
+      console.error('[queryAll] Error code:', (error as any).code)
     }
     throw error
   }
@@ -76,9 +88,18 @@ export async function executeQuery(
   ...params: unknown[]
 ): Promise<void> {
   try {
+    // Check DATABASE_URL before executing query
+    if (!process.env.DATABASE_URL) {
+      throw new Error('DATABASE_URL environment variable is not set. Please configure it in your environment variables.')
+    }
+
     await prisma.$executeRawUnsafe(query, ...params)
   } catch (error) {
-    console.error('[executeQuery] Error:', error)
+    console.error('[executeQuery] Error executing query:', error)
+    if (error instanceof Error) {
+      console.error('[executeQuery] Error message:', error.message)
+      console.error('[executeQuery] Error code:', (error as any).code)
+    }
     throw error
   }
 }
