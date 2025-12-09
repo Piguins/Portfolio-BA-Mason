@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import BackButton from '@/components/BackButton'
+import DashboardHeader from '@/components/DashboardHeader'
+import Modal from '@/components/Modal'
+import SkillForm from '@/components/SkillForm'
 import LoadingButton from '@/components/LoadingButton'
 import './skills.css'
 
@@ -25,12 +26,13 @@ interface SkillsListClientProps {
 }
 
 export default function SkillsListClient({ initialSkills, initialError }: SkillsListClientProps) {
-  const router = useRouter()
   const [skills, setSkills] = useState<Skill[]>(initialSkills)
   const [error, setError] = useState<string | null>(initialError)
   const [loading, setLoading] = useState(initialSkills.length === 0)
   const [deletingId, setDeletingId] = useState<number | null>(null)
   const [filterCategory, setFilterCategory] = useState<string>('all')
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingId, setEditingId] = useState<number | null>(null)
 
   const fetchSkills = useCallback(async () => {
     try {
@@ -91,6 +93,27 @@ export default function SkillsListClient({ initialSkills, initialError }: Skills
     }
   }
 
+  const handleOpenCreate = () => {
+    setEditingId(null)
+    setIsModalOpen(true)
+  }
+
+  const handleOpenEdit = (id: number) => {
+    setEditingId(id)
+    setIsModalOpen(true)
+  }
+
+  const handleModalClose = () => {
+    setIsModalOpen(false)
+    setEditingId(null)
+  }
+
+  const handleFormSuccess = () => {
+    setIsModalOpen(false)
+    setEditingId(null)
+    fetchSkills()
+  }
+
   const filteredSkills =
     filterCategory === 'all' ? skills : skills.filter((s) => s.category === filterCategory)
 
@@ -99,15 +122,15 @@ export default function SkillsListClient({ initialSkills, initialError }: Skills
   return (
     <div className="skills-page">
       <div className="page-container">
-        <div className="page-header">
-          <div className="header-content">
-            <BackButton href="/dashboard" />
-            <div className="header-text">
-              <h1>Quản lý Skills</h1>
-              <p>Quản lý skills, tools và certifications</p>
-            </div>
-          </div>
-          <LoadingButton onClick={() => router.push('/dashboard/skills/new')} variant="primary">
+        <DashboardHeader
+          title="Quản lý Skills"
+          subtitle="Quản lý skills, tools và certifications"
+          showBack={true}
+          backHref="/dashboard"
+        />
+
+        <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'flex-end' }}>
+          <LoadingButton onClick={handleOpenCreate} variant="primary">
             + Thêm Skill
           </LoadingButton>
         </div>
@@ -156,10 +179,7 @@ export default function SkillsListClient({ initialSkills, initialError }: Skills
                   {filterCategory !== 'all' ? ` trong category "${filterCategory}"` : ''}
                 </h3>
                 <p>Hãy thêm skill đầu tiên để bắt đầu quản lý!</p>
-                <LoadingButton
-                  onClick={() => router.push('/dashboard/skills/new')}
-                  variant="primary"
-                >
+                <LoadingButton onClick={handleOpenCreate} variant="primary">
                   + Thêm Skill đầu tiên
                 </LoadingButton>
               </div>
@@ -195,10 +215,7 @@ export default function SkillsListClient({ initialSkills, initialError }: Skills
                         )}
                       </div>
                       <div className="card-actions">
-                        <LoadingButton
-                          onClick={() => router.push(`/dashboard/skills/${skill.id}/edit`)}
-                          variant="primary"
-                        >
+                        <LoadingButton onClick={() => handleOpenEdit(skill.id)} variant="primary">
                           Sửa
                         </LoadingButton>
                         <LoadingButton
@@ -216,6 +233,19 @@ export default function SkillsListClient({ initialSkills, initialError }: Skills
             )}
           </>
         )}
+
+        <Modal
+          isOpen={isModalOpen}
+          onClose={handleModalClose}
+          title={editingId ? 'Sửa Skill' : 'Thêm Skill mới'}
+          size="large"
+        >
+          <SkillForm
+            skillId={editingId || undefined}
+            onSuccess={handleFormSuccess}
+            onCancel={handleModalClose}
+          />
+        </Modal>
       </div>
     </div>
   )

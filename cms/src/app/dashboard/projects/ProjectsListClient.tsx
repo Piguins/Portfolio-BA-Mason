@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import BackButton from '@/components/BackButton'
+import DashboardHeader from '@/components/DashboardHeader'
+import Modal from '@/components/Modal'
+import ProjectForm from '@/components/ProjectForm'
 import LoadingButton from '@/components/LoadingButton'
 import './projects.css'
 
@@ -25,11 +26,12 @@ export default function ProjectsListClient({
   initialProjects,
   initialError,
 }: ProjectsListClientProps) {
-  const router = useRouter()
   const [projects, setProjects] = useState<Project[]>(initialProjects)
   const [error, setError] = useState<string | null>(initialError)
   const [loading, setLoading] = useState(initialProjects.length === 0)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
 
   const fetchProjects = useCallback(async () => {
     try {
@@ -87,18 +89,39 @@ export default function ProjectsListClient({
     }
   }
 
+  const handleOpenCreate = () => {
+    setEditingId(null)
+    setIsModalOpen(true)
+  }
+
+  const handleOpenEdit = (id: string) => {
+    setEditingId(id)
+    setIsModalOpen(true)
+  }
+
+  const handleModalClose = () => {
+    setIsModalOpen(false)
+    setEditingId(null)
+  }
+
+  const handleFormSuccess = () => {
+    setIsModalOpen(false)
+    setEditingId(null)
+    fetchProjects()
+  }
+
   return (
     <div className="projects-page">
       <div className="page-container">
-        <div className="page-header">
-          <div className="header-content">
-            <BackButton href="/dashboard" />
-            <div className="header-text">
-              <h1>Quản lý Projects</h1>
-              <p>Quản lý portfolio projects và case studies</p>
-            </div>
-          </div>
-          <LoadingButton onClick={() => router.push('/dashboard/projects/new')} variant="primary">
+        <DashboardHeader
+          title="Quản lý Projects"
+          subtitle="Quản lý portfolio projects và case studies"
+          showBack={true}
+          backHref="/dashboard"
+        />
+
+        <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'flex-end' }}>
+          <LoadingButton onClick={handleOpenCreate} variant="primary">
             + Thêm Project
           </LoadingButton>
         </div>
@@ -123,7 +146,7 @@ export default function ProjectsListClient({
             <div className="empty-icon">📁</div>
             <h3>Chưa có project nào</h3>
             <p>Hãy thêm project đầu tiên để bắt đầu quản lý!</p>
-            <LoadingButton onClick={() => router.push('/dashboard/projects/new')} variant="primary">
+            <LoadingButton onClick={handleOpenCreate} variant="primary">
               + Thêm Project đầu tiên
             </LoadingButton>
           </div>
@@ -151,10 +174,7 @@ export default function ProjectsListClient({
                     )}
                   </div>
                   <div className="card-actions">
-                    <LoadingButton
-                      onClick={() => router.push(`/dashboard/projects/${project.id}/edit`)}
-                      variant="primary"
-                    >
+                    <LoadingButton onClick={() => handleOpenEdit(project.id)} variant="primary">
                       Sửa
                     </LoadingButton>
                     <LoadingButton
@@ -201,6 +221,19 @@ export default function ProjectsListClient({
             ))}
           </div>
         )}
+
+        <Modal
+          isOpen={isModalOpen}
+          onClose={handleModalClose}
+          title={editingId ? 'Sửa Project' : 'Thêm Project mới'}
+          size="large"
+        >
+          <ProjectForm
+            projectId={editingId || undefined}
+            onSuccess={handleFormSuccess}
+            onCancel={handleModalClose}
+          />
+        </Modal>
       </div>
     </div>
   )

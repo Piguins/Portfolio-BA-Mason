@@ -1,8 +1,10 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
+import DashboardHeader from '@/components/DashboardHeader'
+import Modal from '@/components/Modal'
+import SpecializationForm from '@/components/SpecializationForm'
 import LoadingButton from '@/components/LoadingButton'
 import './specializations.css'
 
@@ -20,11 +22,12 @@ interface Props {
 }
 
 export default function SpecializationsListClient({ initialSpecializations, initialError }: Props) {
-  const router = useRouter()
   const [specializations, setSpecializations] = useState<Specialization[]>(initialSpecializations)
   const [error, setError] = useState<string | null>(initialError)
   const [loading, setLoading] = useState(initialSpecializations.length === 0)
   const [deletingId, setDeletingId] = useState<number | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingId, setEditingId] = useState<number | null>(null)
 
   const fetchSpecializations = useCallback(async () => {
     try {
@@ -89,24 +92,39 @@ export default function SpecializationsListClient({ initialSpecializations, init
     }
   }
 
+  const handleOpenCreate = () => {
+    setEditingId(null)
+    setIsModalOpen(true)
+  }
+
+  const handleOpenEdit = (id: number) => {
+    setEditingId(id)
+    setIsModalOpen(true)
+  }
+
+  const handleModalClose = () => {
+    setIsModalOpen(false)
+    setEditingId(null)
+  }
+
+  const handleFormSuccess = () => {
+    setIsModalOpen(false)
+    setEditingId(null)
+    fetchSpecializations()
+  }
+
   return (
     <div className="specializations-page">
       <div className="page-container">
-        <div className="page-header">
-          <div className="header-content">
-            <a href="/dashboard" className="back-link">
-              ← Quay lại Dashboard
-            </a>
-            <div className="header-text">
-              <h1>Quản lý Specializations</h1>
-              <p>Quản lý các cards trong phần &quot;I specialize in&quot;</p>
-            </div>
-          </div>
-          <LoadingButton
-            onClick={() => router.push('/dashboard/specializations/new')}
-            variant="primary"
-            className="btn-add-specialization"
-          >
+        <DashboardHeader
+          title="Quản lý Specializations"
+          subtitle='Quản lý các cards trong phần "I specialize in"'
+          showBack={true}
+          backHref="/dashboard"
+        />
+
+        <div style={{ marginBottom: '24px', display: 'flex', justifyContent: 'flex-end' }}>
+          <LoadingButton onClick={handleOpenCreate} variant="primary">
             + Thêm Specialization
           </LoadingButton>
         </div>
@@ -129,10 +147,7 @@ export default function SpecializationsListClient({ initialSpecializations, init
         ) : specializations.length === 0 ? (
           <div className="empty-state">
             <p>Chưa có specialization nào. Hãy tạo specialization đầu tiên!</p>
-            <LoadingButton
-              onClick={() => router.push('/dashboard/specializations/new')}
-              variant="primary"
-            >
+            <LoadingButton onClick={handleOpenCreate} variant="primary">
               Tạo Specialization đầu tiên
             </LoadingButton>
           </div>
@@ -155,9 +170,7 @@ export default function SpecializationsListClient({ initialSpecializations, init
                   </div>
                   <div className="card-actions">
                     <LoadingButton
-                      onClick={() =>
-                        router.push(`/dashboard/specializations/${specialization.id}/edit`)
-                      }
+                      onClick={() => handleOpenEdit(specialization.id)}
                       variant="primary"
                     >
                       Sửa
@@ -176,6 +189,19 @@ export default function SpecializationsListClient({ initialSpecializations, init
             ))}
           </div>
         )}
+
+        <Modal
+          isOpen={isModalOpen}
+          onClose={handleModalClose}
+          title={editingId ? 'Sửa Specialization' : 'Thêm Specialization mới'}
+          size="medium"
+        >
+          <SpecializationForm
+            specializationId={editingId || undefined}
+            onSuccess={handleFormSuccess}
+            onCancel={handleModalClose}
+          />
+        </Modal>
       </div>
     </div>
   )
