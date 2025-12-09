@@ -3,6 +3,7 @@ import { FaLinkedin, FaGithub, FaEnvelope } from 'react-icons/fa'
 import './Hero.css'
 import { IMAGES } from '../../constants/images'
 import { useTranslations } from '../../hooks/useTranslations'
+import { heroService } from '../../services/heroService'
 
 const Hero = () => {
   const t = useTranslations()
@@ -12,6 +13,50 @@ const Hero = () => {
     github: false,
     email: false
   })
+  const [heroData, setHeroData] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchHero = async () => {
+      try {
+        setLoading(true)
+        const data = await heroService.get()
+        const formatted = heroService.formatHero(data)
+        setHeroData(formatted)
+      } catch (err) {
+        console.error('Failed to load hero:', err)
+        // Fallback to translations
+        setHeroData({
+          greeting: t.hero.greeting,
+          greetingPart2: t.hero.greetingPart2,
+          name: t.hero.name,
+          title: t.hero.title,
+          description: t.hero.description,
+          linkedinUrl: null,
+          githubUrl: null,
+          emailUrl: null,
+          profileImageUrl: null,
+        })
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchHero()
+  }, [t.hero])
+
+  // Use API data if available, otherwise fallback to translations
+  const hero = heroData || {
+    greeting: t.hero.greeting,
+    greetingPart2: t.hero.greetingPart2,
+    name: t.hero.name,
+    title: t.hero.title,
+    description: t.hero.description,
+    linkedinUrl: null,
+    githubUrl: null,
+    emailUrl: null,
+    profileImageUrl: null,
+  }
 
   useEffect(() => {
     // Check if image is already loaded (from preload)
@@ -55,18 +100,23 @@ const Hero = () => {
         <div className="hero-content">
           <div className="hero-text">
             <h1 className="hero-title">
-              <span className="title-line-1">{t.hero.greeting} </span>
-              <span className="title-line-2">{t.hero.greetingPart2} </span>
-              <span className="title-line-2 bold">{t.hero.name}</span>
+              <span className="title-line-1">{hero.greeting} </span>
+              <span className="title-line-2">{hero.greetingPart2} </span>
+              <span className="title-line-2 bold">{hero.name}</span>
               <span className="title-line-1">, </span>
               <br />
-              <span className="title-line-3">{t.hero.title}</span>
+              <span className="title-line-3">{hero.title}</span>
             </h1>
             <p className="hero-description">
-              {t.hero.description}
+              {hero.description}
             </p>
             <div className="hero-social-buttons">
-              <a href="https://www.linkedin.com/in/piguinslie/" target="_blank" rel="noopener noreferrer" className="social-btn">
+              <a 
+                href={hero.linkedinUrl || "https://www.linkedin.com/in/piguinslie/"} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="social-btn"
+              >
                 {IMAGES.linkedinIcon && !iconErrors.linkedin ? (
                   <img 
                     src={IMAGES.linkedinIcon} 
@@ -78,7 +128,12 @@ const Hero = () => {
                   <FaLinkedin />
                 )}
               </a>
-              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="social-btn">
+              <a 
+                href={hero.githubUrl || "https://github.com"} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="social-btn"
+              >
                 {IMAGES.githubIcon && !iconErrors.github ? (
                   <img 
                     src={IMAGES.githubIcon} 
@@ -90,7 +145,12 @@ const Hero = () => {
                   <FaGithub />
                 )}
               </a>
-              <a href="https://email.com" target="_blank" rel="noopener noreferrer" className="social-btn">
+              <a 
+                href={hero.emailUrl ? `mailto:${hero.emailUrl}` : "mailto:contact@example.com"} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="social-btn"
+              >
                 {IMAGES.emailIcon && !iconErrors.email ? (
                   <img 
                     src={IMAGES.emailIcon} 
@@ -113,8 +173,8 @@ const Hero = () => {
                 </div>
               )}
               <img 
-                src={IMAGES.heroImage} 
-                alt={`${t.hero.name} - ${t.hero.title}`} 
+                src={hero.profileImageUrl || IMAGES.heroImage} 
+                alt={`${hero.name} - ${hero.title}`} 
                 className={`hero-main-image ${imageLoaded ? 'loaded' : ''}`}
                 width="320"
                 height="380"

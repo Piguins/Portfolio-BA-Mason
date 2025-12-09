@@ -2,11 +2,92 @@ import './Skills.css'
 import { IMAGES } from '../../constants/images'
 import { useTranslations } from '../../hooks/useTranslations'
 import { motion } from 'framer-motion'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { specializationsService } from '../../services/specializationsService'
+import { skillsService } from '../../services/skillsService'
 
 const Skills = () => {
   const t = useTranslations()
   const [hoveredLogo, setHoveredLogo] = useState(null)
+  const [specializations, setSpecializations] = useState([])
+  const [skills, setSkills] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true)
+        
+        // Fetch specializations (for cards)
+        const specsData = await specializationsService.getAll()
+        const formattedSpecs = specializationsService.formatSpecializations(specsData)
+        setSpecializations(formattedSpecs)
+        
+        // Fetch skills (for logos) - only highlighted ones
+        const skillsData = await skillsService.getAll()
+        const formattedSkills = skillsService.formatSkills(skillsData)
+        // Filter highlighted skills or get first 9
+        const highlightedSkills = formattedSkills
+          .filter(s => s.isHighlight)
+          .slice(0, 9)
+        setSkills(highlightedSkills)
+      } catch (err) {
+        console.error('Failed to load skills/specializations:', err)
+        // Fallback to translations
+        setSpecializations([
+          {
+            id: 1,
+            number: t.skills.skill1.number,
+            title: t.skills.skill1.title,
+            description: t.skills.skill1.description,
+            iconUrl: null,
+          },
+          {
+            id: 2,
+            number: t.skills.skill2.number,
+            title: t.skills.skill2.title,
+            description: t.skills.skill2.description,
+            iconUrl: null,
+          },
+          {
+            id: 3,
+            number: t.skills.skill3.number,
+            title: t.skills.skill3.title,
+            description: t.skills.skill3.description,
+            iconUrl: null,
+          },
+        ])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [t.skills])
+
+  // Use API data if available, otherwise fallback to translations
+  const displaySpecs = specializations.length > 0 
+    ? specializations.slice(0, 3) // Show max 3 cards
+    : [
+        {
+          id: 1,
+          number: t.skills.skill1.number,
+          title: t.skills.skill1.title,
+          description: t.skills.skill1.description,
+        },
+        {
+          id: 2,
+          number: t.skills.skill2.number,
+          title: t.skills.skill2.title,
+          description: t.skills.skill2.description,
+        },
+        {
+          id: 3,
+          number: t.skills.skill3.number,
+          title: t.skills.skill3.title,
+          description: t.skills.skill3.description,
+        },
+      ]
 
   const logoVariants = {
     initial: { scale: 0, opacity: 0, rotate: -180 },
@@ -235,72 +316,31 @@ const Skills = () => {
             )}
           </div>
           <div className="skills-cards">
-            <motion.div
-              className="skill-card skill-card-1"
-              variants={cardVariants}
-              initial="initial"
-              animate="animate"
-              custom={0}
-              whileHover="hover"
-              whileTap={{ scale: 0.95 }}
-            >
+            {displaySpecs.map((spec, index) => (
               <motion.div
-                className="skill-card-number"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
+                key={spec.id}
+                className={`skill-card skill-card-${index + 1}`}
+                variants={cardVariants}
+                initial="initial"
+                animate="animate"
+                custom={index}
+                whileHover="hover"
+                whileTap={{ scale: 0.95 }}
               >
-                {t.skills.skill1.number}
+                <motion.div
+                  className="skill-card-number"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.5 + index * 0.1, type: "spring", stiffness: 200 }}
+                >
+                  {spec.number}
+                </motion.div>
+                <h3 className="skill-card-title">{spec.title}</h3>
+                <p className="skill-card-description">
+                  {spec.description || ''}
+                </p>
               </motion.div>
-              <h3 className="skill-card-title">{t.skills.skill1.title}</h3>
-              <p className="skill-card-description">
-                {t.skills.skill1.description}
-              </p>
-            </motion.div>
-            <motion.div
-              className="skill-card skill-card-2"
-              variants={cardVariants}
-              initial="initial"
-              animate="animate"
-              custom={1}
-              whileHover="hover"
-              whileTap={{ scale: 0.95 }}
-            >
-              <motion.div
-                className="skill-card-number"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.6, type: "spring", stiffness: 200 }}
-              >
-                {t.skills.skill2.number}
-              </motion.div>
-              <h3 className="skill-card-title">{t.skills.skill2.title}</h3>
-              <p className="skill-card-description">
-                {t.skills.skill2.description}
-              </p>
-            </motion.div>
-            <motion.div
-              className="skill-card skill-card-3"
-              variants={cardVariants}
-              initial="initial"
-              animate="animate"
-              custom={2}
-              whileHover="hover"
-              whileTap={{ scale: 0.95 }}
-            >
-              <motion.div
-                className="skill-card-number"
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.7, type: "spring", stiffness: 200 }}
-              >
-                {t.skills.skill3.number}
-              </motion.div>
-              <h3 className="skill-card-title">{t.skills.skill3.title}</h3>
-              <p className="skill-card-description">
-                {t.skills.skill3.description}
-              </p>
-            </motion.div>
+            ))}
           </div>
         </div>
       </div>
