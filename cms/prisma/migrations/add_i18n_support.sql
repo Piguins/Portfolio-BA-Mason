@@ -19,7 +19,7 @@ ADD COLUMN IF NOT EXISTS description_i18n JSONB;
 UPDATE public.hero_content
 SET 
   greeting_i18n = jsonb_build_object('en', COALESCE(greeting, 'Hey!')),
-  greeting_part2_i18n = jsonb_build_object('en', COALESCE(greeting_part2, "I'm")),
+  greeting_part2_i18n = jsonb_build_object('en', COALESCE(greeting_part2, 'I''m')),
   name_i18n = jsonb_build_object('en', COALESCE(name, 'Thế Kiệt (Mason)')),
   title_i18n = jsonb_build_object('en', COALESCE(title, 'Business Analyst')),
   description_i18n = CASE 
