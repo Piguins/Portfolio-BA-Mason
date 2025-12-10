@@ -47,19 +47,25 @@ export function transformI18nResponse<T extends Record<string, unknown>>(
   // Serialize Date objects to ISO strings
   for (const key in transformed) {
     if (transformed[key] instanceof Date) {
-      transformed[key] = transformed[key].toISOString()
+      transformed[key] = (transformed[key] as Date).toISOString()
     }
   }
 
   for (const field of i18nFields) {
     const i18nField = `${field}_i18n`
     if (i18nField in transformed) {
-      const i18nValue = transformed[i18nField] as I18nText | null | undefined
-      const textValue = getI18nText(i18nValue, language)
-      
-      // Replace _i18n field with plain text field
-      delete transformed[i18nField]
-      transformed[field] = textValue
+      try {
+        const i18nValue = transformed[i18nField] as I18nText | null | undefined
+        const textValue = getI18nText(i18nValue, language, transformed[field] as string || '')
+        
+        // Replace _i18n field with plain text field
+        delete transformed[i18nField]
+        transformed[field] = textValue
+      } catch (err) {
+        console.error(`Error transforming field ${field}:`, err)
+        // Keep original value if transformation fails
+        delete transformed[i18nField]
+      }
     }
   }
 

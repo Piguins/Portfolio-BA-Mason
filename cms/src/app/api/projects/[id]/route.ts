@@ -84,6 +84,11 @@ export async function GET(
 
     return createSuccessResponse(transformed, request, 200, { revalidate: 60 })
   } catch (error) {
+    console.error('Error in GET /api/projects/[id]:', error)
+    if (error instanceof Error) {
+      console.error('Error message:', error.message)
+      console.error('Error stack:', error.stack)
+    }
     return handleDatabaseError(error, 'fetch project', request)
   }
 }
