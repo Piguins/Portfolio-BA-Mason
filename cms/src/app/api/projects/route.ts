@@ -78,21 +78,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const result = await queryFirst<{ id: string }>(
-      `INSERT INTO public.projects (title, summary, hero_image_url, case_study_url, tags_text)
-       VALUES ($1, $2, $3, $4, $5::text[])
-       RETURNING id`,
-      title,
-      summary || null,
-      hero_image_url || null,
-      case_study_url || null,
-      tags_text || []
-    )
-
-    if (!result) {
-      throw new Error('Failed to create project')
-    }
-
     const project = await queryFirst<{
       id: string
       title: string
@@ -103,9 +88,19 @@ export async function POST(request: NextRequest) {
       created_at: Date
       updated_at: Date
     }>(
-      `SELECT * FROM public.projects WHERE id = $1::uuid`,
-      result.id
+      `INSERT INTO public.projects (title, summary, hero_image_url, case_study_url, tags_text)
+       VALUES ($1, $2, $3, $4, $5::text[])
+       RETURNING id, title, summary, hero_image_url, case_study_url, tags_text, created_at, updated_at`,
+      title,
+      summary || null,
+      hero_image_url || null,
+      case_study_url || null,
+      tags_text || []
     )
+
+    if (!project) {
+      throw new Error('Failed to create project')
+    }
 
     return createSuccessResponse(project, request, 201)
   } catch (error) {

@@ -35,10 +35,12 @@ export async function queryFirst<T = unknown>(
     // If not array, return as is (for single row queries)
     return result as T
   } catch (error) {
-    console.error('[queryFirst] Error executing query:', error)
-    if (error instanceof Error) {
-      console.error('[queryFirst] Error message:', error.message)
-      console.error('[queryFirst] Error code:', (error as any).code)
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[queryFirst] Error executing query:', error)
+      if (error instanceof Error) {
+        console.error('[queryFirst] Error message:', error.message)
+        console.error('[queryFirst] Error code:', (error as any).code)
+      }
     }
     throw error
   }
@@ -71,10 +73,12 @@ export async function queryAll<T = unknown>(
     // If not array, wrap in array
     return [result] as T[]
   } catch (error) {
-    console.error('[queryAll] Error executing query:', error)
-    if (error instanceof Error) {
-      console.error('[queryAll] Error message:', error.message)
-      console.error('[queryAll] Error code:', (error as any).code)
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[queryAll] Error executing query:', error)
+      if (error instanceof Error) {
+        console.error('[queryAll] Error message:', error.message)
+        console.error('[queryAll] Error code:', (error as any).code)
+      }
     }
     throw error
   }
@@ -95,10 +99,12 @@ export async function executeQuery(
 
     await prisma.$executeRawUnsafe(query, ...params)
   } catch (error) {
-    console.error('[executeQuery] Error executing query:', error)
-    if (error instanceof Error) {
-      console.error('[executeQuery] Error message:', error.message)
-      console.error('[executeQuery] Error code:', (error as any).code)
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[executeQuery] Error executing query:', error)
+      if (error instanceof Error) {
+        console.error('[executeQuery] Error message:', error.message)
+        console.error('[executeQuery] Error code:', (error as any).code)
+      }
     }
     throw error
   }
@@ -113,7 +119,9 @@ export async function executeTransaction<T>(
   try {
     return (await prisma.$transaction(callback as any)) as T
   } catch (error) {
-    console.error('[executeTransaction] Error:', error)
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[executeTransaction] Error:', error)
+    }
     throw error
   }
 }

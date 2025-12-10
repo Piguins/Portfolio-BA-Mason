@@ -65,20 +65,6 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const result = await queryFirst<{ id: number }>(
-      `INSERT INTO public.specializations (number, title, description, icon_url)
-       VALUES ($1, $2, $3, $4)
-       RETURNING id`,
-      number || null,
-      title,
-      description || null,
-      icon_url || null
-    )
-
-    if (!result) {
-      throw new Error('Failed to create specialization')
-    }
-
     const specialization = await queryFirst<{
       id: number
       number: number | null
@@ -88,10 +74,18 @@ export async function POST(request: NextRequest) {
       created_at: Date
       updated_at: Date
     }>(
-      `SELECT id, number, title, description, icon_url, created_at, updated_at
-       FROM public.specializations WHERE id = $1`,
-      result.id
+      `INSERT INTO public.specializations (number, title, description, icon_url)
+       VALUES ($1, $2, $3, $4)
+       RETURNING id, number, title, description, icon_url, created_at, updated_at`,
+      number || null,
+      title,
+      description || null,
+      icon_url || null
     )
+
+    if (!specialization) {
+      throw new Error('Failed to create specialization')
+    }
 
     return createSuccessResponse(specialization, request, 201)
   } catch (error) {

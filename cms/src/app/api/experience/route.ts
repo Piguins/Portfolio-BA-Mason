@@ -66,7 +66,9 @@ export async function GET(request: NextRequest) {
         try {
           bullets = JSON.parse(bullets)
         } catch (e) {
-          console.error('[Experience GET] Error parsing bullets:', e)
+          if (process.env.NODE_ENV === 'development') {
+            console.error('[Experience GET] Error parsing bullets:', e)
+          }
           bullets = []
         }
       }
@@ -82,7 +84,6 @@ export async function GET(request: NextRequest) {
 
     return createSuccessResponse(transformedExperiences, request)
   } catch (error) {
-    console.error('[Experience GET] Error caught:', error)
     return handleDatabaseError(error, 'fetch experiences', request)
   }
 }
@@ -166,16 +167,27 @@ export async function POST(request: NextRequest) {
       // Return full experience with bullets
       const fullExp = await tx.$queryRawUnsafe(
         `SELECT
-          e.*,
+          e.id,
+          e.company,
+          e.role,
+          e.location,
+          e.start_date,
+          e.end_date,
+          e.is_current,
+          e.description,
+          e.created_at,
+          e.updated_at,
+          e.skills_text,
           COALESCE(
             json_agg(DISTINCT jsonb_build_object('id', eb.id, 'text', eb.text)) 
             FILTER (WHERE eb.id IS NOT NULL),
-            '[]'
+            '[]'::json
           ) AS bullets
          FROM public.experience e
          LEFT JOIN public.experience_bullets eb ON eb.experience_id = e.id
          WHERE e.id = $1::uuid
-         GROUP BY e.id`,
+         GROUP BY e.id, e.company, e.role, e.location, e.start_date, e.end_date, 
+                  e.is_current, e.description, e.created_at, e.updated_at, e.skills_text`,
         expId
       ) as Array<{
         id: string
