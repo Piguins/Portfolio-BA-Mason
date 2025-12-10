@@ -349,7 +349,7 @@
 
 .form-actions {
   display: flex;
-  gap: var(--spacing-md);
+  gap: var(--spacing-lg);
   justify-content: flex-end;
   margin-top: var(--spacing-2xl);
   padding-top: var(--spacing-lg);
