@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import LoadingButton from './LoadingButton'
+import LanguageTabs, { SupportedLanguage } from './LanguageTabs'
 import { fetchWithAuth } from '@/lib/fetchWithAuth'
 import '../app/dashboard/experience/experience.css'
 
@@ -29,18 +30,28 @@ interface ExperienceFormProps {
 
 export default function ExperienceForm({ experienceId, onSuccess, onCancel }: ExperienceFormProps) {
   const isEdit = !!experienceId
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en')
   const [loading, setLoading] = useState(isEdit)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // Store i18n data: {en: "...", vi: "..."}
+  const [i18nData, setI18nData] = useState<{
+    company: Record<SupportedLanguage, string>
+    role: Record<SupportedLanguage, string>
+    location: Record<SupportedLanguage, string>
+    description: Record<SupportedLanguage, string>
+    bullets: Array<{ text: Record<SupportedLanguage, string> }>
+  }>({
+    company: { en: '', vi: '' },
+    role: { en: '', vi: '' },
+    location: { en: '', vi: '' },
+    description: { en: '', vi: '' },
+    bullets: [],
+  })
   const [formData, setFormData] = useState({
-    company: '',
-    role: '',
-    location: '',
     start_date: '',
     end_date: '',
     is_current: false,
-    description: '',
-    bullets: [] as Array<{ text: string }>,
     skills_text: [] as string[],
   })
   const [newBullet, setNewBullet] = useState('')
@@ -56,7 +67,8 @@ export default function ExperienceForm({ experienceId, onSuccess, onCancel }: Ex
       const controller = new AbortController()
       const timeoutId = setTimeout(() => controller.abort(), 10000)
 
-      const response = await fetch(`/api/experience/${experienceId}`, {
+      // Fetch raw i18n data for CMS editing
+      const response = await fetch(`/api/experience/${experienceId}?raw=true`, {
         signal: controller.signal,
         cache: 'no-store',
       })
@@ -67,7 +79,13 @@ export default function ExperienceForm({ experienceId, onSuccess, onCancel }: Ex
         throw new Error('Failed to fetch experience')
       }
 
-      const data: Experience = await response.json()
+      const data: Experience & {
+        company_i18n?: Record<string, string> | string
+        role_i18n?: Record<string, string> | string
+        location_i18n?: Record<string, string> | string
+        description_i18n?: Record<string, string> | string
+        bullets?: Array<{ id: number; text: string; text_i18n?: Record<string, string> | string }>
+      } = await response.json()
 
       const formatDateForInput = (dateString: string | null | undefined) => {
         if (!dateString) return ''
@@ -75,19 +93,36 @@ export default function ExperienceForm({ experienceId, onSuccess, onCancel }: Ex
         return date.toISOString().split('T')[0]
       }
 
+      // Parse i18n data
+      const parseI18n = (i18nValue: unknown, fallback: string): Record<SupportedLanguage, string> => {
+        if (typeof i18nValue === 'object' && i18nValue !== null) {
+          const obj = i18nValue as Record<string, string>
+          return {
+            en: obj.en || fallback,
+            vi: obj.vi || '',
+          }
+        }
+        return { en: fallback, vi: '' }
+      }
+
       setFormData({
-        company: data.company,
-        role: data.role,
-        location: data.location || '',
         start_date: formatDateForInput(data.start_date),
         end_date: formatDateForInput(data.end_date),
         is_current: data.is_current || false,
-        description: data.description || '',
-        bullets: data.bullets?.map((b) => ({ text: b.text })) || [],
         skills_text:
           Array.isArray(data.skills_text) && data.skills_text.length > 0
             ? data.skills_text
             : data.skills_used?.map((s) => s.name) || [],
+      })
+
+      setI18nData({
+        company: parseI18n(data.company_i18n, data.company || ''),
+        role: parseI18n(data.role_i18n, data.role || ''),
+        location: parseI18n(data.location_i18n, data.location || ''),
+        description: parseI18n(data.description_i18n, data.description || ''),
+        bullets: (data.bullets || []).map(bullet => ({
+          text: parseI18n(bullet.text_i18n, bullet.text || '')
+        })),
       })
     } catch (err: any) {
       if (err.name === 'AbortError') {
@@ -110,6 +145,15 @@ export default function ExperienceForm({ experienceId, onSuccess, onCancel }: Ex
     }
   }, [isEdit, experienceId, fetchExperience])
 
+  // Update i18n data when form fields change
+  const updateI18nField = (field: keyof typeof i18nData, value: string) => {
+    if (field === 'bullets') return // Bullets handled separately
+    setI18nData(prev => ({
+      ...prev,
+      [field]: { ...prev[field], [currentLanguage]: value }
+    }))
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
@@ -122,9 +166,21 @@ export default function ExperienceForm({ experienceId, onSuccess, onCancel }: Ex
       const url = isEdit ? `/api/experience/${experienceId}` : `/api/experience`
       const method = isEdit ? 'PUT' : 'POST'
 
+      const payload = {
+        company: i18nData.company,
+        role: i18nData.role,
+        location: i18nData.location,
+        start_date: formData.start_date,
+        end_date: formData.end_date || null,
+        is_current: formData.is_current,
+        description: i18nData.description,
+        bullets: i18nData.bullets.map(b => ({ text: b.text })),
+        skills_text: formData.skills_text,
+      }
+
       const response = await fetchWithAuth(url, {
         method,
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
         signal: controller.signal,
       })
 
@@ -218,15 +274,21 @@ export default function ExperienceForm({ experienceId, onSuccess, onCancel }: Ex
 
       <div className="form-section">
         <h3 className="section-title">Thông tin cơ bản</h3>
+        
+        <LanguageTabs
+          activeLanguage={currentLanguage}
+          onLanguageChange={setCurrentLanguage}
+        />
+
         <div className="form-group">
           <label htmlFor="company">Company *</label>
           <input
             id="company"
             type="text"
             required
-            value={formData.company}
-            onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-            placeholder="Tên công ty"
+            value={i18nData.company[currentLanguage]}
+            onChange={(e) => updateI18nField('company', e.target.value)}
+            placeholder={currentLanguage === 'en' ? "Company name" : "Tên công ty"}
           />
         </div>
 
@@ -236,9 +298,9 @@ export default function ExperienceForm({ experienceId, onSuccess, onCancel }: Ex
             id="role"
             type="text"
             required
-            value={formData.role}
-            onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-            placeholder="Vị trí công việc"
+            value={i18nData.role[currentLanguage]}
+            onChange={(e) => updateI18nField('role', e.target.value)}
+            placeholder={currentLanguage === 'en' ? "Job title" : "Vị trí công việc"}
           />
         </div>
 
@@ -248,9 +310,9 @@ export default function ExperienceForm({ experienceId, onSuccess, onCancel }: Ex
             <input
               id="location"
               type="text"
-              value={formData.location}
-              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-              placeholder="Địa điểm"
+              value={i18nData.location[currentLanguage]}
+              onChange={(e) => updateI18nField('location', e.target.value)}
+              placeholder={currentLanguage === 'en' ? "Location" : "Địa điểm"}
             />
           </div>
         </div>
@@ -303,9 +365,11 @@ export default function ExperienceForm({ experienceId, onSuccess, onCancel }: Ex
           <textarea
             id="description"
             rows={4}
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            placeholder="Mô tả về công việc và trách nhiệm..."
+            value={i18nData.description[currentLanguage]}
+            onChange={(e) => updateI18nField('description', e.target.value)}
+            placeholder={currentLanguage === 'en' 
+              ? "Job description and responsibilities..."
+              : "Mô tả về công việc và trách nhiệm..."}
           />
         </div>
       </div>
@@ -325,11 +389,19 @@ export default function ExperienceForm({ experienceId, onSuccess, onCancel }: Ex
               Thêm
             </LoadingButton>
           </div>
-          {formData.bullets.length > 0 && (
+          {i18nData.bullets.length > 0 && (
             <ul className="bullets-list-form">
-              {formData.bullets.map((bullet, index) => (
+              {i18nData.bullets.map((bullet, index) => (
                 <li key={index} className="bullet-item">
-                  <span>{bullet.text}</span>
+                  <input
+                    type="text"
+                    value={bullet.text[currentLanguage]}
+                    onChange={(e) => updateBullet(index, e.target.value)}
+                    className="bullet-input"
+                    placeholder={currentLanguage === 'en' 
+                      ? "Enter achievement..."
+                      : "Nhập thành tựu..."}
+                  />
                   <button
                     type="button"
                     onClick={() => removeBullet(index)}
