@@ -60,6 +60,13 @@ export default function ConfirmModal({
     }
   }
 
+  // Debug: Log when modal should render
+  useEffect(() => {
+    if (isOpen) {
+      console.log('[ConfirmModal] Rendering modal, isOpen:', isOpen, 'variant:', variant)
+    }
+  }, [isOpen, variant])
+
   return (
     <AnimatePresence>
       {isOpen && (
