@@ -214,18 +214,18 @@ export default function ExperienceForm({ experienceId, onSuccess, onCancel }: Ex
 
   const addBullet = () => {
     if (!newBullet.trim()) return
-    setFormData({
-      ...formData,
-      bullets: [...formData.bullets, { text: newBullet }],
-    })
+    setI18nData(prev => ({
+      ...prev,
+      bullets: [...prev.bullets, { text: { [currentLanguage]: newBullet.trim(), en: '', vi: '' } }]
+    }))
     setNewBullet('')
   }
 
   const removeBullet = (index: number) => {
-    setFormData({
-      ...formData,
-      bullets: formData.bullets.filter((_, i) => i !== index),
-    })
+    setI18nData(prev => ({
+      ...prev,
+      bullets: prev.bullets.filter((_, i) => i !== index)
+    }))
   }
 
   const addSkill = () => {
