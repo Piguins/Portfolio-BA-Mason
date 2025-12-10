@@ -82,8 +82,8 @@ export default function ConfirmModal({
           <div className={`confirm-modal-icon confirm-modal-icon-${variant}`}>
             {variant === 'danger' && (
               <svg
-                width="24"
-                height="24"
+                width="20"
+                height="20"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -98,8 +98,8 @@ export default function ConfirmModal({
             )}
             {variant === 'warning' && (
               <svg
-                width="24"
-                height="24"
+                width="20"
+                height="20"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -114,8 +114,8 @@ export default function ConfirmModal({
             )}
             {variant === 'info' && (
               <svg
-                width="24"
-                height="24"
+                width="20"
+                height="20"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
