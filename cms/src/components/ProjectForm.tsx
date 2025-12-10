@@ -101,7 +101,7 @@ export default function ProjectForm({ projectId, onSuccess, onCancel }: ProjectF
     setSaving(true)
     setError(null)
 
-    if (!formData.title) {
+    if (!i18nData.title[currentLanguage]) {
       setError('Vui lòng điền Title.')
       setSaving(false)
       return

@@ -101,7 +101,7 @@ export default function SpecializationForm({
     setSaving(true)
     setError(null)
 
-    if (!formData.number || !formData.title) {
+    if (!formData.number || !i18nData.title[currentLanguage]) {
       setError('Vui lòng điền đầy đủ Number và Title.')
       setSaving(false)
       return
