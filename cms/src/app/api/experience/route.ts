@@ -1,10 +1,11 @@
 import { NextRequest } from 'next/server'
 import { corsOptionsHandler } from '@/middleware/cors'
 import { parseRequestBody, createSuccessResponse } from '@/lib/api/handlers/request-handler'
-import { handleDatabaseError } from '@/lib/api/handlers/error-handler'
+import { handleDatabaseError, createErrorResponse } from '@/lib/api/handlers/error-handler'
 import { validateRequiredFields } from '@/lib/api/validators/request-validator'
 import { queryAll, executeTransaction } from '@/lib/api/database/query-helpers'
-import { createErrorResponse } from '@/lib/api/handlers/error-handler'
+import { getLanguageFromRequest, transformI18nArray } from '@/lib/i18n/api-helpers'
+import { getI18nText, mergeI18n } from '@/lib/i18n/helpers'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -18,6 +19,8 @@ export async function OPTIONS(request: NextRequest) {
 // GET - Get all experiences (with bullets from experience_bullets)
 export async function GET(request: NextRequest) {
   try {
+    const language = getLanguageFromRequest(request)
+    
     // Optimized query: Use index on start_date for ORDER BY
     // Index idx_experience_start_date should be used for ORDER BY e.start_date DESC
     // Index idx_experience_bullets_experience_id should be used for JOIN
@@ -33,7 +36,11 @@ export async function GET(request: NextRequest) {
       created_at: Date
       updated_at: Date
       skills_text: string[]
-      bullets: Array<{ id: string; text: string }>
+      company_i18n: unknown
+      role_i18n: unknown
+      location_i18n: unknown
+      description_i18n: unknown
+      bullets: Array<{ id: string; text: string; text_i18n?: unknown }>
     }>(`
       SELECT
         e.id,
@@ -47,9 +54,13 @@ export async function GET(request: NextRequest) {
         e.created_at,
         e.updated_at,
         e.skills_text,
+        e.company_i18n,
+        e.role_i18n,
+        e.location_i18n,
+        e.description_i18n,
         COALESCE(
           json_agg(
-            jsonb_build_object('id', eb.id, 'text', eb.text)
+            jsonb_build_object('id', eb.id, 'text', eb.text, 'text_i18n', eb.text_i18n)
             ORDER BY eb.id
           ) FILTER (WHERE eb.id IS NOT NULL),
           '[]'::json
@@ -57,14 +68,22 @@ export async function GET(request: NextRequest) {
       FROM public.experience e
       LEFT JOIN public.experience_bullets eb ON eb.experience_id = e.id
       GROUP BY e.id, e.company, e.role, e.location, e.start_date, e.end_date, 
-               e.is_current, e.description, e.created_at, e.updated_at, e.skills_text
+               e.is_current, e.description, e.created_at, e.updated_at, e.skills_text,
+               e.company_i18n, e.role_i18n, e.location_i18n, e.description_i18n
       ORDER BY e.start_date DESC
     `)
     
-    // Transform bullets from JSON string to array if needed
+    // Transform i18n fields and bullets
     const transformedExperiences = experiences.map(exp => {
+      // Transform main i18n fields
+      const transformed = transformI18nArray(
+        [exp],
+        language,
+        ['company', 'role', 'location', 'description']
+      )[0]
+      
+      // Transform bullets i18n
       let bullets = exp.bullets
-      // Handle case where bullets might be a JSON string
       if (typeof bullets === 'string') {
         try {
           bullets = JSON.parse(bullets)
@@ -75,13 +94,19 @@ export async function GET(request: NextRequest) {
           bullets = []
         }
       }
-      // Ensure bullets is an array
       if (!Array.isArray(bullets)) {
         bullets = []
       }
+      
+      // Transform each bullet's text_i18n
+      const transformedBullets = bullets.map((bullet: { id: string; text: string; text_i18n?: unknown }) => ({
+        id: bullet.id,
+        text: getI18nText(bullet.text_i18n || bullet.text, language, bullet.text || '')
+      }))
+      
       return {
-        ...exp,
-        bullets
+        ...transformed,
+        bullets: transformedBullets
       }
     })
 
