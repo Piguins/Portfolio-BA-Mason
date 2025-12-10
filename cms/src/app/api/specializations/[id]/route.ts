@@ -3,10 +3,16 @@ import { parseRequestBody, createSuccessResponse } from '@/lib/api/handlers/requ
 import { createErrorResponse, handleDatabaseError } from '@/lib/api/handlers/error-handler'
 import { validateRequiredFields, validateIntegerId } from '@/lib/api/validators/request-validator'
 import { queryFirst, executeQuery } from '@/lib/api/database/query-helpers'
+import { corsOptionsHandler } from '@/middleware/cors'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+// Handle OPTIONS request for CORS
+export async function OPTIONS(request: NextRequest) {
+  return corsOptionsHandler(request)
+}
 
 // GET - Get specialization by ID
 export async function GET(

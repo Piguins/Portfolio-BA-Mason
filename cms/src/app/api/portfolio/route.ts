@@ -4,10 +4,16 @@ import { createSuccessResponse } from '@/lib/api/handlers/request-handler'
 import { handleDatabaseError, createErrorResponse } from '@/lib/api/handlers/error-handler'
 import { parseRequestBody } from '@/lib/api/handlers/request-handler'
 import { validateRequiredFields } from '@/lib/api/validators/request-validator'
+import { corsOptionsHandler } from '@/middleware/cors'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+// Handle OPTIONS request for CORS
+export async function OPTIONS(request: NextRequest) {
+  return corsOptionsHandler(request)
+}
 
 // GET - Get all portfolio projects
 export async function GET(request: NextRequest) {

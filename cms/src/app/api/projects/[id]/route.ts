@@ -4,10 +4,16 @@ import { createErrorResponse, handleDatabaseError } from '@/lib/api/handlers/err
 import { validateRequiredFields } from '@/lib/api/validators/request-validator'
 import { validateUUID } from '@/lib/api/validators/uuid-validator'
 import { queryFirst, executeQuery } from '@/lib/api/database/query-helpers'
+import { corsOptionsHandler } from '@/middleware/cors'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+// Handle OPTIONS request for CORS
+export async function OPTIONS(request: NextRequest) {
+  return corsOptionsHandler(request)
+}
 
 // GET - Get project by ID
 export async function GET(

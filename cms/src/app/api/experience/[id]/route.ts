@@ -4,10 +4,16 @@ import { createErrorResponse, handleDatabaseError } from '@/lib/api/handlers/err
 import { validateRequiredFields } from '@/lib/api/validators/request-validator'
 import { validateUUID } from '@/lib/api/validators/uuid-validator'
 import { queryFirst, executeTransaction } from '@/lib/api/database/query-helpers'
+import { corsOptionsHandler } from '@/middleware/cors'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
+
+// Handle OPTIONS request for CORS
+export async function OPTIONS(request: NextRequest) {
+  return corsOptionsHandler(request)
+}
 
 // GET - Get experience by ID (with bullets from experience_bullets)
 export async function GET(
