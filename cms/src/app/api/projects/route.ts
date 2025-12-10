@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
     const published = searchParams.get('published')
 
     // Optimized query: Use index idx_projects_created_at for ORDER BY
+    // Use COALESCE to handle cases where i18n columns might not exist yet
     const projects = await queryAll<{
       id: string
       title: string
@@ -38,15 +39,15 @@ export async function GET(request: NextRequest) {
     }>(`
       SELECT
         id,
-        title,
+        COALESCE(title, '') as title,
         summary,
         hero_image_url,
         case_study_url,
         tags_text,
         created_at,
         updated_at,
-        title_i18n,
-        summary_i18n
+        COALESCE(title_i18n, NULL) as title_i18n,
+        COALESCE(summary_i18n, NULL) as summary_i18n
       FROM public.projects
       ORDER BY created_at DESC
     `)
