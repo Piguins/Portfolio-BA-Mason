@@ -82,8 +82,10 @@ export default function SkillsListClient({ initialSkills, initialError }: Skills
   }, [initialSkills.length, fetchSkills])
 
   const handleDeleteClick = (id: number) => {
+    console.log('Delete clicked for skill:', id)
     setConfirmDeleteId(id)
     setIsConfirmOpen(true)
+    console.log('Confirm modal should open, isConfirmOpen:', true)
   }
 
   const handleConfirmDelete = async () => {
