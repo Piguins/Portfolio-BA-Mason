@@ -343,10 +343,15 @@ export async function POST(request: NextRequest) {
       )
 
       // Transform bullets i18n
-      const transformedBullets = bulletsResult.map(bullet => ({
-        id: bullet.id,
-        text: getI18nText(bullet.text_i18n || bullet.text, language, bullet.text || '')
-      }))
+      const transformedBullets = bulletsResult.map(bullet => {
+        const i18nValue = bullet.text_i18n && typeof bullet.text_i18n === 'object' && Object.keys(bullet.text_i18n).length > 0
+          ? bullet.text_i18n
+          : bullet.text
+        return {
+          id: bullet.id,
+          text: getI18nText(i18nValue as any, language, bullet.text || '')
+        }
+      })
 
       // Build response object with proper date serialization
       return {
