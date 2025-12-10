@@ -135,10 +135,12 @@ export default function ExperienceListClient({
     setEditingId(null)
   }
 
-  const handleFormSuccess = () => {
+  const handleFormSuccess = async () => {
     setIsModalOpen(false)
     setEditingId(null)
-    fetchExperiences()
+    // Small delay to ensure API has committed the transaction
+    await new Promise(resolve => setTimeout(resolve, 100))
+    await fetchExperiences()
   }
 
   const formatDate = (dateString: string) => {

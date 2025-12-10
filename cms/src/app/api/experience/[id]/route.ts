@@ -260,9 +260,13 @@ export async function PUT(
         id
       ) as Array<{ id: string; text: string }>
 
-      // Build response object
+      // Build response object with proper date serialization
       return {
         ...experienceData,
+        start_date: experienceData.start_date.toISOString().split('T')[0],
+        end_date: experienceData.end_date ? experienceData.end_date.toISOString().split('T')[0] : null,
+        created_at: experienceData.created_at.toISOString(),
+        updated_at: experienceData.updated_at.toISOString(),
         bullets: bulletsResult || []
       }
     })
