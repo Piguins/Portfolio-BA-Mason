@@ -129,9 +129,17 @@ export default function SpecializationForm({
       const url = isEdit ? `/api/specializations/${specializationId}` : `/api/specializations`
       const method = isEdit ? 'PUT' : 'POST'
 
+      // Construct payload with i18n data
+      const payload = {
+        title: i18nData.title,
+        description: i18nData.description,
+        number: formData.number,
+        icon_url: formData.icon_url,
+      }
+
       const response = await fetchWithAuth(url, {
         method,
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
         signal: controller.signal,
       })
 
