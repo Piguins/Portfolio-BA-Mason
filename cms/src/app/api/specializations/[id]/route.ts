@@ -67,7 +67,13 @@ export async function GET(
 
     // If raw=true, return i18n data as-is for CMS editing
     if (raw) {
-      return createSuccessResponse(specialization, request, 200, { revalidate: 60 })
+      // Serialize dates for JSON response
+      const serializedSpecialization = {
+        ...specialization,
+        created_at: specialization.created_at.toISOString(),
+        updated_at: specialization.updated_at.toISOString(),
+      }
+      return createSuccessResponse(serializedSpecialization, request, 200, { revalidate: 60 })
     }
 
     // Transform i18n fields

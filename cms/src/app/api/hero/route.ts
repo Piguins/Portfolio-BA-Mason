@@ -85,7 +85,13 @@ export async function GET(request: NextRequest) {
 
     // If raw=true, return i18n data as-is for CMS editing
     if (raw) {
-      return createSuccessResponse(hero, request, 200, { revalidate: 60 })
+      // Serialize dates for JSON response
+      const serializedHero = {
+        ...hero,
+        created_at: hero.created_at.toISOString(),
+        updated_at: hero.updated_at.toISOString(),
+      }
+      return createSuccessResponse(serializedHero, request, 200, { revalidate: 60 })
     }
 
     // Otherwise, transform i18n fields to plain text based on requested language

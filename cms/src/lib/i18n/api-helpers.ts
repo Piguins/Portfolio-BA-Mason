@@ -35,6 +35,7 @@ export function getLanguageFromRequest(request: NextRequest): SupportedLanguage 
 /**
  * Transform API response to include i18n data
  * Converts JSONB fields to plain text based on requested language
+ * Also serializes Date objects to ISO strings
  */
 export function transformI18nResponse<T extends Record<string, unknown>>(
   data: T,
@@ -42,6 +43,13 @@ export function transformI18nResponse<T extends Record<string, unknown>>(
   i18nFields: string[]
 ): T {
   const transformed: Record<string, unknown> = { ...data }
+
+  // Serialize Date objects to ISO strings
+  for (const key in transformed) {
+    if (transformed[key] instanceof Date) {
+      transformed[key] = transformed[key].toISOString()
+    }
+  }
 
   for (const field of i18nFields) {
     const i18nField = `${field}_i18n`
