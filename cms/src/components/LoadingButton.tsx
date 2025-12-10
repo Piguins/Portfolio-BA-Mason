@@ -23,11 +23,12 @@ export default function LoadingButton({
   className = '',
 }: LoadingButtonProps) {
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    // Always prevent default for submit buttons to avoid page reload
+    // For submit buttons, let the form onSubmit handle it
+    // Don't prevent default or call onClick - form will handle submission
     if (type === 'submit') {
-      e.preventDefault()
+      return // Let form onSubmit handle it
     }
-    // Call onClick if provided
+    // For non-submit buttons, call onClick if provided
     if (onClick) {
       onClick()
     }
