@@ -152,6 +152,10 @@ export async function POST(request: NextRequest) {
         Array.isArray(skills_text) ? skills_text : []
       ) as Array<{ id: string }>
 
+      if (!expResult || expResult.length === 0) {
+        throw new Error('Failed to create experience: No ID returned')
+      }
+
       const exp = expResult[0]
       const expId = exp.id
 
@@ -159,11 +163,13 @@ export async function POST(request: NextRequest) {
       if (bullets.length > 0) {
         for (const bullet of bullets) {
           const bulletText = typeof bullet === 'string' ? bullet : (bullet.text || '')
-          await tx.$executeRawUnsafe(
-            `INSERT INTO public.experience_bullets (experience_id, text) VALUES ($1::uuid, $2)`,
-            expId,
-            bulletText
-          )
+          if (bulletText.trim()) {
+            await tx.$executeRawUnsafe(
+              `INSERT INTO public.experience_bullets (experience_id, text) VALUES ($1::uuid, $2)`,
+              expId,
+              bulletText
+            )
+          }
         }
       }
 
@@ -182,8 +188,10 @@ export async function POST(request: NextRequest) {
           e.updated_at,
           e.skills_text,
           COALESCE(
-            json_agg(DISTINCT jsonb_build_object('id', eb.id, 'text', eb.text)) 
-            FILTER (WHERE eb.id IS NOT NULL),
+            json_agg(
+              jsonb_build_object('id', eb.id, 'text', eb.text)
+              ORDER BY eb.id
+            ) FILTER (WHERE eb.id IS NOT NULL),
             '[]'::json
           ) AS bullets
          FROM public.experience e
@@ -206,6 +214,10 @@ export async function POST(request: NextRequest) {
         skills_text: string[]
         bullets: Array<{ id: string; text: string }>
       }>
+
+      if (!fullExp || fullExp.length === 0) {
+        throw new Error('Failed to retrieve created experience')
+      }
 
       return fullExp[0]
     })
