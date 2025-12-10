@@ -4,6 +4,8 @@ import { createErrorResponse, handleDatabaseError } from '@/lib/api/handlers/err
 import { validateRequiredFields, validateIntegerId } from '@/lib/api/validators/request-validator'
 import { queryFirst, executeQuery } from '@/lib/api/database/query-helpers'
 import { corsOptionsHandler } from '@/middleware/cors'
+import { getLanguageFromRequest, transformI18nResponse } from '@/lib/i18n/api-helpers'
+import { getI18nText } from '@/lib/i18n/helpers'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -21,6 +23,7 @@ export async function GET(
 ) {
   try {
     const { id } = params
+    const language = getLanguageFromRequest(request)
 
     // Validate integer ID
     const idValidation = validateIntegerId(id)
@@ -41,8 +44,12 @@ export async function GET(
       icon_url: string | null
       created_at: Date
       updated_at: Date
+      title_i18n: unknown
+      description_i18n: unknown
     }>(
-      `SELECT id, number, title, description, icon_url, created_at, updated_at
+      `SELECT 
+        id, number, title, description, icon_url, created_at, updated_at,
+        title_i18n, description_i18n
        FROM public.specializations WHERE id = $1`,
       idValidation.value
     )
@@ -56,7 +63,10 @@ export async function GET(
       )
     }
 
-    return createSuccessResponse(specialization, request, 200, { revalidate: 60 })
+    // Transform i18n fields
+    const transformed = transformI18nResponse(specialization, language, ['title', 'description'])
+
+    return createSuccessResponse(transformed, request, 200, { revalidate: 60 })
   } catch (error) {
     return handleDatabaseError(error, 'fetch specialization', request)
   }
@@ -69,6 +79,7 @@ export async function PUT(
 ) {
   try {
     const { id } = params
+    const language = getLanguageFromRequest(request)
 
     // Validate integer ID
     const idValidation = validateIntegerId(id)
@@ -81,11 +92,11 @@ export async function PUT(
       )
     }
 
-    // Parse request body
+    // Parse request body - supports both i18n format and plain text (backward compatible)
     const parseResult = await parseRequestBody<{
       number?: number | null
-      title?: string
-      description?: string | null
+      title?: Record<string, string> | string
+      description?: Record<string, string> | string | null
       icon_url?: string | null
     }>(request)
     if (parseResult.error) {
@@ -106,14 +117,37 @@ export async function PUT(
       )
     }
 
+    // Convert i18n data to JSONB format
+    const titleI18n = typeof title === 'object' 
+      ? JSON.stringify(title) 
+      : title 
+        ? JSON.stringify({ en: title }) 
+        : null
+    
+    const descriptionI18n = description
+      ? typeof description === 'object'
+        ? JSON.stringify(description)
+        : description.trim() !== ''
+          ? JSON.stringify({ en: description })
+          : null
+      : null
+
+    // Get plain text values for backward compatibility
+    const titleText = getI18nText(title, 'en', '')
+    const descriptionText = getI18nText(description, 'en') || null
+
     await executeQuery(
       `UPDATE public.specializations
-       SET number = $1, title = $2, description = $3, icon_url = $4, updated_at = NOW()
-       WHERE id = $5`,
+       SET number = $1, title = $2, description = $3, icon_url = $4,
+           title_i18n = $5::jsonb, description_i18n = $6::jsonb,
+           updated_at = NOW()
+       WHERE id = $7`,
       number || null,
-      title,
-      description || null,
+      titleText,
+      descriptionText,
       icon_url || null,
+      titleI18n,
+      descriptionI18n,
       idValidation.value
     )
 
@@ -125,13 +159,24 @@ export async function PUT(
       icon_url: string | null
       created_at: Date
       updated_at: Date
+      title_i18n: unknown
+      description_i18n: unknown
     }>(
-      `SELECT id, number, title, description, icon_url, created_at, updated_at
+      `SELECT 
+        id, number, title, description, icon_url, created_at, updated_at,
+        title_i18n, description_i18n
        FROM public.specializations WHERE id = $1`,
       idValidation.value
     )
 
-    return createSuccessResponse(specialization, request)
+    if (!specialization) {
+      throw new Error('Failed to retrieve updated specialization')
+    }
+
+    // Transform i18n fields in response
+    const transformed = transformI18nResponse(specialization, language, ['title', 'description'])
+
+    return createSuccessResponse(transformed, request)
   } catch (error) {
     return handleDatabaseError(error, 'update specialization', request)
   }
