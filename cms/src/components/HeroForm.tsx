@@ -67,7 +67,8 @@ export default function HeroForm({ onSuccess, onCancel }: HeroFormProps) {
         const controller = new AbortController()
         const timeoutId = setTimeout(() => controller.abort(), 10000)
 
-        const response = await fetch('/api/hero', {
+        // Fetch raw i18n data for CMS editing
+        const response = await fetch('/api/hero?raw=true', {
           cache: 'no-store',
           signal: controller.signal,
         })
@@ -78,8 +79,50 @@ export default function HeroForm({ onSuccess, onCancel }: HeroFormProps) {
           throw new Error('Failed to fetch hero content')
         }
 
-        const data: HeroData = await response.json()
-        setFormData(data)
+        const data: HeroData & {
+          greeting_i18n?: Record<string, string> | string
+          greeting_part2_i18n?: Record<string, string> | string
+          name_i18n?: Record<string, string> | string
+          title_i18n?: Record<string, string> | string
+          description_i18n?: Record<string, string> | string | null
+        } = await response.json()
+        
+        setFormData({
+          id: data.id,
+          greeting: data.greeting,
+          greeting_part2: data.greeting_part2,
+          name: data.name,
+          title: data.title,
+          description: data.description,
+          linkedin_url: data.linkedin_url,
+          github_url: data.github_url,
+          email_url: data.email_url,
+          profile_image_url: data.profile_image_url,
+        })
+        
+        // Initialize i18n data from API response
+        const parseI18n = (i18nValue: unknown, fallback: string): Record<SupportedLanguage, string> => {
+          if (typeof i18nValue === 'object' && i18nValue !== null) {
+            const obj = i18nValue as Record<string, string>
+            return {
+              en: obj.en || fallback,
+              vi: obj.vi || '',
+            }
+          }
+          return { en: fallback, vi: '' }
+        }
+        
+        setI18nData({
+          greeting: parseI18n(data.greeting_i18n, data.greeting || ''),
+          greeting_part2: parseI18n(data.greeting_part2_i18n, data.greeting_part2 || ''),
+          name: parseI18n(data.name_i18n, data.name || ''),
+          title: parseI18n(data.title_i18n, data.title || ''),
+          description: data.description_i18n
+            ? parseI18n(data.description_i18n, data.description || '')
+            : data.description
+              ? { en: data.description, vi: '' }
+              : null,
+        })
       } catch (err: any) {
         if (err.name === 'AbortError') {
           setError('Request timeout. Vui lòng thử lại.')
