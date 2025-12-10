@@ -17,9 +17,13 @@ interface Experience {
   end_date?: string
   is_current: boolean
   description?: string
-  bullets?: Array<{ id: number; text: string }>
+  bullets?: Array<{ id: number; text: string; text_i18n?: Record<string, string> | string }>
   skills_text?: string[]
   skills_used?: Array<{ id: number; name: string; slug: string }>
+  company_i18n?: Record<string, string> | string
+  role_i18n?: Record<string, string> | string
+  location_i18n?: Record<string, string> | string
+  description_i18n?: Record<string, string> | string
 }
 
 interface ExperienceFormProps {

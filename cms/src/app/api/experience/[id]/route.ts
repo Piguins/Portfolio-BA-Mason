@@ -87,7 +87,8 @@ export async function GET(
        WHERE e.id = $1::uuid
        GROUP BY e.id, e.company, e.role, e.location, e.start_date, e.end_date, 
                 e.is_current, e.description, e.created_at, e.updated_at, e.skills_text,
-                e.company_i18n, e.role_i18n, e.location_i18n, e.description_i18n`,
+                e.company_i18n, e.role_i18n, e.location_i18n, e.description_i18n
+      `,
       id
     )
 
