@@ -39,15 +39,15 @@ export async function GET(request: NextRequest) {
     }>(`
       SELECT
         id,
-        COALESCE(title, '') as title,
+        title,
         summary,
         hero_image_url,
         case_study_url,
         tags_text,
         created_at,
         updated_at,
-        COALESCE(title_i18n, NULL) as title_i18n,
-        COALESCE(summary_i18n, NULL) as summary_i18n
+        title_i18n,
+        summary_i18n
       FROM public.projects
       ORDER BY created_at DESC
     `)
