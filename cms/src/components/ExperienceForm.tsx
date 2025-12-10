@@ -228,6 +228,16 @@ export default function ExperienceForm({ experienceId, onSuccess, onCancel }: Ex
     }))
   }
 
+  const updateBullet = (index: number, value: string) => {
+    setI18nData(prev => {
+      const newBullets = [...prev.bullets]
+      newBullets[index] = {
+        text: { ...newBullets[index].text, [currentLanguage]: value }
+      }
+      return { ...prev, bullets: newBullets }
+    })
+  }
+
   const addSkill = () => {
     const value = newSkill.trim()
     if (!value) return
