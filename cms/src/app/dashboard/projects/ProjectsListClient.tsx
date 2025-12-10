@@ -167,7 +167,6 @@ export default function ProjectsListClient({
           </div>
         ) : projects.length === 0 ? (
           <div className="empty-state">
-            <div className="empty-icon">📁</div>
             <h3>Chưa có project nào</h3>
             <p>Hãy thêm project đầu tiên để bắt đầu quản lý!</p>
             <LoadingButton onClick={handleOpenCreate} variant="primary">

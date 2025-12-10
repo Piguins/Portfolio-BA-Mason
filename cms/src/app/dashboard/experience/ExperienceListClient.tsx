@@ -181,7 +181,6 @@ export default function ExperienceListClient({
           </div>
         ) : experiences.length === 0 ? (
           <div className="empty-state">
-            <div className="empty-icon">📋</div>
             <h3>Chưa có experience nào</h3>
             <p>Hãy thêm experience đầu tiên để bắt đầu quản lý!</p>
             <LoadingButton onClick={handleOpenCreate} variant="primary">

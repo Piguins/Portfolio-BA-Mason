@@ -98,10 +98,6 @@
   font-size: 0.9375rem;
 }
 
-.empty-icon {
-  font-size: 3rem;
-}
-
 .projects-list {
   display: flex;
   flex-direction: column;
