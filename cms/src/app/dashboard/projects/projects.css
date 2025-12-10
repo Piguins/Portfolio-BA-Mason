@@ -122,6 +122,45 @@
   border-color: var(--primary-blue-light);
 }
 
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-lg);
+  gap: var(--spacing-lg);
+}
+
+.card-title-section {
+  flex: 1;
+}
+
+.card-title-section h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--gray-900);
+  margin: 0 0 var(--spacing-md) 0;
+  line-height: 1.4;
+}
+
+.card-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+  align-items: flex-start;
+}
+
+.card-description {
+  margin-top: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.card-description p {
+  color: var(--gray-600);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
 .slug {
   font-size: 0.875rem;
   color: var(--gray-500);
