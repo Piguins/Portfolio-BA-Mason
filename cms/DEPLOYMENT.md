@@ -230,6 +230,49 @@ curl https://admin.mason.id.vn/api/health
 }
 ```
 
+## 🌍 Region Optimization
+
+### Đồng bộ Region giữa Vercel và Supabase
+
+Để giảm latency, đảm bảo Vercel Serverless Functions và Supabase Database ở cùng region hoặc gần nhau.
+
+#### 1. Xác định Supabase Region
+
+Kiểm tra region từ DATABASE_URL:
+- Format: `postgresql://...@aws-0-[region].pooler.supabase.com:6543/...`
+- Ví dụ: `aws-0-ap-southeast-1` = Singapore region
+
+Hoặc kiểm tra trong Supabase Dashboard:
+- Settings → Infrastructure → Region
+
+#### 2. Cấu hình Vercel Region
+
+File `vercel.json` đã được cấu hình với region `sin1` (Singapore) - phù hợp cho Việt Nam và khu vực Đông Nam Á.
+
+**Region Mapping:**
+- Supabase `ap-southeast-1` (Singapore) → Vercel `sin1` ✅ (đã cấu hình)
+- Supabase `ap-southeast-2` (Sydney) → Vercel `syd1`
+- Supabase `ap-northeast-1` (Tokyo) → Vercel `hnd1`
+- Supabase `us-east-1` (US East) → Vercel `iad1`
+- Supabase `eu-west-1` (EU West) → Vercel `fra1`
+
+**Nếu Supabase ở region khác:**
+1. Xác định region của Supabase
+2. Cập nhật `regions` trong `cms/vercel.json` với region code tương ứng
+3. Redeploy project
+
+#### 3. Verify Region Configuration
+
+Sau khi deploy, kiểm tra:
+1. Vercel Dashboard → Project → Functions
+2. Xem region được hiển thị trong function details
+3. Test API response time để verify latency improvement
+
+**Lưu ý:**
+- Region configuration chỉ apply cho serverless functions (API routes)
+- Static assets vẫn được serve từ edge network
+- Latency improvement có thể thấy rõ nhất với database queries
+
 ## ✅ Checklist Before Deployment
 
 - [ ] DATABASE_URL đã được set trong Vercel
@@ -237,6 +280,7 @@ curl https://admin.mason.id.vn/api/health
 - [ ] NEXT_PUBLIC_SUPABASE_ANON_KEY đã được set
 - [ ] NEXT_PUBLIC_APP_URL đã được set
 - [ ] **Root Directory đã được set thành `cms` trong Vercel Settings**
+- [ ] **Vercel region đã được cấu hình phù hợp với Supabase region** (đã set `sin1` trong vercel.json)
 - [ ] Prisma client đã được generate (thêm vào build command)
 - [ ] Database cho phép connections từ Vercel
 - [ ] Test API endpoints sau khi deploy
