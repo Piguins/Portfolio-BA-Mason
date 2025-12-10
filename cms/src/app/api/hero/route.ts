@@ -46,10 +46,10 @@ export async function GET(request: NextRequest) {
         profile_image_url: null,
         created_at: new Date(),
         updated_at: new Date(),
-      }, request)
+      }, request, 200, { revalidate: 60 })
     }
 
-    return createSuccessResponse(hero, request)
+    return createSuccessResponse(hero, request, 200, { revalidate: 60 })
   } catch (error) {
     return handleDatabaseError(error, 'fetch hero section', request)
   }

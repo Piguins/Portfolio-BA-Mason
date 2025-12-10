@@ -20,6 +20,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const published = searchParams.get('published')
 
+    // Optimized query: Use index idx_projects_created_at for ORDER BY
     const projects = await queryAll<{
       id: string
       title: string
@@ -43,7 +44,7 @@ export async function GET(request: NextRequest) {
       ORDER BY created_at DESC
     `)
 
-    return createSuccessResponse(projects, request)
+    return createSuccessResponse(projects, request, 200, { revalidate: 60 })
   } catch (error) {
     return handleDatabaseError(error, 'fetch projects', request)
   }

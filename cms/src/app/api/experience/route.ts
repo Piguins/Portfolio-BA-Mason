@@ -18,6 +18,9 @@ export async function OPTIONS(request: NextRequest) {
 // GET - Get all experiences (with bullets from experience_bullets)
 export async function GET(request: NextRequest) {
   try {
+    // Optimized query: Use index on start_date for ORDER BY
+    // Index idx_experience_start_date should be used for ORDER BY e.start_date DESC
+    // Index idx_experience_bullets_experience_id should be used for JOIN
     const experiences = await queryAll<{
       id: string
       company: string
@@ -45,10 +48,10 @@ export async function GET(request: NextRequest) {
         e.updated_at,
         e.skills_text,
         COALESCE(
-          json_agg(DISTINCT jsonb_build_object(
-            'id', eb.id,
-            'text', eb.text
-          )) FILTER (WHERE eb.id IS NOT NULL),
+          json_agg(
+            jsonb_build_object('id', eb.id, 'text', eb.text)
+            ORDER BY eb.id
+          ) FILTER (WHERE eb.id IS NOT NULL),
           '[]'::json
         ) AS bullets
       FROM public.experience e
@@ -82,7 +85,7 @@ export async function GET(request: NextRequest) {
       }
     })
 
-    return createSuccessResponse(transformedExperiences, request)
+    return createSuccessResponse(transformedExperiences, request, 200, { revalidate: 60 })
   } catch (error) {
     return handleDatabaseError(error, 'fetch experiences', request)
   }

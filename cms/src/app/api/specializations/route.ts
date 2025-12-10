@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
       ORDER BY id ASC
     `)
 
-    return createSuccessResponse(specializations, request)
+    return createSuccessResponse(specializations, request, 200, { revalidate: 60 })
   } catch (error) {
     return handleDatabaseError(error, 'fetch specializations', request)
   }

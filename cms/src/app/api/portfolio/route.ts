@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' },
     })
 
-    return createSuccessResponse(portfolios, request)
+    return createSuccessResponse(portfolios, request, 200, { revalidate: 60 })
   } catch (error) {
     return handleDatabaseError(error, 'fetch portfolios', request)
   }

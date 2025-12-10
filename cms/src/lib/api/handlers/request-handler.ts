@@ -66,16 +66,29 @@ export async function parseRequestBody<T = unknown>(
 }
 
 /**
- * Create success response with CORS headers
+ * Create success response with CORS headers and optional caching
  */
 export function createSuccessResponse<T>(
   data: T,
   request: NextRequest,
-  statusCode: number = 200
+  statusCode: number = 200,
+  options?: {
+    revalidate?: number // Cache revalidation time in seconds
+    cacheControl?: string // Custom Cache-Control header
+  }
 ): NextResponse {
+  const headers = new Headers(corsHeaders(request))
+  
+  // Add caching headers if specified
+  if (options?.revalidate) {
+    headers.set('Cache-Control', `public, s-maxage=${options.revalidate}, stale-while-revalidate=${options.revalidate * 2}`)
+  } else if (options?.cacheControl) {
+    headers.set('Cache-Control', options.cacheControl)
+  }
+  
   return NextResponse.json(data, {
     status: statusCode,
-    headers: corsHeaders(request),
+    headers,
   })
 }
 

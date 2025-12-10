@@ -49,7 +49,7 @@ export async function GET(
       )
     }
 
-    return createSuccessResponse(project, request)
+    return createSuccessResponse(project, request, 200, { revalidate: 60 })
   } catch (error) {
     return handleDatabaseError(error, 'fetch project', request)
   }

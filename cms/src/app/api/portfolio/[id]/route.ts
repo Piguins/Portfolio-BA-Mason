@@ -42,7 +42,7 @@ export async function GET(
       )
     }
 
-    return createSuccessResponse(portfolio, request)
+    return createSuccessResponse(portfolio, request, 200, { revalidate: 60 })
   } catch (error) {
     return handleDatabaseError(error, 'fetch portfolio', request)
   }

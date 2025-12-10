@@ -10,11 +10,13 @@ type TransactionClient = {
 
 /**
  * Safely execute raw query and return first result
+ * Includes performance monitoring for slow queries
  */
 export async function queryFirst<T = unknown>(
   query: string,
   ...params: unknown[]
 ): Promise<T | null> {
+  const startTime = Date.now()
   try {
     // Check DATABASE_URL before executing query
     if (!process.env.DATABASE_URL) {
@@ -22,6 +24,13 @@ export async function queryFirst<T = unknown>(
     }
 
     const result = await prisma.$queryRawUnsafe(query, ...params)
+    const queryTime = Date.now() - startTime
+    
+    // Log slow queries (>200ms) in development
+    if (process.env.NODE_ENV === 'development' && queryTime > 200) {
+      console.warn(`[queryFirst] Slow query detected: ${queryTime}ms`)
+      console.warn(`[queryFirst] Query: ${query.substring(0, 100)}...`)
+    }
     
     if (!result) {
       return null
@@ -35,8 +44,9 @@ export async function queryFirst<T = unknown>(
     // If not array, return as is (for single row queries)
     return result as T
   } catch (error) {
+    const queryTime = Date.now() - startTime
     if (process.env.NODE_ENV === 'development') {
-      console.error('[queryFirst] Error executing query:', error)
+      console.error(`[queryFirst] Error executing query (${queryTime}ms):`, error)
       if (error instanceof Error) {
         console.error('[queryFirst] Error message:', error.message)
         console.error('[queryFirst] Error code:', (error as any).code)
@@ -48,11 +58,13 @@ export async function queryFirst<T = unknown>(
 
 /**
  * Safely execute raw query and return all results
+ * Includes performance monitoring for slow queries
  */
 export async function queryAll<T = unknown>(
   query: string,
   ...params: unknown[]
 ): Promise<T[]> {
+  const startTime = Date.now()
   try {
     // Check DATABASE_URL before executing query
     if (!process.env.DATABASE_URL) {
@@ -60,6 +72,13 @@ export async function queryAll<T = unknown>(
     }
 
     const result = await prisma.$queryRawUnsafe(query, ...params)
+    const queryTime = Date.now() - startTime
+    
+    // Log slow queries (>200ms) in development
+    if (process.env.NODE_ENV === 'development' && queryTime > 200) {
+      console.warn(`[queryAll] Slow query detected: ${queryTime}ms`)
+      console.warn(`[queryAll] Query: ${query.substring(0, 100)}...`)
+    }
     
     if (!result) {
       return []
@@ -73,8 +92,9 @@ export async function queryAll<T = unknown>(
     // If not array, wrap in array
     return [result] as T[]
   } catch (error) {
+    const queryTime = Date.now() - startTime
     if (process.env.NODE_ENV === 'development') {
-      console.error('[queryAll] Error executing query:', error)
+      console.error(`[queryAll] Error executing query (${queryTime}ms):`, error)
       if (error instanceof Error) {
         console.error('[queryAll] Error message:', error.message)
         console.error('[queryAll] Error code:', (error as any).code)

@@ -50,7 +50,7 @@ export async function GET(
       )
     }
 
-    return createSuccessResponse(specialization, request)
+    return createSuccessResponse(specialization, request, 200, { revalidate: 60 })
   } catch (error) {
     return handleDatabaseError(error, 'fetch specialization', request)
   }

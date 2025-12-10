@@ -27,7 +27,9 @@ function getPrismaClient(): PrismaClient {
       }
     }
   } = {
-    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    // Only log errors in production to reduce overhead
+    // Query logging can be enabled in development for debugging
+    log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
   }
   
   // Only set datasources if DATABASE_URL is available

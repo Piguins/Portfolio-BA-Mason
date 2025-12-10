@@ -29,6 +29,7 @@ export async function GET(
       )
     }
 
+    // Optimized query: Use index on experience_bullets.experience_id for JOIN
     const experience = await queryFirst<{
       id: string
       company: string
@@ -56,9 +57,11 @@ export async function GET(
         e.updated_at,
         e.skills_text,
         COALESCE(
-          json_agg(DISTINCT jsonb_build_object('id', eb.id, 'text', eb.text)) 
-          FILTER (WHERE eb.id IS NOT NULL),
-          '[]'
+          json_agg(
+            jsonb_build_object('id', eb.id, 'text', eb.text)
+            ORDER BY eb.id
+          ) FILTER (WHERE eb.id IS NOT NULL),
+          '[]'::json
         ) AS bullets
        FROM public.experience e
        LEFT JOIN public.experience_bullets eb ON eb.experience_id = e.id
@@ -77,7 +80,7 @@ export async function GET(
       )
     }
 
-    return createSuccessResponse(experience, request)
+    return createSuccessResponse(experience, request, 200, { revalidate: 60 })
   } catch (error) {
     return handleDatabaseError(error, 'fetch experience', request)
   }
@@ -224,7 +227,7 @@ export async function PUT(
       return fullExp[0]
     })
 
-    return createSuccessResponse(experience, request)
+    return createSuccessResponse(experience, request, 200, { revalidate: 60 })
   } catch (error) {
     return handleDatabaseError(error, 'update experience', request)
   }
