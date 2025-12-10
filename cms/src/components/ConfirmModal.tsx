@@ -48,8 +48,6 @@ export default function ConfirmModal({
     }
   }, [isOpen, onClose, loading])
 
-  if (!isOpen) return null
-
   const handleConfirm = () => {
     if (!loading) {
       onConfirm()
@@ -62,9 +60,11 @@ export default function ConfirmModal({
     }
   }
 
+  if (!isOpen) return null
+
   return (
-    <AnimatePresence>
-      <div className="confirm-modal-overlay" onClick={handleCancel}>
+    <AnimatePresence mode="wait">
+      <div className="confirm-modal-overlay" onClick={handleCancel} key="confirm-overlay">
         <motion.div
           className="confirm-modal-content"
           onClick={(e) => e.stopPropagation()}
