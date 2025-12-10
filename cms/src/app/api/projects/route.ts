@@ -4,6 +4,8 @@ import { handleDatabaseError, createErrorResponse } from '@/lib/api/handlers/err
 import { validateRequiredFields } from '@/lib/api/validators/request-validator'
 import { queryAll, queryFirst, executeQuery } from '@/lib/api/database/query-helpers'
 import { corsOptionsHandler } from '@/middleware/cors'
+import { getLanguageFromRequest, transformI18nArray } from '@/lib/i18n/api-helpers'
+import { getI18nText } from '@/lib/i18n/helpers'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -17,6 +19,7 @@ export async function OPTIONS(request: NextRequest) {
 // GET - Get all projects (uses projects table)
 export async function GET(request: NextRequest) {
   try {
+    const language = getLanguageFromRequest(request)
     const { searchParams } = new URL(request.url)
     const published = searchParams.get('published')
 
@@ -30,6 +33,8 @@ export async function GET(request: NextRequest) {
       tags_text: string[]
       created_at: Date
       updated_at: Date
+      title_i18n: unknown
+      summary_i18n: unknown
     }>(`
       SELECT
         id,
@@ -39,12 +44,17 @@ export async function GET(request: NextRequest) {
         case_study_url,
         tags_text,
         created_at,
-        updated_at
+        updated_at,
+        title_i18n,
+        summary_i18n
       FROM public.projects
       ORDER BY created_at DESC
     `)
 
-    return createSuccessResponse(projects, request, 200, { revalidate: 60 })
+    // Transform i18n fields
+    const transformed = transformI18nArray(projects, language, ['title', 'summary'])
+
+    return createSuccessResponse(transformed, request, 200, { revalidate: 60 })
   } catch (error) {
     return handleDatabaseError(error, 'fetch projects', request)
   }
@@ -53,10 +63,12 @@ export async function GET(request: NextRequest) {
 // POST - Create project
 export async function POST(request: NextRequest) {
   try {
-    // Parse request body
+    const language = getLanguageFromRequest(request)
+    
+    // Parse request body - supports both i18n format and plain text (backward compatible)
     const parseResult = await parseRequestBody<{
-      title?: string
-      summary?: string | null
+      title?: Record<string, string> | string
+      summary?: Record<string, string> | string | null
       hero_image_url?: string | null
       case_study_url?: string | null
       tags_text?: string[]
@@ -79,6 +91,25 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Convert i18n data to JSONB format
+    const titleI18n = typeof title === 'object' 
+      ? JSON.stringify(title) 
+      : title 
+        ? JSON.stringify({ en: title }) 
+        : null
+    
+    const summaryI18n = summary
+      ? typeof summary === 'object'
+        ? JSON.stringify(summary)
+        : summary.trim() !== ''
+          ? JSON.stringify({ en: summary })
+          : null
+      : null
+
+    // Get plain text values for backward compatibility
+    const titleText = getI18nText(title, 'en', '')
+    const summaryText = getI18nText(summary, 'en') || null
+
     const project = await queryFirst<{
       id: string
       title: string
@@ -88,22 +119,29 @@ export async function POST(request: NextRequest) {
       tags_text: string[]
       created_at: Date
       updated_at: Date
+      title_i18n: unknown
+      summary_i18n: unknown
     }>(
-      `INSERT INTO public.projects (title, summary, hero_image_url, case_study_url, tags_text)
-       VALUES ($1, $2, $3, $4, $5::text[])
-       RETURNING id, title, summary, hero_image_url, case_study_url, tags_text, created_at, updated_at`,
-      title,
-      summary || null,
+      `INSERT INTO public.projects (title, summary, hero_image_url, case_study_url, tags_text, title_i18n, summary_i18n)
+       VALUES ($1, $2, $3, $4, $5::text[], $6::jsonb, $7::jsonb)
+       RETURNING id, title, summary, hero_image_url, case_study_url, tags_text, created_at, updated_at, title_i18n, summary_i18n`,
+      titleText,
+      summaryText,
       hero_image_url || null,
       case_study_url || null,
-      tags_text || []
+      tags_text || [],
+      titleI18n,
+      summaryI18n
     )
 
     if (!project) {
       throw new Error('Failed to create project')
     }
 
-    return createSuccessResponse(project, request, 201)
+    // Transform i18n fields in response
+    const transformed = transformI18nArray([project], language, ['title', 'summary'])[0]
+
+    return createSuccessResponse(transformed, request, 201)
   } catch (error) {
     return handleDatabaseError(error, 'create project', request)
   }

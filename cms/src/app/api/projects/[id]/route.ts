@@ -5,6 +5,8 @@ import { validateRequiredFields } from '@/lib/api/validators/request-validator'
 import { validateUUID } from '@/lib/api/validators/uuid-validator'
 import { queryFirst, executeQuery } from '@/lib/api/database/query-helpers'
 import { corsOptionsHandler } from '@/middleware/cors'
+import { getLanguageFromRequest, transformI18nResponse } from '@/lib/i18n/api-helpers'
+import { getI18nText } from '@/lib/i18n/helpers'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -22,6 +24,7 @@ export async function GET(
 ) {
   try {
     const { id } = params
+    const language = getLanguageFromRequest(request)
 
     // Validate UUID format
     try {
@@ -44,7 +47,15 @@ export async function GET(
       tags_text: string[]
       created_at: Date
       updated_at: Date
-    }>(`SELECT * FROM public.projects WHERE id = $1::uuid`, id)
+      title_i18n: unknown
+      summary_i18n: unknown
+    }>(`
+      SELECT 
+        id, title, summary, hero_image_url, case_study_url, tags_text,
+        created_at, updated_at, title_i18n, summary_i18n
+      FROM public.projects 
+      WHERE id = $1::uuid
+    `, id)
 
     if (!project) {
       return createErrorResponse(
@@ -55,7 +66,10 @@ export async function GET(
       )
     }
 
-    return createSuccessResponse(project, request, 200, { revalidate: 60 })
+    // Transform i18n fields
+    const transformed = transformI18nResponse(project, language, ['title', 'summary'])
+
+    return createSuccessResponse(transformed, request, 200, { revalidate: 60 })
   } catch (error) {
     return handleDatabaseError(error, 'fetch project', request)
   }
@@ -68,6 +82,7 @@ export async function PUT(
 ) {
   try {
     const { id } = params
+    const language = getLanguageFromRequest(request)
 
     // Validate UUID format
     try {
@@ -81,10 +96,10 @@ export async function PUT(
       )
     }
 
-    // Parse request body
+    // Parse request body - supports both i18n format and plain text (backward compatible)
     const parseResult = await parseRequestBody<{
-      title?: string
-      summary?: string | null
+      title?: Record<string, string> | string
+      summary?: Record<string, string> | string | null
       hero_image_url?: string | null
       case_study_url?: string | null
       tags_text?: string[]
@@ -107,16 +122,39 @@ export async function PUT(
       )
     }
 
+    // Convert i18n data to JSONB format
+    const titleI18n = typeof title === 'object' 
+      ? JSON.stringify(title) 
+      : title 
+        ? JSON.stringify({ en: title }) 
+        : null
+    
+    const summaryI18n = summary
+      ? typeof summary === 'object'
+        ? JSON.stringify(summary)
+        : summary.trim() !== ''
+          ? JSON.stringify({ en: summary })
+          : null
+      : null
+
+    // Get plain text values for backward compatibility
+    const titleText = getI18nText(title, 'en', '')
+    const summaryText = getI18nText(summary, 'en') || null
+
     await executeQuery(
       `UPDATE public.projects
        SET title = $1, summary = $2, hero_image_url = $3, case_study_url = $4,
-           tags_text = $5::text[], updated_at = NOW()
-       WHERE id = $6::uuid`,
-      title,
-      summary || null,
+           tags_text = $5::text[], 
+           title_i18n = $6::jsonb, summary_i18n = $7::jsonb,
+           updated_at = NOW()
+       WHERE id = $8::uuid`,
+      titleText,
+      summaryText,
       hero_image_url || null,
       case_study_url || null,
       tags_text || [],
+      titleI18n,
+      summaryI18n,
       id
     )
 
@@ -129,9 +167,24 @@ export async function PUT(
       tags_text: string[]
       created_at: Date
       updated_at: Date
-    }>(`SELECT * FROM public.projects WHERE id = $1::uuid`, id)
+      title_i18n: unknown
+      summary_i18n: unknown
+    }>(`
+      SELECT 
+        id, title, summary, hero_image_url, case_study_url, tags_text,
+        created_at, updated_at, title_i18n, summary_i18n
+      FROM public.projects 
+      WHERE id = $1::uuid
+    `, id)
 
-    return createSuccessResponse(project, request)
+    if (!project) {
+      throw new Error('Failed to retrieve updated project')
+    }
+
+    // Transform i18n fields in response
+    const transformed = transformI18nResponse(project, language, ['title', 'summary'])
+
+    return createSuccessResponse(transformed, request)
   } catch (error) {
     return handleDatabaseError(error, 'update project', request)
   }
