@@ -138,7 +138,8 @@ export default function HeroForm({ onSuccess, onCancel }: HeroFormProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       onSubmit={handleSubmit}
-      className="experience-form"
+      className="hero-form"
+      noValidate
     >
       {error && (
         <div className="error-message" style={{ marginBottom: '1rem' }}>
