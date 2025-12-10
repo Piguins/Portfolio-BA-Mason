@@ -79,8 +79,10 @@ export async function GET(
       return createSuccessResponse(serializedProject, request, 200, { revalidate: 60 })
     }
 
-    // Transform i18n fields
-    const transformed = transformI18nResponse(project, language, ['title', 'summary'])
+    // Transform i18n fields (only if i18n columns exist)
+    const transformed = ('title_i18n' in project || 'summary_i18n' in project)
+      ? transformI18nResponse(project, language, ['title', 'summary'])
+      : project
 
     return createSuccessResponse(transformed, request, 200, { revalidate: 60 })
   } catch (error) {

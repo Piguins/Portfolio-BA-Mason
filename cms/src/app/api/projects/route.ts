@@ -24,33 +24,65 @@ export async function GET(request: NextRequest) {
     const published = searchParams.get('published')
 
     // Optimized query: Use index idx_projects_created_at for ORDER BY
-    // Use COALESCE to handle cases where i18n columns might not exist yet
-    const projects = await queryAll<{
-      id: string
-      title: string
-      summary: string | null
-      hero_image_url: string | null
-      case_study_url: string | null
-      tags_text: string[]
-      created_at: Date
-      updated_at: Date
-      title_i18n: unknown
-      summary_i18n: unknown
-    }>(`
-      SELECT
-        id,
-        title,
-        summary,
-        hero_image_url,
-        case_study_url,
-        tags_text,
-        created_at,
-        updated_at,
-        title_i18n,
-        summary_i18n
-      FROM public.projects
-      ORDER BY created_at DESC
-    `)
+    // Check if i18n columns exist, if not use regular columns
+    let projects
+    try {
+      projects = await queryAll<{
+        id: string
+        title: string
+        summary: string | null
+        hero_image_url: string | null
+        case_study_url: string | null
+        tags_text: string[]
+        created_at: Date
+        updated_at: Date
+        title_i18n?: unknown
+        summary_i18n?: unknown
+      }>(`
+        SELECT
+          id,
+          title,
+          summary,
+          hero_image_url,
+          case_study_url,
+          tags_text,
+          created_at,
+          updated_at,
+          title_i18n,
+          summary_i18n
+        FROM public.projects
+        ORDER BY created_at DESC
+      `)
+    } catch (err: any) {
+      // If columns don't exist, try without i18n columns
+      if (err?.message?.includes('column') && err?.message?.includes('does not exist')) {
+        console.warn('i18n columns not found, using regular columns')
+        projects = await queryAll<{
+          id: string
+          title: string
+          summary: string | null
+          hero_image_url: string | null
+          case_study_url: string | null
+          tags_text: string[]
+          created_at: Date
+          updated_at: Date
+        }>(`
+          SELECT
+            id,
+            title,
+            summary,
+            hero_image_url,
+            case_study_url,
+            tags_text,
+            created_at,
+            updated_at
+          FROM public.projects
+          ORDER BY created_at DESC
+        `)
+      } else {
+        throw err
+      }
+    }
 
     // Transform i18n fields
     const transformed = transformI18nArray(projects, language, ['title', 'summary'])
