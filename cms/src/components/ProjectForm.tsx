@@ -157,6 +157,7 @@ export default function ProjectForm({ projectId, onSuccess, onCancel }: ProjectF
       animate={{ opacity: 1 }}
       onSubmit={handleSubmit}
       className="project-form"
+      noValidate
     >
       {error && (
         <motion.div

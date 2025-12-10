@@ -202,6 +202,7 @@ export default function ExperienceForm({ experienceId, onSuccess, onCancel }: Ex
       animate={{ opacity: 1 }}
       onSubmit={handleSubmit}
       className="experience-form"
+      noValidate
     >
       {error && (
         <motion.div

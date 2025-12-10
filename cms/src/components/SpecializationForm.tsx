@@ -136,6 +136,7 @@ export default function SpecializationForm({
       animate={{ opacity: 1 }}
       onSubmit={handleSubmit}
       className="specialization-form"
+      noValidate
     >
       {error && (
         <motion.div
