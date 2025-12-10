@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import LoadingButton from './LoadingButton'
@@ -46,13 +46,9 @@ export default function ExperienceForm({ experienceId, onSuccess, onCancel }: Ex
   const [newBullet, setNewBullet] = useState('')
   const [newSkill, setNewSkill] = useState('')
 
-  useEffect(() => {
-    if (isEdit && experienceId) {
-      fetchExperience()
-    }
-  }, [isEdit, experienceId])
-
-  const fetchExperience = async () => {
+  const fetchExperience = useCallback(async () => {
+    if (!experienceId) return
+    
     try {
       setLoading(true)
       setError(null)
@@ -106,7 +102,13 @@ export default function ExperienceForm({ experienceId, onSuccess, onCancel }: Ex
     } finally {
       setLoading(false)
     }
-  }
+  }, [experienceId])
+
+  useEffect(() => {
+    if (isEdit && experienceId) {
+      fetchExperience()
+    }
+  }, [isEdit, experienceId, fetchExperience])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

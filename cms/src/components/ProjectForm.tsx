@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import LoadingButton from './LoadingButton'
@@ -37,13 +37,9 @@ export default function ProjectForm({ projectId, onSuccess, onCancel }: ProjectF
   })
   const [newTag, setNewTag] = useState('')
 
-  useEffect(() => {
-    if (isEdit && projectId) {
-      fetchProject()
-    }
-  }, [isEdit, projectId])
-
-  const fetchProject = async () => {
+  const fetchProject = useCallback(async () => {
+    if (!projectId) return
+    
     try {
       setLoading(true)
       setError(null)
@@ -71,7 +67,13 @@ export default function ProjectForm({ projectId, onSuccess, onCancel }: ProjectF
     } finally {
       setLoading(false)
     }
-  }
+  }, [projectId])
+
+  useEffect(() => {
+    if (isEdit && projectId) {
+      fetchProject()
+    }
+  }, [isEdit, projectId, fetchProject])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

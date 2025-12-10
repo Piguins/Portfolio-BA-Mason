@@ -4,8 +4,8 @@ import { parseRequestBody, createSuccessResponse } from '@/lib/api/handlers/requ
 import { handleDatabaseError, createErrorResponse } from '@/lib/api/handlers/error-handler'
 import { validateRequiredFields } from '@/lib/api/validators/request-validator'
 import { queryAll, executeTransaction } from '@/lib/api/database/query-helpers'
-import { getLanguageFromRequest, transformI18nArray } from '@/lib/i18n/api-helpers'
-import { getI18nText, mergeI18n } from '@/lib/i18n/helpers'
+import { getLanguageFromRequest, transformI18nArray, transformI18nResponse } from '@/lib/i18n/api-helpers'
+import { getI18nText } from '@/lib/i18n/helpers'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -220,11 +220,11 @@ export async function POST(request: NextRequest) {
       console.log('[Experience POST] Values:', {
         company,
         role,
-        location: normalizedLocation,
+        location: locationText,
         start_date,
         end_date: normalizedEndDate,
         is_current,
-        description: normalizedDescription,
+        description: descriptionText,
         bullets_count: bullets.length,
         skills_text_count: Array.isArray(skills_text) ? skills_text.length : 0,
       })
