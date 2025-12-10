@@ -103,7 +103,28 @@ export async function GET(
 
     // If raw=true, return i18n data as-is for CMS editing
     if (raw) {
-      return createSuccessResponse(experience, request, 200, { revalidate: 60 })
+      // Serialize dates and ensure bullets are properly formatted
+      let bullets = experience.bullets
+      if (typeof bullets === 'string') {
+        try {
+          bullets = JSON.parse(bullets)
+        } catch {
+          bullets = []
+        }
+      }
+      if (!Array.isArray(bullets)) {
+        bullets = []
+      }
+      
+      const serializedExperience = {
+        ...experience,
+        start_date: experience.start_date.toISOString().split('T')[0],
+        end_date: experience.end_date ? experience.end_date.toISOString().split('T')[0] : null,
+        created_at: experience.created_at.toISOString(),
+        updated_at: experience.updated_at.toISOString(),
+        bullets: bullets,
+      }
+      return createSuccessResponse(serializedExperience, request, 200, { revalidate: 60 })
     }
 
     // Transform i18n fields
