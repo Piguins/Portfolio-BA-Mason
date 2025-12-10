@@ -29,13 +29,20 @@ export default function SpecializationForm({
   onCancel,
 }: SpecializationFormProps) {
   const isEdit = !!specializationId
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en')
   const [loading, setLoading] = useState(isEdit)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // Store i18n data: {en: "...", vi: "..."}
+  const [i18nData, setI18nData] = useState<{
+    title: Record<SupportedLanguage, string>
+    description: Record<SupportedLanguage, string>
+  }>({
+    title: { en: '', vi: '' },
+    description: { en: '', vi: '' },
+  })
   const [formData, setFormData] = useState({
     number: '',
-    title: '',
-    description: '',
     icon_url: '',
   })
 
@@ -95,6 +102,14 @@ export default function SpecializationForm({
       fetchSpecialization()
     }
   }, [isEdit, specializationId, fetchSpecialization])
+
+  // Update i18n data when form fields change
+  const updateI18nField = (field: keyof typeof i18nData, value: string) => {
+    setI18nData(prev => ({
+      ...prev,
+      [field]: { ...prev[field], [currentLanguage]: value }
+    }))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

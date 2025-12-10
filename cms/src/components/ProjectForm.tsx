@@ -26,12 +26,19 @@ interface ProjectFormProps {
 
 export default function ProjectForm({ projectId, onSuccess, onCancel }: ProjectFormProps) {
   const isEdit = !!projectId
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en')
   const [loading, setLoading] = useState(isEdit)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // Store i18n data: {en: "...", vi: "..."}
+  const [i18nData, setI18nData] = useState<{
+    title: Record<SupportedLanguage, string>
+    summary: Record<SupportedLanguage, string>
+  }>({
+    title: { en: '', vi: '' },
+    summary: { en: '', vi: '' },
+  })
   const [formData, setFormData] = useState({
-    title: '',
-    summary: '',
     hero_image_url: '',
     case_study_url: '',
     tags_text: [] as string[],
@@ -95,6 +102,14 @@ export default function ProjectForm({ projectId, onSuccess, onCancel }: ProjectF
       fetchProject()
     }
   }, [isEdit, projectId, fetchProject])
+
+  // Update i18n data when form fields change
+  const updateI18nField = (field: keyof typeof i18nData, value: string) => {
+    setI18nData(prev => ({
+      ...prev,
+      [field]: { ...prev[field], [currentLanguage]: value }
+    }))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
