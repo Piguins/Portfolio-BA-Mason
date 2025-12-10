@@ -4,10 +4,17 @@ import { API_ENDPOINTS } from '../config/api.js'
 export const experienceService = {
   /**
    * Fetch all experiences from API
+   * @param {string} language - Language code ('en' or 'vi'), defaults to 'en'
    */
-  async getAll() {
+  async getAll(language = 'en') {
     try {
-      const response = await fetch(API_ENDPOINTS.experience)
+      const url = `${API_ENDPOINTS.experience}?lang=${language}`
+      const response = await fetch(url, {
+        cache: 'no-store',
+        headers: {
+          'Accept-Language': language,
+        },
+      })
       
       if (!response.ok) {
         throw new Error(`Failed to fetch experiences: ${response.statusText}`)

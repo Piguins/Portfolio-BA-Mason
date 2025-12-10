@@ -3,10 +3,12 @@ import { FaLinkedin, FaGithub, FaEnvelope } from 'react-icons/fa'
 import './Hero.css'
 import { IMAGES } from '../../constants/images'
 import { useTranslations } from '../../hooks/useTranslations'
+import { useLanguage } from '../../contexts/LanguageContext'
 import { heroService } from '../../services/heroService'
 
 const Hero = () => {
   const t = useTranslations()
+  const { language } = useLanguage()
   const [imageLoaded, setImageLoaded] = useState(false)
   const [iconErrors, setIconErrors] = useState({
     linkedin: false,
@@ -20,7 +22,9 @@ const Hero = () => {
     const fetchHero = async () => {
       try {
         setLoading(true)
-        const data = await heroService.get()
+        // Use current language or default to 'en'
+        const lang = language || 'en'
+        const data = await heroService.get(lang)
         const formatted = heroService.formatHero(data)
         setHeroData(formatted)
       } catch (err) {
@@ -43,7 +47,7 @@ const Hero = () => {
     }
 
     fetchHero()
-  }, [t.hero])
+  }, [language, t.hero])
 
   // Use API data if available, otherwise fallback to translations
   const hero = heroData || {

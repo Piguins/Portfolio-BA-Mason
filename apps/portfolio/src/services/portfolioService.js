@@ -4,11 +4,16 @@ import { API_ENDPOINTS } from '../config/api.js'
 export const portfolioService = {
   /**
    * Fetch all projects from API
+   * @param {string} language - Language code ('en' or 'vi'), defaults to 'en'
    */
-  async getAll() {
+  async getAll(language = 'en') {
     try {
-      const response = await fetch(API_ENDPOINTS.projects, {
+      const url = `${API_ENDPOINTS.projects}?lang=${language}`
+      const response = await fetch(url, {
         cache: 'no-store',
+        headers: {
+          'Accept-Language': language,
+        },
       })
       
       if (!response.ok) {

@@ -4,11 +4,16 @@ import { API_ENDPOINTS } from '../config/api.js'
 export const heroService = {
   /**
    * Fetch hero section from API
+   * @param {string} language - Language code ('en' or 'vi'), defaults to 'en'
    */
-  async get() {
+  async get(language = 'en') {
     try {
-      const response = await fetch(API_ENDPOINTS.hero, {
+      const url = `${API_ENDPOINTS.hero}?lang=${language}`
+      const response = await fetch(url, {
         cache: 'no-store',
+        headers: {
+          'Accept-Language': language,
+        },
       })
       
       if (!response.ok) {

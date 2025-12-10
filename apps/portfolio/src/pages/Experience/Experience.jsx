@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react'
 import { FiCalendar, FiMapPin } from 'react-icons/fi'
 import { useTranslations } from '../../hooks/useTranslations'
+import { useLanguage } from '../../contexts/LanguageContext'
 import { experienceService } from '../../services/experienceService'
 import './Experience.css'
 
 const Experience = () => {
   const t = useTranslations()
+  const { language } = useLanguage()
   const [experiences, setExperiences] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -15,7 +17,9 @@ const Experience = () => {
       try {
         setLoading(true)
         setError(null)
-        const data = await experienceService.getAll()
+        // Use current language or default to 'en'
+        const lang = language || 'en'
+        const data = await experienceService.getAll(lang)
         
         // Format data for UI
         const formatted = data.map(exp => experienceService.formatExperience(exp))
@@ -56,7 +60,7 @@ const Experience = () => {
     }
 
     fetchExperiences()
-  }, [t.experience])
+  }, [language, t.experience])
 
   if (loading) {
     return (

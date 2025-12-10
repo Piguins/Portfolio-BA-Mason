@@ -4,11 +4,16 @@ import { API_ENDPOINTS } from '../config/api.js'
 export const specializationsService = {
   /**
    * Fetch all specializations from API
+   * @param {string} language - Language code ('en' or 'vi'), defaults to 'en'
    */
-  async getAll() {
+  async getAll(language = 'en') {
     try {
-      const response = await fetch(API_ENDPOINTS.specializations, {
+      const url = `${API_ENDPOINTS.specializations}?lang=${language}`
+      const response = await fetch(url, {
         cache: 'no-store',
+        headers: {
+          'Accept-Language': language,
+        },
       })
       
       if (!response.ok) {

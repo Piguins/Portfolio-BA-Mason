@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react'
 import { FiArrowRight } from 'react-icons/fi'
 import { useTranslations } from '../../hooks/useTranslations'
+import { useLanguage } from '../../contexts/LanguageContext'
 import { IMAGES } from '../../constants/images'
 import { portfolioService } from '../../services/portfolioService'
 import './Portfolio.css'
 
 const Portfolio = () => {
   const t = useTranslations()
+  const { language } = useLanguage()
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
 
@@ -14,7 +16,9 @@ const Portfolio = () => {
     const fetchProjects = async () => {
       try {
         setLoading(true)
-        const data = await portfolioService.getAll()
+        // Use current language or default to 'en'
+        const lang = language || 'en'
+        const data = await portfolioService.getAll(lang)
         const formatted = data.map(project => portfolioService.formatProject(project))
         // Sort by created_at (newest first) and limit to 3
         formatted.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
@@ -57,7 +61,7 @@ const Portfolio = () => {
     }
 
     fetchProjects()
-  }, [t.portfolio])
+  }, [language, t.portfolio])
 
   // Use API data if available, otherwise fallback to translations
   const displayProjects = projects.length > 0

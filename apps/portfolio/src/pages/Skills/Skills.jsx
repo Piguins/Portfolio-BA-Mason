@@ -1,12 +1,14 @@
 import './Skills.css'
 import { IMAGES } from '../../constants/images'
 import { useTranslations } from '../../hooks/useTranslations'
+import { useLanguage } from '../../contexts/LanguageContext'
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { specializationsService } from '../../services/specializationsService'
 
 const Skills = () => {
   const t = useTranslations()
+  const { language } = useLanguage()
   const [hoveredLogo, setHoveredLogo] = useState(null)
   const [specializations, setSpecializations] = useState([])
   const [loading, setLoading] = useState(true)
@@ -17,7 +19,9 @@ const Skills = () => {
         setLoading(true)
         
         // Fetch specializations (for cards)
-        const specsData = await specializationsService.getAll()
+        // Use current language or default to 'en'
+        const lang = language || 'en'
+        const specsData = await specializationsService.getAll(lang)
         const formattedSpecs = specializationsService.formatSpecializations(specsData)
         setSpecializations(formattedSpecs)
       } catch (err) {
@@ -52,7 +56,7 @@ const Skills = () => {
     }
 
     fetchData()
-  }, [t.skills])
+  }, [language, t.skills])
 
   // Use API data if available, otherwise fallback to translations
   const displaySpecs = specializations.length > 0 
