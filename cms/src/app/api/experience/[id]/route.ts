@@ -5,6 +5,8 @@ import { validateRequiredFields } from '@/lib/api/validators/request-validator'
 import { validateUUID } from '@/lib/api/validators/uuid-validator'
 import { queryFirst, executeTransaction } from '@/lib/api/database/query-helpers'
 import { corsOptionsHandler } from '@/middleware/cors'
+import { getLanguageFromRequest, transformI18nResponse } from '@/lib/i18n/api-helpers'
+import { getI18nText } from '@/lib/i18n/helpers'
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic'
@@ -22,6 +24,7 @@ export async function GET(
 ) {
   try {
     const { id } = params
+    const language = getLanguageFromRequest(request)
 
     // Validate UUID format
     try {
@@ -48,7 +51,11 @@ export async function GET(
       created_at: Date
       updated_at: Date
       skills_text: string[]
-      bullets: Array<{ id: string; text: string }>
+      company_i18n: unknown
+      role_i18n: unknown
+      location_i18n: unknown
+      description_i18n: unknown
+      bullets: Array<{ id: string; text: string; text_i18n?: unknown }>
     }>(
       `SELECT
         e.id,
@@ -62,9 +69,13 @@ export async function GET(
         e.created_at,
         e.updated_at,
         e.skills_text,
+        e.company_i18n,
+        e.role_i18n,
+        e.location_i18n,
+        e.description_i18n,
         COALESCE(
           json_agg(
-            jsonb_build_object('id', eb.id, 'text', eb.text)
+            jsonb_build_object('id', eb.id, 'text', eb.text, 'text_i18n', eb.text_i18n)
             ORDER BY eb.id
           ) FILTER (WHERE eb.id IS NOT NULL),
           '[]'::json
@@ -73,7 +84,8 @@ export async function GET(
        LEFT JOIN public.experience_bullets eb ON eb.experience_id = e.id
        WHERE e.id = $1::uuid
        GROUP BY e.id, e.company, e.role, e.location, e.start_date, e.end_date, 
-                e.is_current, e.description, e.created_at, e.updated_at, e.skills_text`,
+                e.is_current, e.description, e.created_at, e.updated_at, e.skills_text,
+                e.company_i18n, e.role_i18n, e.location_i18n, e.description_i18n`,
       id
     )
 
@@ -86,7 +98,45 @@ export async function GET(
       )
     }
 
-    return createSuccessResponse(experience, request, 200, { revalidate: 60 })
+    // Transform i18n fields
+    const transformed = transformI18nResponse(
+      experience,
+      language,
+      ['company', 'role', 'location', 'description']
+    )
+
+    // Transform bullets i18n
+    let bullets = experience.bullets
+    if (typeof bullets === 'string') {
+      try {
+        bullets = JSON.parse(bullets)
+      } catch {
+        bullets = []
+      }
+    }
+    if (!Array.isArray(bullets)) {
+      bullets = []
+    }
+    
+    const transformedBullets = bullets.map((bullet: { id: string; text: string; text_i18n?: unknown }) => {
+      const i18nValue = bullet.text_i18n && typeof bullet.text_i18n === 'object' && Object.keys(bullet.text_i18n).length > 0
+        ? bullet.text_i18n
+        : bullet.text
+      return {
+        id: bullet.id,
+        text: getI18nText(i18nValue as any, language, bullet.text || '')
+      }
+    })
+
+    return createSuccessResponse(
+      {
+        ...transformed,
+        bullets: transformedBullets
+      },
+      request,
+      200,
+      { revalidate: 60 }
+    )
   } catch (error) {
     return handleDatabaseError(error, 'fetch experience', request)
   }
@@ -99,6 +149,7 @@ export async function PUT(
 ) {
   try {
     const { id } = params
+    const language = getLanguageFromRequest(request)
 
     // Validate UUID format
     try {
@@ -112,16 +163,16 @@ export async function PUT(
       )
     }
 
-    // Parse request body
+    // Parse request body - supports both i18n format and plain text (backward compatible)
     const parseResult = await parseRequestBody<{
-      company?: string
-      role?: string
-      location?: string
+      company?: Record<string, string> | string
+      role?: Record<string, string> | string
+      location?: Record<string, string> | string
       start_date?: string
       end_date?: string | null
       is_current?: boolean
-      description?: string | null
-      bullets?: Array<{ text?: string } | string>
+      description?: Record<string, string> | string | null
+      bullets?: Array<{ text?: Record<string, string> | string } | string>
       skills_text?: string[]
     }>(request)
     if (parseResult.error) {
@@ -152,10 +203,43 @@ export async function PUT(
       )
     }
 
+    // Convert i18n data to JSONB format
+    const companyI18n = typeof company === 'object' 
+      ? JSON.stringify(company) 
+      : company 
+        ? JSON.stringify({ en: company }) 
+        : null
+    
+    const roleI18n = typeof role === 'object'
+      ? JSON.stringify(role)
+      : role
+        ? JSON.stringify({ en: role })
+        : null
+    
+    const locationI18n = location
+      ? typeof location === 'object'
+        ? JSON.stringify(location)
+        : location.trim() !== ''
+          ? JSON.stringify({ en: location })
+          : null
+      : null
+    
+    const descriptionI18n = description
+      ? typeof description === 'object'
+        ? JSON.stringify(description)
+        : description.trim() !== ''
+          ? JSON.stringify({ en: description })
+          : null
+      : null
+
+    // Get plain text values for backward compatibility (old columns)
+    const companyText = getI18nText(company, 'en', '')
+    const roleText = getI18nText(role, 'en', '')
+    const locationText = getI18nText(location, 'en') || null
+    const descriptionText = getI18nText(description, 'en') || null
+
     // Normalize empty strings to null for optional fields
     const normalizedEndDate = end_date && typeof end_date === 'string' && end_date.trim() !== '' ? end_date : null
-    const normalizedDescription = description && typeof description === 'string' && description.trim() !== '' ? description : null
-    const normalizedLocation = location && typeof location === 'string' && location.trim() !== '' ? location : null
 
     // Validate start_date format
     if (!start_date || typeof start_date !== 'string' || start_date.trim() === '') {
@@ -173,11 +257,11 @@ export async function PUT(
         id,
         company,
         role,
-        location: normalizedLocation,
+        location: locationText,
         start_date,
         end_date: normalizedEndDate,
         is_current,
-        description: normalizedDescription,
+        description: descriptionText,
         bullets_count: bullets.length,
         skills_text_count: Array.isArray(skills_text) ? skills_text.length : 0,
       })
@@ -185,21 +269,28 @@ export async function PUT(
 
     // Use transaction
     const experience = await executeTransaction(async (tx) => {
-      // Update experience
+      // Update experience (with i18n fields)
       await tx.$executeRawUnsafe(
         `UPDATE public.experience 
          SET company = $1, role = $2, location = $3, start_date = $4::date, 
              end_date = $5::date, is_current = $6, description = $7,
-             skills_text = $8::text[], updated_at = NOW()
-         WHERE id = $9::uuid`,
-        company,
-        role,
-        normalizedLocation,
+             skills_text = $8::text[],
+             company_i18n = $9::jsonb, role_i18n = $10::jsonb, 
+             location_i18n = $11::jsonb, description_i18n = $12::jsonb,
+             updated_at = NOW()
+         WHERE id = $13::uuid`,
+        companyText,
+        roleText,
+        locationText,
         start_date,
         normalizedEndDate,
         is_current || false,
-        normalizedDescription,
+        descriptionText,
         Array.isArray(skills_text) ? skills_text : [],
+        companyI18n,
+        roleI18n,
+        locationI18n,
+        descriptionI18n,
         id
       )
 
@@ -209,15 +300,24 @@ export async function PUT(
         id
       )
 
-      // Insert new bullets
+      // Insert new bullets (with i18n support)
       if (bullets.length > 0) {
         for (const bullet of bullets) {
-          const bulletText = typeof bullet === 'string' ? bullet : (bullet.text || '')
+          const bulletData = typeof bullet === 'string' ? { text: bullet } : bullet
+          const bulletText = typeof bulletData.text === 'string' ? bulletData.text : getI18nText(bulletData.text, 'en', '')
+          const bulletTextI18n = typeof bulletData.text === 'object'
+            ? JSON.stringify(bulletData.text)
+            : bulletText.trim() !== ''
+              ? JSON.stringify({ en: bulletText })
+              : null
+          
           if (bulletText.trim()) {
             await tx.$executeRawUnsafe(
-              `INSERT INTO public.experience_bullets (experience_id, text) VALUES ($1::uuid, $2)`,
+              `INSERT INTO public.experience_bullets (experience_id, text, text_i18n) 
+               VALUES ($1::uuid, $2, $3::jsonb)`,
               id,
-              bulletText
+              bulletText,
+              bulletTextI18n
             )
           }
         }
