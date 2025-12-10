@@ -247,7 +247,7 @@
 
 .card-actions {
   display: flex;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-md);
   flex-shrink: 0;
   align-items: center;
 }
