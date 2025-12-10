@@ -323,7 +323,7 @@ export async function PUT(
         }
       }
 
-      // Get the updated experience with all fields
+      // Get the updated experience with all fields (including i18n)
       const fullExpResult = await tx.$queryRawUnsafe(
         `SELECT
           id,
@@ -336,7 +336,11 @@ export async function PUT(
           description,
           created_at,
           updated_at,
-          skills_text
+          skills_text,
+          company_i18n,
+          role_i18n,
+          location_i18n,
+          description_i18n
          FROM public.experience
          WHERE id = $1::uuid`,
         id
@@ -352,6 +356,10 @@ export async function PUT(
         created_at: Date
         updated_at: Date
         skills_text: string[]
+        company_i18n: unknown
+        role_i18n: unknown
+        location_i18n: unknown
+        description_i18n: unknown
       }>
 
       if (!fullExpResult || fullExpResult.length === 0) {
@@ -360,20 +368,38 @@ export async function PUT(
 
       const experienceData = fullExpResult[0]
 
-      // Get bullets separately to avoid complex aggregation in transaction
+      // Get bullets separately (with i18n)
       const bulletsResult = await tx.$queryRawUnsafe(
-        `SELECT id, text FROM public.experience_bullets WHERE experience_id = $1::uuid ORDER BY id`,
+        `SELECT id, text, text_i18n FROM public.experience_bullets WHERE experience_id = $1::uuid ORDER BY id`,
         id
-      ) as Array<{ id: string; text: string }>
+      ) as Array<{ id: string; text: string; text_i18n?: unknown }>
+
+      // Transform i18n fields
+      const transformed = transformI18nResponse(
+        experienceData,
+        language,
+        ['company', 'role', 'location', 'description']
+      )
+
+      // Transform bullets i18n
+      const transformedBullets = bulletsResult.map(bullet => {
+        const i18nValue = bullet.text_i18n && typeof bullet.text_i18n === 'object' && Object.keys(bullet.text_i18n).length > 0
+          ? bullet.text_i18n
+          : bullet.text
+        return {
+          id: bullet.id,
+          text: getI18nText(i18nValue as any, language, bullet.text || '')
+        }
+      })
 
       // Build response object with proper date serialization
       return {
-        ...experienceData,
+        ...transformed,
         start_date: experienceData.start_date.toISOString().split('T')[0],
         end_date: experienceData.end_date ? experienceData.end_date.toISOString().split('T')[0] : null,
         created_at: experienceData.created_at.toISOString(),
         updated_at: experienceData.updated_at.toISOString(),
-        bullets: bulletsResult || []
+        bullets: transformedBullets
       }
     })
 
