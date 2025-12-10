@@ -18,7 +18,8 @@ export async function OPTIONS(request: NextRequest) {
 // GET - Get hero section (singleton) - Uses hero_content table
 export async function GET(request: NextRequest) {
   try {
-    const language = getLanguageFromRequest(request)
+    const { searchParams } = new URL(request.url)
+    const raw = searchParams.get('raw') === 'true' // For CMS to get raw i18n data
     
     const hero = await queryFirst<{
       id: number
@@ -52,7 +53,7 @@ export async function GET(request: NextRequest) {
 
     if (!hero) {
       // Return default if not exists
-      return createSuccessResponse({
+      const defaultData = {
         id: 1,
         greeting: 'Hey!',
         greeting_part2: "I'm",
@@ -65,10 +66,30 @@ export async function GET(request: NextRequest) {
         profile_image_url: null,
         created_at: new Date(),
         updated_at: new Date(),
-      }, request, 200, { revalidate: 60 })
+      }
+      
+      if (raw) {
+        // Return with i18n structure for CMS
+        return createSuccessResponse({
+          ...defaultData,
+          greeting_i18n: { en: defaultData.greeting, vi: '' },
+          greeting_part2_i18n: { en: defaultData.greeting_part2, vi: '' },
+          name_i18n: { en: defaultData.name, vi: '' },
+          title_i18n: { en: defaultData.title, vi: '' },
+          description_i18n: { en: defaultData.description, vi: '' },
+        }, request, 200, { revalidate: 60 })
+      }
+      
+      return createSuccessResponse(defaultData, request, 200, { revalidate: 60 })
     }
 
-    // Transform i18n fields to plain text based on language
+    // If raw=true, return i18n data as-is for CMS editing
+    if (raw) {
+      return createSuccessResponse(hero, request, 200, { revalidate: 60 })
+    }
+
+    // Otherwise, transform i18n fields to plain text based on requested language
+    const language = getLanguageFromRequest(request)
     const transformed = transformI18nResponse(
       hero,
       language,
