@@ -58,12 +58,9 @@ function getPrismaClient(): PrismaClient {
     console.error('[Prisma] Client error:', e)
   })
 
-  // In production (serverless), don't cache the client globally
-  // Each serverless function should create its own instance
-  // In development, cache to prevent multiple instances
-  if (process.env.NODE_ENV !== 'production') {
-    globalForPrisma.prisma = client
-  }
+  // Cache client globally to reuse connections (important for serverless performance)
+  // This prevents creating new Prisma client on every request
+  globalForPrisma.prisma = client
 
   return client
 }

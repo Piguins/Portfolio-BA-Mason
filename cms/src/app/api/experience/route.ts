@@ -18,8 +18,6 @@ export async function OPTIONS(request: NextRequest) {
 // GET - Get all experiences (with bullets from experience_bullets)
 export async function GET(request: NextRequest) {
   try {
-    console.log('[Experience GET] Starting query...')
-    
     const experiences = await queryAll<{
       id: string
       company: string
@@ -59,8 +57,6 @@ export async function GET(request: NextRequest) {
                e.is_current, e.description, e.created_at, e.updated_at, e.skills_text
       ORDER BY e.start_date DESC
     `)
-
-    console.log(`[Experience GET] Query successful, found ${experiences.length} experiences`)
     
     // Transform bullets from JSON string to array if needed
     const transformedExperiences = experiences.map(exp => {
