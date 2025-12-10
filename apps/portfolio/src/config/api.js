@@ -6,7 +6,6 @@ export const API_ENDPOINTS = {
   hero: `${API_BASE_URL}/api/hero`,
   experience: `${API_BASE_URL}/api/experience`,
   projects: `${API_BASE_URL}/api/projects`,
-  skills: `${API_BASE_URL}/api/skills`,
   specializations: `${API_BASE_URL}/api/specializations`,
 }
 

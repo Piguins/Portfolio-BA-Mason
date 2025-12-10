@@ -4,13 +4,11 @@ import { useTranslations } from '../../hooks/useTranslations'
 import { motion } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { specializationsService } from '../../services/specializationsService'
-import { skillsService } from '../../services/skillsService'
 
 const Skills = () => {
   const t = useTranslations()
   const [hoveredLogo, setHoveredLogo] = useState(null)
   const [specializations, setSpecializations] = useState([])
-  const [skills, setSkills] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -22,17 +20,8 @@ const Skills = () => {
         const specsData = await specializationsService.getAll()
         const formattedSpecs = specializationsService.formatSpecializations(specsData)
         setSpecializations(formattedSpecs)
-        
-        // Fetch skills (for logos) - only highlighted ones
-        const skillsData = await skillsService.getAll()
-        const formattedSkills = skillsService.formatSkills(skillsData)
-        // Filter highlighted skills or get first 9
-        const highlightedSkills = formattedSkills
-          .filter(s => s.isHighlight)
-          .slice(0, 9)
-        setSkills(highlightedSkills)
       } catch (err) {
-        console.error('Failed to load skills/specializations:', err)
+        console.error('Failed to load specializations:', err)
         // Fallback to translations
         setSpecializations([
           {

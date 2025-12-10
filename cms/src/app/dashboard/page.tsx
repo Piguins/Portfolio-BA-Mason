@@ -43,11 +43,6 @@ export default async function DashboardPage() {
             link="/dashboard/projects"
           />
           <DashboardCard
-            title="Skills"
-            description="Quản lý Skills, Tools, Certifications"
-            link="/dashboard/skills"
-          />
-          <DashboardCard
             title="Experience"
             description="Quản lý Experience / Timeline"
             link="/dashboard/experience"
