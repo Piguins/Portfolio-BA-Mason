@@ -185,15 +185,20 @@ export default function SpecializationForm({
           />
         </div>
 
+        <LanguageTabs
+          activeLanguage={currentLanguage}
+          onLanguageChange={setCurrentLanguage}
+        />
+
         <div className="form-group">
           <label htmlFor="title">Title *</label>
           <input
             id="title"
             type="text"
             required
-            value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            placeholder="Business Analysis"
+            value={i18nData.title[currentLanguage]}
+            onChange={(e) => updateI18nField('title', e.target.value)}
+            placeholder={currentLanguage === 'en' ? "Specialization title" : "Tiêu đề chuyên môn"}
           />
         </div>
 
@@ -202,9 +207,11 @@ export default function SpecializationForm({
           <textarea
             id="description"
             rows={4}
-            value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            placeholder="I analyze business processes and requirements..."
+            value={i18nData.description[currentLanguage]}
+            onChange={(e) => updateI18nField('description', e.target.value)}
+            placeholder={currentLanguage === 'en' 
+              ? "Specialization description..."
+              : "Mô tả về chuyên môn..."}
           />
         </div>
 

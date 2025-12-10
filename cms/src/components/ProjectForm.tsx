@@ -194,15 +194,21 @@ export default function ProjectForm({ projectId, onSuccess, onCancel }: ProjectF
 
       <div className="form-section">
         <h3 className="section-title">Thông tin cơ bản</h3>
+        
+        <LanguageTabs
+          activeLanguage={currentLanguage}
+          onLanguageChange={setCurrentLanguage}
+        />
+
         <div className="form-group">
           <label htmlFor="title">Title *</label>
           <input
             id="title"
             type="text"
             required
-            value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            placeholder="Re-Design For Business Analyst Portfolio"
+            value={i18nData.title[currentLanguage]}
+            onChange={(e) => updateI18nField('title', e.target.value)}
+            placeholder={currentLanguage === 'en' ? "Project title" : "Tên dự án"}
           />
         </div>
 
@@ -211,9 +217,11 @@ export default function ProjectForm({ projectId, onSuccess, onCancel }: ProjectF
           <textarea
             id="summary"
             rows={4}
-            value={formData.summary}
-            onChange={(e) => setFormData({ ...formData, summary: e.target.value })}
-            placeholder="It is a long established fact that a reader will be distracted by the readable content..."
+            value={i18nData.summary[currentLanguage]}
+            onChange={(e) => updateI18nField('summary', e.target.value)}
+            placeholder={currentLanguage === 'en' 
+              ? "Brief project description..."
+              : "Mô tả ngắn về dự án..."}
           />
         </div>
       </div>
