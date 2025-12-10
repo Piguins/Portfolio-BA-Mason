@@ -22,10 +22,20 @@ export default function LoadingButton({
   onClick,
   className = '',
 }: LoadingButtonProps) {
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // Prevent default form submission if type is submit and onClick is provided
+    if (type === 'submit' && onClick) {
+      e.preventDefault()
+      onClick()
+    } else if (onClick) {
+      onClick()
+    }
+  }
+
   return (
     <motion.button
       type={type}
-      onClick={onClick}
+      onClick={handleClick}
       disabled={disabled || loading}
       className={`btn-loading btn-${variant} ${className}`}
       whileHover={!disabled && !loading ? { scale: 1.02 } : {}}
