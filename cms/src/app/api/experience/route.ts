@@ -134,6 +134,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Normalize empty strings to null for optional fields
+    const normalizedEndDate = end_date && end_date.trim() !== '' ? end_date : null
+    const normalizedDescription = description && description.trim() !== '' ? description : null
+    const normalizedLocation = location && location.trim() !== '' ? location : null
+
     // Use transaction for atomicity
     const experience = await executeTransaction(async (tx) => {
       // Insert experience and get ID
@@ -144,11 +149,11 @@ export async function POST(request: NextRequest) {
          RETURNING id`,
         company,
         role,
-        location || null,
+        normalizedLocation,
         start_date,
-        end_date || null,
+        normalizedEndDate,
         is_current || false,
-        description || null,
+        normalizedDescription,
         Array.isArray(skills_text) ? skills_text : []
       ) as Array<{ id: string }>
 

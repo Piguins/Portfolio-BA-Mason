@@ -146,6 +146,11 @@ export async function PUT(
       )
     }
 
+    // Normalize empty strings to null for optional fields
+    const normalizedEndDate = end_date && end_date.trim() !== '' ? end_date : null
+    const normalizedDescription = description && description.trim() !== '' ? description : null
+    const normalizedLocation = location && location.trim() !== '' ? location : null
+
     // Use transaction
     const experience = await executeTransaction(async (tx) => {
       // Update experience
@@ -157,11 +162,11 @@ export async function PUT(
          WHERE id = $9::uuid`,
         company,
         role,
-        location || null,
+        normalizedLocation,
         start_date,
-        end_date || null,
+        normalizedEndDate,
         is_current || false,
-        description || null,
+        normalizedDescription,
         Array.isArray(skills_text) ? skills_text : [],
         id
       )
