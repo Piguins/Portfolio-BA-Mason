@@ -147,17 +147,43 @@ export async function PUT(
     }
 
     // Normalize empty strings to null for optional fields
-    const normalizedEndDate = end_date && end_date.trim() !== '' ? end_date : null
-    const normalizedDescription = description && description.trim() !== '' ? description : null
-    const normalizedLocation = location && location.trim() !== '' ? location : null
+    const normalizedEndDate = end_date && typeof end_date === 'string' && end_date.trim() !== '' ? end_date : null
+    const normalizedDescription = description && typeof description === 'string' && description.trim() !== '' ? description : null
+    const normalizedLocation = location && typeof location === 'string' && location.trim() !== '' ? location : null
+
+    // Validate start_date format
+    if (!start_date || typeof start_date !== 'string' || start_date.trim() === '') {
+      return createErrorResponse(
+        new Error('start_date is required and must be a valid date string'),
+        'start_date is required and must be a valid date string',
+        request,
+        400
+      )
+    }
+
+    // Log values for debugging (only in development)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Experience PUT] Values:', {
+        id,
+        company,
+        role,
+        location: normalizedLocation,
+        start_date,
+        end_date: normalizedEndDate,
+        is_current,
+        description: normalizedDescription,
+        bullets_count: bullets.length,
+        skills_text_count: Array.isArray(skills_text) ? skills_text.length : 0,
+      })
+    }
 
     // Use transaction
     const experience = await executeTransaction(async (tx) => {
       // Update experience
       await tx.$executeRawUnsafe(
         `UPDATE public.experience 
-         SET company = $1, role = $2, location = $3, start_date = $4, 
-             end_date = $5, is_current = $6, description = $7,
+         SET company = $1, role = $2, location = $3, start_date = $4::date, 
+             end_date = $5::date, is_current = $6, description = $7,
              skills_text = $8::text[], updated_at = NOW()
          WHERE id = $9::uuid`,
         company,

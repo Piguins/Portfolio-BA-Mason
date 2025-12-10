@@ -135,9 +135,34 @@ export async function POST(request: NextRequest) {
     }
 
     // Normalize empty strings to null for optional fields
-    const normalizedEndDate = end_date && end_date.trim() !== '' ? end_date : null
-    const normalizedDescription = description && description.trim() !== '' ? description : null
-    const normalizedLocation = location && location.trim() !== '' ? location : null
+    const normalizedEndDate = end_date && typeof end_date === 'string' && end_date.trim() !== '' ? end_date : null
+    const normalizedDescription = description && typeof description === 'string' && description.trim() !== '' ? description : null
+    const normalizedLocation = location && typeof location === 'string' && location.trim() !== '' ? location : null
+
+    // Validate start_date format
+    if (!start_date || typeof start_date !== 'string' || start_date.trim() === '') {
+      return createErrorResponse(
+        new Error('start_date is required and must be a valid date string'),
+        'start_date is required and must be a valid date string',
+        request,
+        400
+      )
+    }
+
+    // Log values for debugging (only in development)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[Experience POST] Values:', {
+        company,
+        role,
+        location: normalizedLocation,
+        start_date,
+        end_date: normalizedEndDate,
+        is_current,
+        description: normalizedDescription,
+        bullets_count: bullets.length,
+        skills_text_count: Array.isArray(skills_text) ? skills_text.length : 0,
+      })
+    }
 
     // Use transaction for atomicity
     const experience = await executeTransaction(async (tx) => {
@@ -145,7 +170,7 @@ export async function POST(request: NextRequest) {
       const expResult = await tx.$queryRawUnsafe(
         `INSERT INTO public.experience 
          (company, role, location, start_date, end_date, is_current, description, skills_text)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8::text[])
+         VALUES ($1, $2, $3, $4::date, $5::date, $6, $7, $8::text[])
          RETURNING id`,
         company,
         role,
