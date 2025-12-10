@@ -129,9 +129,16 @@ export default function ProjectForm({ projectId, onSuccess, onCancel }: ProjectF
       const url = isEdit ? `/api/projects/${projectId}` : `/api/projects`
       const method = isEdit ? 'PUT' : 'POST'
 
+      // Construct payload with i18n data
+      const payload = {
+        title: i18nData.title,
+        summary: i18nData.summary,
+        ...formData,
+      }
+
       const response = await fetchWithAuth(url, {
         method,
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
         signal: controller.signal,
       })
 
