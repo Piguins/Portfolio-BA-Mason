@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import LoadingButton from './LoadingButton'
@@ -38,13 +38,9 @@ export default function SpecializationForm({
     icon_url: '',
   })
 
-  useEffect(() => {
-    if (isEdit && specializationId) {
-      fetchSpecialization()
-    }
-  }, [isEdit, specializationId])
-
-  const fetchSpecialization = async () => {
+  const fetchSpecialization = useCallback(async () => {
+    if (!specializationId) return
+    
     try {
       setLoading(true)
       setError(null)
@@ -71,7 +67,13 @@ export default function SpecializationForm({
     } finally {
       setLoading(false)
     }
-  }
+  }, [specializationId])
+
+  useEffect(() => {
+    if (isEdit && specializationId) {
+      fetchSpecialization()
+    }
+  }, [isEdit, specializationId, fetchSpecialization])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

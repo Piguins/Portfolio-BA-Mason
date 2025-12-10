@@ -99,10 +99,16 @@ export async function GET(request: NextRequest) {
       }
       
       // Transform each bullet's text_i18n
-      const transformedBullets = bullets.map((bullet: { id: string; text: string; text_i18n?: unknown }) => ({
-        id: bullet.id,
-        text: getI18nText(bullet.text_i18n || bullet.text, language, bullet.text || '')
-      }))
+      const transformedBullets = bullets.map((bullet: { id: string; text: string; text_i18n?: unknown }) => {
+        // Use text_i18n if available, otherwise fallback to text
+        const i18nValue = bullet.text_i18n && typeof bullet.text_i18n === 'object' && Object.keys(bullet.text_i18n).length > 0
+          ? bullet.text_i18n
+          : bullet.text
+        return {
+          id: bullet.id,
+          text: getI18nText(i18nValue as any, language, bullet.text || '')
+        }
+      })
       
       return {
         ...transformed,

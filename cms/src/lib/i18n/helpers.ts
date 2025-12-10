@@ -58,13 +58,13 @@ export function getI18nText(
 export function textToI18n(
   text: string | null | undefined,
   defaultLanguage: SupportedLanguage = 'en'
-): Record<SupportedLanguage, string> | null {
+): Partial<Record<SupportedLanguage, string>> | null {
   if (!text || text.trim() === '') {
     return null
   }
   return {
     [defaultLanguage]: text.trim(),
-  }
+  } as Partial<Record<SupportedLanguage, string>>
 }
 
 /**

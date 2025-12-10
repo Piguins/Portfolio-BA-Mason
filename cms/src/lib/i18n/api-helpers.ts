@@ -41,7 +41,7 @@ export function transformI18nResponse<T extends Record<string, unknown>>(
   language: SupportedLanguage,
   i18nFields: string[]
 ): T {
-  const transformed = { ...data }
+  const transformed: Record<string, unknown> = { ...data }
 
   for (const field of i18nFields) {
     const i18nField = `${field}_i18n`
@@ -55,7 +55,7 @@ export function transformI18nResponse<T extends Record<string, unknown>>(
     }
   }
 
-  return transformed
+  return transformed as T
 }
 
 /**
