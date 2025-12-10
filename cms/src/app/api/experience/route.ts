@@ -173,32 +173,22 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // Return full experience with bullets
-      const fullExp = await tx.$queryRawUnsafe(
+      // Get the created experience with all fields
+      const fullExpResult = await tx.$queryRawUnsafe(
         `SELECT
-          e.id,
-          e.company,
-          e.role,
-          e.location,
-          e.start_date,
-          e.end_date,
-          e.is_current,
-          e.description,
-          e.created_at,
-          e.updated_at,
-          e.skills_text,
-          COALESCE(
-            json_agg(
-              jsonb_build_object('id', eb.id, 'text', eb.text)
-              ORDER BY eb.id
-            ) FILTER (WHERE eb.id IS NOT NULL),
-            '[]'::json
-          ) AS bullets
-         FROM public.experience e
-         LEFT JOIN public.experience_bullets eb ON eb.experience_id = e.id
-         WHERE e.id = $1::uuid
-         GROUP BY e.id, e.company, e.role, e.location, e.start_date, e.end_date, 
-                  e.is_current, e.description, e.created_at, e.updated_at, e.skills_text`,
+          id,
+          company,
+          role,
+          location,
+          start_date,
+          end_date,
+          is_current,
+          description,
+          created_at,
+          updated_at,
+          skills_text
+         FROM public.experience
+         WHERE id = $1::uuid`,
         expId
       ) as Array<{
         id: string
@@ -212,14 +202,25 @@ export async function POST(request: NextRequest) {
         created_at: Date
         updated_at: Date
         skills_text: string[]
-        bullets: Array<{ id: string; text: string }>
       }>
 
-      if (!fullExp || fullExp.length === 0) {
+      if (!fullExpResult || fullExpResult.length === 0) {
         throw new Error('Failed to retrieve created experience')
       }
 
-      return fullExp[0]
+      const experienceData = fullExpResult[0]
+
+      // Get bullets separately to avoid complex aggregation in transaction
+      const bulletsResult = await tx.$queryRawUnsafe(
+        `SELECT id, text FROM public.experience_bullets WHERE experience_id = $1::uuid ORDER BY id`,
+        expId
+      ) as Array<{ id: string; text: string }>
+
+      // Build response object
+      return {
+        ...experienceData,
+        bullets: bulletsResult || []
+      }
     })
 
     return createSuccessResponse(experience, request, 201)
