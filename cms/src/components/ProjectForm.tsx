@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import LoadingButton from './LoadingButton'
+import LanguageTabs, { SupportedLanguage } from './LanguageTabs'
 import { fetchWithAuth } from '@/lib/fetchWithAuth'
 import { fetchWithTimeout } from '@/lib/fetchWithTimeout'
 import '../app/dashboard/projects/projects.css'
@@ -44,7 +45,8 @@ export default function ProjectForm({ projectId, onSuccess, onCancel }: ProjectF
       setLoading(true)
       setError(null)
 
-      const response = await fetchWithTimeout(`/api/projects/${projectId}`, {
+      // Fetch raw i18n data for CMS editing
+      const response = await fetchWithTimeout(`/api/projects/${projectId}?raw=true`, {
         timeout: 10000,
       })
 
@@ -52,13 +54,32 @@ export default function ProjectForm({ projectId, onSuccess, onCancel }: ProjectF
         throw new Error('Failed to fetch project')
       }
 
-      const data: Project = await response.json()
+      const data: Project & {
+        title_i18n?: Record<string, string> | string
+        summary_i18n?: Record<string, string> | string
+      } = await response.json()
+
+      // Parse i18n data
+      const parseI18n = (i18nValue: unknown, fallback: string): Record<SupportedLanguage, string> => {
+        if (typeof i18nValue === 'object' && i18nValue !== null) {
+          const obj = i18nValue as Record<string, string>
+          return {
+            en: obj.en || fallback,
+            vi: obj.vi || '',
+          }
+        }
+        return { en: fallback, vi: '' }
+      }
+
       setFormData({
-        title: data.title || '',
-        summary: data.summary || '',
         hero_image_url: data.hero_image_url || '',
         case_study_url: data.case_study_url || '',
         tags_text: data.tags_text || [],
+      })
+
+      setI18nData({
+        title: parseI18n(data.title_i18n, data.title || ''),
+        summary: parseI18n(data.summary_i18n, data.summary || ''),
       })
     } catch (err: any) {
       const errorMsg = err.message || 'Failed to load project'

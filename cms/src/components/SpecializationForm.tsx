@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import LoadingButton from './LoadingButton'
+import LanguageTabs, { SupportedLanguage } from './LanguageTabs'
 import { fetchWithAuth } from '@/lib/fetchWithAuth'
 import { fetchWithTimeout } from '@/lib/fetchWithTimeout'
 import '../app/dashboard/specializations/specializations.css'
@@ -45,7 +46,8 @@ export default function SpecializationForm({
       setLoading(true)
       setError(null)
 
-      const response = await fetchWithTimeout(`/api/specializations/${specializationId}`, {
+      // Fetch raw i18n data for CMS editing
+      const response = await fetchWithTimeout(`/api/specializations/${specializationId}?raw=true`, {
         timeout: 10000,
       })
 
@@ -53,12 +55,31 @@ export default function SpecializationForm({
         throw new Error('Failed to fetch specialization')
       }
 
-      const data: Specialization = await response.json()
+      const data: Specialization & {
+        title_i18n?: Record<string, string> | string
+        description_i18n?: Record<string, string> | string
+      } = await response.json()
+
+      // Parse i18n data
+      const parseI18n = (i18nValue: unknown, fallback: string): Record<SupportedLanguage, string> => {
+        if (typeof i18nValue === 'object' && i18nValue !== null) {
+          const obj = i18nValue as Record<string, string>
+          return {
+            en: obj.en || fallback,
+            vi: obj.vi || '',
+          }
+        }
+        return { en: fallback, vi: '' }
+      }
+
       setFormData({
-        number: data.number || '',
-        title: data.title || '',
-        description: data.description || '',
+        number: data.number?.toString() || '',
         icon_url: data.icon_url || '',
+      })
+
+      setI18nData({
+        title: parseI18n(data.title_i18n, data.title || ''),
+        description: parseI18n(data.description_i18n, data.description || ''),
       })
     } catch (err: any) {
       const errorMsg = err.message || 'Failed to load specialization'

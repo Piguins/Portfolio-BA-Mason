@@ -24,6 +24,8 @@ export async function GET(
 ) {
   try {
     const { id } = params
+    const { searchParams } = new URL(request.url)
+    const raw = searchParams.get('raw') === 'true' // For CMS to get raw i18n data
     const language = getLanguageFromRequest(request)
 
     // Validate UUID format
@@ -64,6 +66,11 @@ export async function GET(
         request,
         404
       )
+    }
+
+    // If raw=true, return i18n data as-is for CMS editing
+    if (raw) {
+      return createSuccessResponse(project, request, 200, { revalidate: 60 })
     }
 
     // Transform i18n fields
