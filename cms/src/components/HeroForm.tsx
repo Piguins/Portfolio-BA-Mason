@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
 import LoadingButton from './LoadingButton'
+import LanguageTabs, { SupportedLanguage } from './LanguageTabs'
 import { fetchWithAuth } from '@/lib/fetchWithAuth'
 import '../app/dashboard/experience/experience.css'
 
@@ -26,9 +27,24 @@ interface HeroFormProps {
 }
 
 export default function HeroForm({ onSuccess, onCancel }: HeroFormProps) {
+  const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('en')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  // Store i18n data: {en: "...", vi: "..."}
+  const [i18nData, setI18nData] = useState<{
+    greeting: Record<SupportedLanguage, string>
+    greeting_part2: Record<SupportedLanguage, string>
+    name: Record<SupportedLanguage, string>
+    title: Record<SupportedLanguage, string>
+    description: Record<SupportedLanguage, string> | null
+  }>({
+    greeting: { en: '', vi: '' },
+    greeting_part2: { en: '', vi: '' },
+    name: { en: '', vi: '' },
+    title: { en: '', vi: '' },
+    description: null,
+  })
   const [formData, setFormData] = useState<HeroData>({
     id: 1,
     greeting: '',
@@ -78,17 +94,31 @@ export default function HeroForm({ onSuccess, onCancel }: HeroFormProps) {
     fetchHero()
   }, [])
 
+  // Update i18n data when form fields change
+  const updateI18nField = (field: keyof typeof i18nData, value: string) => {
+    setI18nData(prev => {
+      const newData = { ...prev }
+      if (field === 'description') {
+        newData.description = newData.description || { en: '', vi: '' }
+        newData.description[currentLanguage] = value
+      } else {
+        newData[field] = { ...newData[field], [currentLanguage]: value }
+      }
+      return newData
+    })
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
     setError(null)
 
     const payload = {
-      greeting: formData.greeting,
-      greeting_part2: formData.greeting_part2,
-      name: formData.name,
-      title: formData.title,
-      description: formData.description || null,
+      greeting: i18nData.greeting,
+      greeting_part2: i18nData.greeting_part2,
+      name: i18nData.name,
+      title: i18nData.title,
+      description: i18nData.description || null,
       linkedin_url: formData.linkedin_url || null,
       github_url: formData.github_url || null,
       email_url: formData.email_url || null,
@@ -149,15 +179,21 @@ export default function HeroForm({ onSuccess, onCancel }: HeroFormProps) {
 
       <div className="form-section">
         <h3 className="section-title">Thông tin cơ bản</h3>
+        
+        <LanguageTabs
+          activeLanguage={currentLanguage}
+          onLanguageChange={setCurrentLanguage}
+        />
+
         <div className="form-group">
           <label htmlFor="greeting">Greeting *</label>
           <input
             id="greeting"
             type="text"
             required
-            value={formData.greeting}
-            onChange={(e) => setFormData({ ...formData, greeting: e.target.value })}
-            placeholder="Hey!"
+            value={i18nData.greeting[currentLanguage]}
+            onChange={(e) => updateI18nField('greeting', e.target.value)}
+            placeholder={currentLanguage === 'en' ? "Hey!" : "Xin chào!"}
           />
         </div>
 
@@ -167,9 +203,9 @@ export default function HeroForm({ onSuccess, onCancel }: HeroFormProps) {
             id="greeting_part2"
             type="text"
             required
-            value={formData.greeting_part2}
-            onChange={(e) => setFormData({ ...formData, greeting_part2: e.target.value })}
-            placeholder="I'm"
+            value={i18nData.greeting_part2[currentLanguage]}
+            onChange={(e) => updateI18nField('greeting_part2', e.target.value)}
+            placeholder={currentLanguage === 'en' ? "I'm" : "Tôi là"}
           />
         </div>
 
@@ -179,8 +215,8 @@ export default function HeroForm({ onSuccess, onCancel }: HeroFormProps) {
             id="name"
             type="text"
             required
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            value={i18nData.name[currentLanguage]}
+            onChange={(e) => updateI18nField('name', e.target.value)}
             placeholder="Thế Kiệt (Mason)"
           />
         </div>
@@ -191,9 +227,9 @@ export default function HeroForm({ onSuccess, onCancel }: HeroFormProps) {
             id="title"
             type="text"
             required
-            value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-            placeholder="Business Analyst"
+            value={i18nData.title[currentLanguage]}
+            onChange={(e) => updateI18nField('title', e.target.value)}
+            placeholder={currentLanguage === 'en' ? "Business Analyst" : "Phân tích nghiệp vụ"}
           />
         </div>
 
@@ -202,9 +238,15 @@ export default function HeroForm({ onSuccess, onCancel }: HeroFormProps) {
           <textarea
             id="description"
             rows={3}
-            value={formData.description || ''}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value || null })}
-            placeholder="Agency-quality business analysis with the personal touch of a freelancer."
+            value={i18nData.description?.[currentLanguage] || ''}
+            onChange={(e) => {
+              const newDesc = i18nData.description || { en: '', vi: '' }
+              newDesc[currentLanguage] = e.target.value
+              setI18nData(prev => ({ ...prev, description: newDesc }))
+            }}
+            placeholder={currentLanguage === 'en' 
+              ? "Agency-quality business analysis with the personal touch of a freelancer."
+              : "Phân tích nghiệp vụ chất lượng với sự chăm sóc tận tâm của một freelancer."}
           />
         </div>
       </div>

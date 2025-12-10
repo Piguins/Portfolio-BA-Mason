@@ -1,0 +1,31 @@
+.language-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid var(--border-color, #e5e7eb);
+  padding-bottom: 8px;
+}
+
+.language-tab {
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary, #6b7280);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -10px;
+  transition: all 0.2s ease;
+}
+
+.language-tab:hover {
+  color: var(--primary-blue, #3b82f6);
+}
+
+.language-tab.active {
+  color: var(--primary-blue, #3b82f6);
+  border-bottom-color: var(--primary-blue, #3b82f6);
+  font-weight: 600;
+}
+
